@@ -4,7 +4,7 @@
 
 // Define your hardware parameters here.
 const int ENCODER_STEPS_INT = 600; // 600 step spindle optical rotary encoder. Fractional values not supported.
-const int ENCODER_BACKLASH = 3; // Numer of impulses encoder can issue without movement of the spindle
+const int ENCODER_BACKLASH = 3;    // Numer of impulses encoder can issue without movement of the spindle
 
 // Spindle rotary encoder pins. Swap values if the rotation direction is wrong.
 #define ENC_A 7
@@ -12,66 +12,66 @@ const int ENCODER_BACKLASH = 3; // Numer of impulses encoder can issue without m
 
 // Main lead screw (Z) parameters.
 const long SCREW_Z_DU = 20000; // 2mm lead screw in deci-microns (10^-7 of a meter)
-const long MOTOR_STEPS_Z = 800;
-const long SPEED_START_Z = 2 * MOTOR_STEPS_Z; // Initial speed of a motor, steps / second.
-const long ACCELERATION_Z = 30 * MOTOR_STEPS_Z; // Acceleration of a motor, steps / second ^ 2.
+const long MOTOR_STEPS_Z = 200;
+const long SPEED_START_Z = 2 * MOTOR_STEPS_Z;       // Initial speed of a motor, steps / second.
+const long ACCELERATION_Z = 30 * MOTOR_STEPS_Z;     // Acceleration of a motor, steps / second ^ 2.
 const long SPEED_MANUAL_MOVE_Z = 6 * MOTOR_STEPS_Z; // Maximum speed of a motor during manual move, steps / second.
-const bool INVERT_Z = false; // change (true/false) if the carriage moves e.g. "left" when you press "right".
-const bool NEEDS_REST_Z = false; // Set to false for closed-loop drivers, true for open-loop.
-const long MAX_TRAVEL_MM_Z = 300; // Lathe bed doesn't allow to travel more than this in one go, 30cm / ~1 foot
-const long BACKLASH_DU_Z = 6500; // 0.65mm backlash in deci-microns (10^-7 of a meter)
-const char NAME_Z = 'Z'; // Text shown on screen before axis position value, GCode axis name
+const bool INVERT_Z = true;                         // change (true/false) if the carriage moves e.g. "left" when you press "right".
+const bool NEEDS_REST_Z = false;                    // Set to false for closed-loop drivers, true for open-loop.
+const long MAX_TRAVEL_MM_Z = 300;                   // Lathe bed doesn't allow to travel more than this in one go, 30cm / ~1 foot
+const long BACKLASH_DU_Z = 200;                     // 0.02mm backlash in deci-microns (10^-7 of a meter)
+const char NAME_Z = 'Z';                            // Text shown on screen before axis position value, GCode axis name
 
 // Cross-slide lead screw (X) parameters.
-const long SCREW_X_DU = 12500; // 1.25mm lead screw with 3x reduction in deci-microns (10^-7) of a meter
-const long MOTOR_STEPS_X = 2400; // 800 steps at 3x reduction
-const long SPEED_START_X = MOTOR_STEPS_X; // Initial speed of a motor, steps / second.
-const long ACCELERATION_X = 10 * MOTOR_STEPS_X; // Acceleration of a motor, steps / second ^ 2.
+const long SCREW_X_DU = 10000;                      // 1.0mm lead screw with 3x reduction in deci-microns (10^-7) of a meter
+const long MOTOR_STEPS_X = 600;                     // 200 steps at 3x reduction
+const long SPEED_START_X = MOTOR_STEPS_X;           // Initial speed of a motor, steps / second.
+const long ACCELERATION_X = 10 * MOTOR_STEPS_X;     // Acceleration of a motor, steps / second ^ 2.
 const long SPEED_MANUAL_MOVE_X = 3 * MOTOR_STEPS_X; // Maximum speed of a motor during manual move, steps / second.
-const bool INVERT_X = true; // change (true/false) if the carriage moves e.g. "left" when you press "right".
-const bool NEEDS_REST_X = false; // Set to false for all kinds of drivers or X will be unlocked when not moving.
-const long MAX_TRAVEL_MM_X = 100; // Cross slide doesn't allow to travel more than this in one go, 10cm
-const long BACKLASH_DU_X = 1500; // 0.15mm backlash in deci-microns (10^-7 of a meter)
-const char NAME_X = 'X'; // Text shown on screen before axis position value, GCode axis name
+const bool INVERT_X = false;                        // change (true/false) if the carriage moves e.g. "left" when you press "right".
+const bool NEEDS_REST_X = false;                    // Set to false for all kinds of drivers or X will be unlocked when not moving.
+const long MAX_TRAVEL_MM_X = 100;                   // Cross slide doesn't allow to travel more than this in one go, 10cm
+const long BACKLASH_DU_X = 1500;                    // 0.15mm backlash in deci-microns (10^-7 of a meter)
+const char NAME_X = 'X';                            // Text shown on screen before axis position value, GCode axis name
 
 // Manual stepping with left/right/up/down buttons. Only used when step isn't default continuous (1mm or 0.1").
-const long STEP_TIME_MS = 500; // Time in milliseconds it should take to make 1 manual step.
+const long STEP_TIME_MS = 500;          // Time in milliseconds it should take to make 1 manual step.
 const long DELAY_BETWEEN_STEPS_MS = 80; // Time in milliseconds to wait between steps.
 
 /* Changing anything below shouldn't be needed for basic use. */
 
 // Configuration for axis connected to A1. This is uncommon. Dividing head (C) motor parameters.
 // Throughout the configuration below we assume 1mm = 1degree of rotation, so 1du = 0.0001degree.
-const bool ACTIVE_A1 = false; // Whether the axis is connected
-const bool ROTARY_A1 = true; // Whether the axis is rotary or linear
-const long MOTOR_STEPS_A1 = 300; // Number of motor steps for 1 rotation of the the worm gear screw (full step with 20:30 reduction)
-const long SCREW_A1_DU = 20000; // Degrees multiplied by 10000 that the spindle travels per 1 turn of the worm gear. 2 degrees.
-const long SPEED_START_A1 = 1600; // Initial speed of a motor, steps / second.
-const long ACCELERATION_A1 = 16000; // Acceleration of a motor, steps / second ^ 2.
+const bool ACTIVE_A1 = false;           // Whether the axis is connected
+const bool ROTARY_A1 = true;            // Whether the axis is rotary or linear
+const long MOTOR_STEPS_A1 = 300;        // Number of motor steps for 1 rotation of the the worm gear screw (full step with 20:30 reduction)
+const long SCREW_A1_DU = 20000;         // Degrees multiplied by 10000 that the spindle travels per 1 turn of the worm gear. 2 degrees.
+const long SPEED_START_A1 = 1600;       // Initial speed of a motor, steps / second.
+const long ACCELERATION_A1 = 16000;     // Acceleration of a motor, steps / second ^ 2.
 const long SPEED_MANUAL_MOVE_A1 = 3200; // Maximum speed of a motor during manual move, steps / second.
-const bool INVERT_A1 = false; // change (true/false) if the carriage moves e.g. "left" when you press "right".
-const bool NEEDS_REST_A1 = false; // Set to false for closed-loop drivers. Open-loop: true if you need holding torque, false otherwise.
-const long MAX_TRAVEL_MM_A1 = 360; // Probably doesn't make sense to ask the dividin head to travel multiple turns.
-const long BACKLASH_DU_A1 = 0; // Assuming no backlash on the worm gear
-const char NAME_A1 = 'C'; // Text shown on screen before axis position value, GCode axis name
+const bool INVERT_A1 = false;           // change (true/false) if the carriage moves e.g. "left" when you press "right".
+const bool NEEDS_REST_A1 = false;       // Set to false for closed-loop drivers. Open-loop: true if you need holding torque, false otherwise.
+const long MAX_TRAVEL_MM_A1 = 360;      // Probably doesn't make sense to ask the dividin head to travel multiple turns.
+const long BACKLASH_DU_A1 = 0;          // Assuming no backlash on the worm gear
+const char NAME_A1 = 'C';               // Text shown on screen before axis position value, GCode axis name
 
 // Manual handwheels on A1 and A2. Ignore if you don't have them installed.
-const bool PULSE_1_USE = false; // Whether there's a pulse generator connected on A11-A13 to be used for movement.
-const char PULSE_1_AXIS = NAME_Z; // Set to NAME_X to make A11-A13 pulse generator control X instead.
-const bool PULSE_1_INVERT = false; // Set to true to change the direction in which encoder moves the axis
-const bool PULSE_2_USE = false; // Whether there's a pulse generator connected on A21-A23 to be used for movement.
-const char PULSE_2_AXIS = NAME_X; // Set to NAME_Z to make A21-A23 pulse generator control Z instead.
-const bool PULSE_2_INVERT = true; // Set to false to change the direction in which encoder moves the axis
+const bool PULSE_1_USE = false;         // Whether there's a pulse generator connected on A11-A13 to be used for movement.
+const char PULSE_1_AXIS = NAME_Z;       // Set to NAME_X to make A11-A13 pulse generator control X instead.
+const bool PULSE_1_INVERT = false;      // Set to true to change the direction in which encoder moves the axis
+const bool PULSE_2_USE = false;         // Whether there's a pulse generator connected on A21-A23 to be used for movement.
+const char PULSE_2_AXIS = NAME_X;       // Set to NAME_Z to make A21-A23 pulse generator control Z instead.
+const bool PULSE_2_INVERT = true;       // Set to false to change the direction in which encoder moves the axis
 const float PULSE_PER_REVOLUTION = 100; // PPR of handwheels used on A1 and/or A2.
-const long PULSE_MIN_WIDTH_US = 1000; // Microseconds width of the pulse that is required for it to be registered. Prevents noise.
-const long PULSE_HALF_BACKLASH = 2; // Prevents spurious reverses when moving using a handwheel. Raise to 3 or 4 if they still happen.
+const long PULSE_MIN_WIDTH_US = 1000;   // Microseconds width of the pulse that is required for it to be registered. Prevents noise.
+const long PULSE_HALF_BACKLASH = 2;     // Prevents spurious reverses when moving using a handwheel. Raise to 3 or 4 if they still happen.
 
-const long DUPR_MAX = 254000; // No more than 1 inch pitch
-const int STARTS_MAX = 124; // No more than 124-start thread
-const long PASSES_MAX = 999; // No more turn or face passes than this
-const long SAFE_DISTANCE_DU = 5000; // Step back 0.5mm from the material when moving between cuts in automated modes
-const long SAVE_DELAY_US = 5000000; // Wait 5s after last save and last change of saveable data before saving again
-const long DIRECTION_SETUP_DELAY_US = 5; // Stepper driver needs some time to adjust to direction change
+const long DUPR_MAX = 254000;             // No more than 1 inch pitch
+const int STARTS_MAX = 124;               // No more than 124-start thread
+const long PASSES_MAX = 999;              // No more turn or face passes than this
+const long SAFE_DISTANCE_DU = 5000;       // Step back 0.5mm from the material when moving between cuts in automated modes
+const long SAVE_DELAY_US = 5000000;       // Wait 5s after last save and last change of saveable data before saving again
+const long DIRECTION_SETUP_DELAY_US = 5;  // Stepper driver needs some time to adjust to direction change
 const long STEPPED_ENABLE_DELAY_MS = 100; // Delay after stepper is enabled and before issuing steps
 
 // Version of the pref storage format, should be changed when non-backward-compatible
@@ -187,12 +187,12 @@ const long GCODE_WAIT_EPSILON_STEPS = 10;
 #define PREF_AUX_FORWARD "af"
 
 #define MOVE_STEP_1 10000 // 1mm
-#define MOVE_STEP_2 1000 // 0.1mm
-#define MOVE_STEP_3 100 // 0.01mm
+#define MOVE_STEP_2 1000  // 0.1mm
+#define MOVE_STEP_3 100   // 0.01mm
 
 #define MOVE_STEP_IMP_1 25400 // 1/10"
-#define MOVE_STEP_IMP_2 2540 // 1/100"
-#define MOVE_STEP_IMP_3 254 // 1/1000" also known as 1 thou
+#define MOVE_STEP_IMP_2 2540  // 1/100"
+#define MOVE_STEP_IMP_3 254   // 1/1000" also known as 1 thou
 
 #define MODE_NORMAL 0
 #define MODE_ASYNC 2
@@ -221,11 +221,11 @@ const long GCODE_WAIT_EPSILON_STEPS = 10;
 const float TPI_ROUND_EPSILON = 0.03;
 
 const float ENCODER_STEPS_FLOAT = ENCODER_STEPS_INT; // Convenience float version of ENCODER_STEPS_INT
-const long RPM_BULK = ENCODER_STEPS_INT; // Measure RPM averaged over this number of encoder pulses
-const long RPM_UPDATE_INTERVAL_MICROS = 1000000; // Don't redraw RPM more often than once per second
+const long RPM_BULK = ENCODER_STEPS_INT;             // Measure RPM averaged over this number of encoder pulses
+const long RPM_UPDATE_INTERVAL_MICROS = 1000000;     // Don't redraw RPM more often than once per second
 
 const long GCODE_FEED_DEFAULT_DU_SEC = 20000; // Default feed in du/sec in GCode mode
-const float GCODE_FEED_MIN_DU_SEC = 167; // Minimum feed in du/sec in GCode mode - F1
+const float GCODE_FEED_MIN_DU_SEC = 167;      // Minimum feed in du/sec in GCode mode - F1
 
 #define DREAD(x) digitalRead(x)
 #define DHIGH(x) digitalWrite(x, HIGH)
@@ -266,26 +266,27 @@ int numpadDigits[20];
 int numpadIndex = 0;
 
 bool isOn = false;
-bool nextIsOn; // isOn value that should be applied asap
+bool nextIsOn;     // isOn value that should be applied asap
 bool nextIsOnFlag; // whether nextIsOn requires attention
 unsigned long resetMillis = 0;
 int emergencyStop = 0;
 
 bool beepFlag = false; // allows time-critical code to ask for a beep on another core
 
-long dupr = 0; // pitch, tenth of a micron per rotation
-long savedDupr = 0; // dupr saved in Preferences
-long nextDupr = dupr; // dupr value that should be applied asap
+long dupr = 0;             // pitch, tenth of a micron per rotation
+long savedDupr = 0;        // dupr saved in Preferences
+long nextDupr = dupr;      // dupr value that should be applied asap
 bool nextDuprFlag = false; // whether nextDupr requires attention
 
 SemaphoreHandle_t motionMutex; // controls blocks of code where variables affecting the motion loop() are changed
 
-int starts = 1; // number of starts in a multi-start thread
-int savedStarts = 0; // starts saved in Preferences
-int nextStarts = starts; // number of starts that should be used asap
+int starts = 1;              // number of starts in a multi-start thread
+int savedStarts = 0;         // starts saved in Preferences
+int nextStarts = starts;     // number of starts that should be used asap
 bool nextStartsFlag = false; // whether nextStarts requires attention
 
-struct Axis {
+struct Axis
+{
   SemaphoreHandle_t mutex;
 
   char name;
@@ -294,33 +295,33 @@ struct Axis {
   float motorSteps; // motor steps per revolution of the axis
   float screwPitch; // lead screw pitch in deci-microns (10^-7 of a meter)
 
-  long pos; // relative position of the tool in stepper motor steps
-  long savedPos; // value saved in Preferences
+  long pos;            // relative position of the tool in stepper motor steps
+  long savedPos;       // value saved in Preferences
   float fractionalPos; // fractional distance in steps that we meant to travel but couldn't
-  long originPos; // relative position of the stepper motor to origin, in steps
+  long originPos;      // relative position of the stepper motor to origin, in steps
   long savedOriginPos; // originPos saved in Preferences
-  long posGlobal; // global position of the motor in steps
+  long posGlobal;      // global position of the motor in steps
   long savedPosGlobal; // posGlobal saved in Preferences
-  int pendingPos; // steps of the stepper motor that we should make as soon as possible
-  long motorPos; // position of the motor in stepper motor steps, same as pos unless moving back, then differs by backlashSteps
-  long savedMotorPos; // motorPos saved in Preferences
-  bool continuous; // whether current movement is expected to continue until an unknown position
+  int pendingPos;      // steps of the stepper motor that we should make as soon as possible
+  long motorPos;       // position of the motor in stepper motor steps, same as pos unless moving back, then differs by backlashSteps
+  long savedMotorPos;  // motorPos saved in Preferences
+  bool continuous;     // whether current movement is expected to continue until an unknown position
 
-  long leftStop; // left stop value of pos
-  long savedLeftStop; // value saved in Preferences
-  long nextLeftStop; // left stop value that should be applied asap
+  long leftStop;         // left stop value of pos
+  long savedLeftStop;    // value saved in Preferences
+  long nextLeftStop;     // left stop value that should be applied asap
   bool nextLeftStopFlag; // whether nextLeftStop required attention
 
-  long rightStop; // right stop value of pos
-  long savedRightStop; // value saved in Preferences
-  long nextRightStop; // right stop value that should be applied asap
+  long rightStop;         // right stop value of pos
+  long savedRightStop;    // value saved in Preferences
+  long nextRightStop;     // right stop value that should be applied asap
   bool nextRightStopFlag; // whether nextRightStop requires attention
 
-  long speed; // motor speed in steps / second
-  long speedStart; // Initial speed of a motor, steps / second.
-  long speedMax; // To limit max speed e.g. for manual moves
+  long speed;           // motor speed in steps / second
+  long speedStart;      // Initial speed of a motor, steps / second.
+  long speedMax;        // To limit max speed e.g. for manual moves
   long speedManualMove; // Maximum speed of a motor during manual move, steps / second.
-  long acceleration; // Acceleration of a motor, steps / second ^ 2.
+  long acceleration;    // Acceleration of a motor, steps / second ^ 2.
   long decelerateSteps; // Number of steps before the end position the deceleration should start.
 
   bool direction; // To reset speed when direction changes.
@@ -330,20 +331,21 @@ struct Axis {
   bool disabled;
   bool savedDisabled;
 
-  bool invertStepper; // change (true/false) if the carriage moves e.g. "left" when you press "right".
-  bool needsRest; // set to false for closed-loop drivers, true for open-loop.
-  bool movingManually; // whether stepper is being moved by left/right buttons
-  long estopSteps; // amount of steps to exceed machine limits
-  long backlashSteps; // amount of steps in reverse direction to re-engage the carriage
+  bool invertStepper;    // change (true/false) if the carriage moves e.g. "left" when you press "right".
+  bool needsRest;        // set to false for closed-loop drivers, true for open-loop.
+  bool movingManually;   // whether stepper is being moved by left/right buttons
+  long estopSteps;       // amount of steps to exceed machine limits
+  long backlashSteps;    // amount of steps in reverse direction to re-engage the carriage
   long gcodeRelativePos; // absolute position in steps that relative GCode refers to
 
-  int ena; // Enable pin of this motor
-  int dir; // Direction pin of this motor
+  int ena;  // Enable pin of this motor
+  int dir;  // Direction pin of this motor
   int step; // Step pin of this motor
 };
 
-void initAxis(Axis* a, char name, bool active, bool rotational, float motorSteps, float screwPitch, long speedStart, long speedManualMove,
-    long acceleration, bool invertStepper, bool needsRest, long maxTravelMm, long backlashDu, int ena, int dir, int step) {
+void initAxis(Axis *a, char name, bool active, bool rotational, float motorSteps, float screwPitch, long speedStart, long speedManualMove,
+              long acceleration, bool invertStepper, bool needsRest, long maxTravelMm, long backlashDu, int ena, int dir, int step)
+{
   a->mutex = xSemaphoreCreateMutex();
 
   a->name = name;
@@ -379,7 +381,8 @@ void initAxis(Axis* a, char name, bool active, bool rotational, float motorSteps
   a->acceleration = acceleration;
   a->decelerateSteps = 0;
   long s = speedManualMove;
-  while (s > speedStart) {
+  while (s > speedStart)
+  {
     a->decelerateSteps++;
     s -= a->acceleration / float(s);
   }
@@ -407,137 +410,130 @@ Axis z;
 Axis x;
 Axis a1;
 
-unsigned long saveTime = 0; // micros() of the previous Prefs write
-unsigned long spindleEncTime = 0; // micros() of the previous spindle update
+unsigned long saveTime = 0;               // micros() of the previous Prefs write
+unsigned long spindleEncTime = 0;         // micros() of the previous spindle update
 unsigned long spindleEncTimeDiffBulk = 0; // micros() between RPM_BULK spindle updates
 unsigned long spindleEncTimeAtIndex0 = 0; // micros() when spindleEncTimeIndex was 0
-int spindleEncTimeIndex = 0; // counter going between 0 and RPM_BULK - 1
-long spindlePos = 0; // Spindle position
-long spindlePosAvg = 0; // Spindle position accounting for encoder backlash
-long savedSpindlePosAvg = 0; // spindlePosAvg saved in Preferences
-long savedSpindlePos = 0; // spindlePos value saved in Preferences
-volatile long spindlePosDelta = 0; // Unprocessed encoder ticks.
-int spindlePosSync = 0; // Non-zero if gearbox is on and a soft limit was removed while axis was on it
-int savedSpindlePosSync = 0; // spindlePosSync saved in Preferences
-long spindlePosGlobal = 0; // global spindle position that is unaffected by e.g. zeroing
-long savedSpindlePosGlobal = 0; // spindlePosGlobal saved in Preferences
+int spindleEncTimeIndex = 0;              // counter going between 0 and RPM_BULK - 1
+long spindlePos = 0;                      // Spindle position
+long spindlePosAvg = 0;                   // Spindle position accounting for encoder backlash
+long savedSpindlePosAvg = 0;              // spindlePosAvg saved in Preferences
+long savedSpindlePos = 0;                 // spindlePos value saved in Preferences
+volatile long spindlePosDelta = 0;        // Unprocessed encoder ticks.
+int spindlePosSync = 0;                   // Non-zero if gearbox is on and a soft limit was removed while axis was on it
+int savedSpindlePosSync = 0;              // spindlePosSync saved in Preferences
+long spindlePosGlobal = 0;                // global spindle position that is unaffected by e.g. zeroing
+long savedSpindlePosGlobal = 0;           // spindlePosGlobal saved in Preferences
 
 volatile int pulse1Delta = 0; // Outstanding pulses generated by pulse generator on terminal A1.
 volatile int pulse2Delta = 0; // Outstanding pulses generated by pulse generator on terminal A2.
 
-bool showAngle = false; // Whether to show 0-359 spindle angle on screen
-bool showTacho = false; // Whether to show spindle RPM on screen
+bool showAngle = false;      // Whether to show 0-359 spindle angle on screen
+bool showTacho = false;      // Whether to show spindle RPM on screen
 bool savedShowAngle = false; // showAngle value saved in Preferences
 bool savedShowTacho = false; // showTacho value saved in Preferences
 int shownRpm = 0;
 unsigned long shownRpmTime = 0; // micros() when shownRpm was set
 
-long moveStep = 0; // thousandth of a mm
+long moveStep = 0;      // thousandth of a mm
 long savedMoveStep = 0; // moveStep saved in Preferences
 
-volatile int mode = -1; // mode of operation (ELS, multi-start ELS, asynchronous)
-int nextMode = 0; // mode value that should be applied asap
+volatile int mode = -1;    // mode of operation (ELS, multi-start ELS, asynchronous)
+int nextMode = 0;          // mode value that should be applied asap
 bool nextModeFlag = false; // whether nextMode needs attention
-int savedMode = -1; // mode saved in Preferences
+int savedMode = -1;        // mode saved in Preferences
 
-int measure = MEASURE_METRIC; // Whether to show distances in inches
+int measure = MEASURE_METRIC;      // Whether to show distances in inches
 int savedMeasure = MEASURE_METRIC; // measure value saved in Preferences
 
-float coneRatio = 1; // In cone mode, how much X moves for 1 step of Z
-float savedConeRatio = 0; // value of coneRatio saved in Preferences
-float nextConeRatio = 0; // coneRatio that should be applied asap
+float coneRatio = 1;            // In cone mode, how much X moves for 1 step of Z
+float savedConeRatio = 0;       // value of coneRatio saved in Preferences
+float nextConeRatio = 0;        // coneRatio that should be applied asap
 bool nextConeRatioFlag = false; // whether nextConeRatio requires attention
 
-int turnPasses = 3; // In turn mode, how many turn passes to make
+int turnPasses = 3;      // In turn mode, how many turn passes to make
 int savedTurnPasses = 0; // value of turnPasses saved in Preferences
 
-long setupIndex = 0; // Index of automation setup step
-bool auxForward = true; // True for external, false for external thread
+long setupIndex = 0;          // Index of automation setup step
+bool auxForward = true;       // True for external, false for external thread
 bool savedAuxForward = false; // value of auxForward saved in Preferences
 
-long opIndex = 0; // Index of an automation operation
+long opIndex = 0;                // Index of an automation operation
 bool opIndexAdvanceFlag = false; // Whether user requested to move to the next pass
-long opSubIndex = 0; // Sub-index of an automation operation
-int opDuprSign = 1; // 1 if dupr was positive when operation started, -1 if negative
-long opDupr = 0; // dupr that the multi-pass operation started with
+long opSubIndex = 0;             // Sub-index of an automation operation
+int opDuprSign = 1;              // 1 if dupr was positive when operation started, -1 if negative
+long opDupr = 0;                 // dupr that the multi-pass operation started with
 
 const int customCharMmCode = 0;
 byte customCharMm[] = {
-  B11010,
-  B10101,
-  B10101,
-  B00000,
-  B11010,
-  B10101,
-  B10101,
-  B00000
-};
+    B11010,
+    B10101,
+    B10101,
+    B00000,
+    B11010,
+    B10101,
+    B10101,
+    B00000};
 const int customCharLimUpCode = 1;
 byte customCharLimUp[] = {
-  B11111,
-  B00100,
-  B01110,
-  B10101,
-  B00100,
-  B00100,
-  B00000,
-  B00000
-};
+    B11111,
+    B00100,
+    B01110,
+    B10101,
+    B00100,
+    B00100,
+    B00000,
+    B00000};
 const int customCharLimDownCode = 2;
 byte customCharLimDown[] = {
-  B00000,
-  B00100,
-  B00100,
-  B10101,
-  B01110,
-  B00100,
-  B11111,
-  B00000
-};
+    B00000,
+    B00100,
+    B00100,
+    B10101,
+    B01110,
+    B00100,
+    B11111,
+    B00000};
 const int customCharLimLeftCode = 3;
 byte customCharLimLeft[] = {
-  B10000,
-  B10010,
-  B10100,
-  B11111,
-  B10100,
-  B10010,
-  B10000,
-  B00000
-};
+    B10000,
+    B10010,
+    B10100,
+    B11111,
+    B10100,
+    B10010,
+    B10000,
+    B00000};
 const int customCharLimRightCode = 4;
 byte customCharLimRight[] = {
-  B00001,
-  B01001,
-  B00101,
-  B11111,
-  B00101,
-  B01001,
-  B00001,
-  B00000
-};
+    B00001,
+    B01001,
+    B00101,
+    B11111,
+    B00101,
+    B01001,
+    B00001,
+    B00000};
 const int customCharLimUpDownCode = 5;
 byte customCharLimUpDown[] = {
-  B11111,
-  B00100,
-  B01110,
-  B00000,
-  B01110,
-  B00100,
-  B11111,
-  B00000
-};
+    B11111,
+    B00100,
+    B01110,
+    B00000,
+    B01110,
+    B00100,
+    B11111,
+    B00000};
 const int customCharLimLeftRightCode = 6;
 byte customCharLimLeftRight[] = {
-  B00000,
-  B10001,
-  B10001,
-  B11111,
-  B10001,
-  B10001,
-  B00000,
-  B00000
-};
+    B00000,
+    B10001,
+    B10001,
+    B11111,
+    B10001,
+    B10001,
+    B00000,
+    B00000};
 
 String gcodeCommand = "";
 long gcodeFeedDuPerSec = GCODE_FEED_DEFAULT_DU_SEC;
@@ -549,20 +545,25 @@ bool gcodeInSemicolon = false;
 hw_timer_t *async_timer = timerBegin(0, 80, true);
 bool timerAttached = false;
 
-int getApproxRpm() {
+int getApproxRpm()
+{
   unsigned long t = micros();
-  if (t > spindleEncTime + 100000) {
+  if (t > spindleEncTime + 100000)
+  {
     // RPM less than 10.
     return 0;
   }
-  if (t < shownRpmTime + RPM_UPDATE_INTERVAL_MICROS) {
+  if (t < shownRpmTime + RPM_UPDATE_INTERVAL_MICROS)
+  {
     // Don't update RPM too often to avoid flickering.
     return shownRpm;
   }
   int rpm = 0;
-  if (spindleEncTimeDiffBulk > 0) {
+  if (spindleEncTimeDiffBulk > 0)
+  {
     rpm = 60000000 / spindleEncTimeDiffBulk;
-    if (abs(rpm - shownRpm) < (rpm < 1000 ? 2 : 5)) {
+    if (abs(rpm - shownRpm) < (rpm < 1000 ? 2 : 5))
+    {
       // Don't update RPM with insignificant differences.
       rpm = shownRpm;
     }
@@ -570,27 +571,39 @@ int getApproxRpm() {
   return rpm;
 }
 
-bool stepperIsRunning(Axis* a) {
+bool stepperIsRunning(Axis *a)
+{
   return micros() - a->stepStartUs < 50000;
 }
 
 // Returns number of letters printed.
-int printDeciMicrons(long deciMicrons, int precisionPointsMax) {
-  if (deciMicrons == 0) {
+int printDeciMicrons(long deciMicrons, int precisionPointsMax)
+{
+  if (deciMicrons == 0)
+  {
     return lcd.print("0");
   }
   bool imperial = measure != MEASURE_METRIC;
   long v = imperial ? round(deciMicrons / 25.4) : deciMicrons;
   int points = 0;
-  if (v == 0 && precisionPointsMax >= 5) {
+  if (v == 0 && precisionPointsMax >= 5)
+  {
     points = 5;
-  } else if ((v % 10) != 0 && precisionPointsMax >= 4) {
+  }
+  else if ((v % 10) != 0 && precisionPointsMax >= 4)
+  {
     points = 4;
-  } else if ((v % 100) != 0 && precisionPointsMax >= 3) {
+  }
+  else if ((v % 100) != 0 && precisionPointsMax >= 3)
+  {
     points = 3;
-  } else if ((v % 1000) != 0 && precisionPointsMax >= 2) {
+  }
+  else if ((v % 1000) != 0 && precisionPointsMax >= 2)
+  {
     points = 2;
-  } else if ((v % 10000) != 0 && precisionPointsMax >= 1) {
+  }
+  else if ((v % 10000) != 0 && precisionPointsMax >= 1)
+  {
     points = 1;
   }
   int count = lcd.print(deciMicrons / (imperial ? 254000.0 : 10000.0), points);
@@ -598,13 +611,19 @@ int printDeciMicrons(long deciMicrons, int precisionPointsMax) {
   return count;
 }
 
-int printDegrees(long degrees10000) {
+int printDegrees(long degrees10000)
+{
   int points = 0;
-  if ((degrees10000 % 100) != 0) {
+  if ((degrees10000 % 100) != 0)
+  {
     points = 3;
-  } else if ((degrees10000 % 1000) != 0) {
+  }
+  else if ((degrees10000 % 1000) != 0)
+  {
     points = 2;
-  } else if ((degrees10000 % 10000) != 0) {
+  }
+  else if ((degrees10000 % 10000) != 0)
+  {
     points = 1;
   }
   int count = lcd.print(degrees10000 / 10000.0, points);
@@ -612,20 +631,30 @@ int printDegrees(long degrees10000) {
   return count;
 }
 
-int printDupr(long value) {
+int printDupr(long value)
+{
   int count = 0;
-  if (measure != MEASURE_TPI) {
+  if (measure != MEASURE_TPI)
+  {
     count += printDeciMicrons(value, 5);
-  } else {
+  }
+  else
+  {
     float tpi = 254000.0 / value;
-    if (abs(tpi - round(tpi)) < TPI_ROUND_EPSILON) {
+    if (abs(tpi - round(tpi)) < TPI_ROUND_EPSILON)
+    {
       count += lcd.print(int(round(tpi)));
-    } else {
+    }
+    else
+    {
       int tpi100 = round(tpi * 100);
       int points = 0;
-      if ((tpi100 % 10) != 0) {
+      if ((tpi100 % 10) != 0)
+      {
         points = 2;
-      } else if ((tpi100 % 100) != 0) {
+      }
+      else if ((tpi100 % 100) != 0)
+      {
         points = 1;
       }
       count += lcd.print(tpi, points);
@@ -635,133 +664,193 @@ int printDupr(long value) {
   return count;
 }
 
-void printLcdSpaces(int charIndex) {
+void printLcdSpaces(int charIndex)
+{
   // Our screen has width 20.
-  for (; charIndex < 20; charIndex++) {
+  for (; charIndex < 20; charIndex++)
+  {
     lcd.print(" ");
   }
 }
 
-long stepsToDu(Axis* a, long steps) {
+long stepsToDu(Axis *a, long steps)
+{
   return round(steps * a->screwPitch / a->motorSteps);
 }
 
-long getAxisPosDu(Axis* a) {
+long getAxisPosDu(Axis *a)
+{
   return stepsToDu(a, a->pos + a->originPos);
 }
 
-long getAxisStopDiffDu(Axis* a) {
-  if (a->leftStop == LONG_MAX || a->rightStop == LONG_MIN) return 0;
+long getAxisStopDiffDu(Axis *a)
+{
+  if (a->leftStop == LONG_MAX || a->rightStop == LONG_MIN)
+    return 0;
   return stepsToDu(a, a->leftStop - a->rightStop);
 }
 
-int printAxisPos(Axis* a) {
-  if (a->rotational) {
+int printAxisPos(Axis *a)
+{
+  if (a->rotational)
+  {
     return printDegrees(getAxisPosDu(a));
   }
   return printDeciMicrons(getAxisPosDu(a), 3);
 }
 
-int printAxisStopDiff(Axis* a, bool addTrailingSpace) {
+int printAxisStopDiff(Axis *a, bool addTrailingSpace)
+{
   int count = 0;
-  if (a->rotational) {
+  if (a->rotational)
+  {
     count = printDegrees(getAxisStopDiffDu(a));
-  } else {
+  }
+  else
+  {
     count = printDeciMicrons(getAxisStopDiffDu(a), 3);
   }
-  if (addTrailingSpace) {
+  if (addTrailingSpace)
+  {
     count += lcd.print(' ');
   }
   return count;
 }
 
-int printAxisPosWithName(Axis* a, bool addTrailingSpace) {
-  if (!a->active || a->disabled) return 0;
+int printAxisPosWithName(Axis *a, bool addTrailingSpace)
+{
+  if (!a->active || a->disabled)
+    return 0;
   int count = lcd.print(a->name);
   count += printAxisPos(a);
-  if (addTrailingSpace) {
+  if (addTrailingSpace)
+  {
     count += lcd.print(' ');
   }
   return count;
 }
 
-int printNoTrailing0(float value) {
+int printNoTrailing0(float value)
+{
   long v = round(value * 100000);
   int points = 0;
-  if ((v % 10) != 0) {
+  if ((v % 10) != 0)
+  {
     points = 5;
-  } else if ((v % 100) != 0) {
+  }
+  else if ((v % 100) != 0)
+  {
     points = 4;
-  } else if ((v % 1000) != 0) {
+  }
+  else if ((v % 1000) != 0)
+  {
     points = 3;
-  } else if ((v % 10000) != 0) {
+  }
+  else if ((v % 10000) != 0)
+  {
     points = 2;
-  } else if ((v % 100000) != 0) {
+  }
+  else if ((v % 100000) != 0)
+  {
     points = 1;
   }
   return lcd.print(value, points);
 }
 
-bool needZStops() {
+bool needZStops()
+{
   return mode == MODE_TURN || mode == MODE_FACE || mode == MODE_THREAD || mode == MODE_ELLIPSE;
 }
 
-bool isPassMode() {
+bool isPassMode()
+{
   return mode == MODE_TURN || mode == MODE_FACE || mode == MODE_CUT || mode == MODE_THREAD || mode == MODE_ELLIPSE;
 }
 
-int getLastSetupIndex() {
-  if (mode == MODE_CONE) return 2;
-  if (mode == MODE_TURN || mode == MODE_FACE || mode == MODE_CUT || mode == MODE_THREAD || mode == MODE_ELLIPSE) return 3;
+int getLastSetupIndex()
+{
+  if (mode == MODE_CONE)
+    return 2;
+  if (mode == MODE_TURN || mode == MODE_FACE || mode == MODE_CUT || mode == MODE_THREAD || mode == MODE_ELLIPSE)
+    return 3;
   return 0;
 }
 
-Axis* getPitchAxis() {
+Axis *getPitchAxis()
+{
   return mode == MODE_FACE ? &x : &z;
 }
 
-long getPassModeZStart() {
-  if (mode == MODE_TURN || mode == MODE_THREAD) return dupr > 0 ? z.rightStop : z.leftStop;
-  if (mode == MODE_FACE) return auxForward ? z.rightStop : z.leftStop;
-  if (mode == MODE_ELLIPSE) return dupr > 0 ? z.leftStop : z.rightStop;
+long getPassModeZStart()
+{
+  if (mode == MODE_TURN || mode == MODE_THREAD)
+    return dupr > 0 ? z.rightStop : z.leftStop;
+  if (mode == MODE_FACE)
+    return auxForward ? z.rightStop : z.leftStop;
+  if (mode == MODE_ELLIPSE)
+    return dupr > 0 ? z.leftStop : z.rightStop;
   return z.pos;
 }
 
-long getPassModeXStart() {
-  if (mode == MODE_TURN || mode == MODE_THREAD) return auxForward ? x.rightStop : x.leftStop;
-  if (mode == MODE_FACE || mode == MODE_CUT) return dupr > 0 ? x.rightStop : x.leftStop;
-  if (mode == MODE_ELLIPSE) return x.rightStop;
+long getPassModeXStart()
+{
+  if (mode == MODE_TURN || mode == MODE_THREAD)
+    return auxForward ? x.rightStop : x.leftStop;
+  if (mode == MODE_FACE || mode == MODE_CUT)
+    return dupr > 0 ? x.rightStop : x.leftStop;
+  if (mode == MODE_ELLIPSE)
+    return x.rightStop;
   return x.pos;
 }
 
-int printMode() {
-  if (mode == MODE_ASYNC) {
+int printMode()
+{
+  if (mode == MODE_ASYNC)
+  {
     return lcd.print("ASY ");
-  } else if (mode == MODE_CONE) {
+  }
+  else if (mode == MODE_CONE)
+  {
     return lcd.print("CONE ");
-  } else if (mode == MODE_TURN) {
+  }
+  else if (mode == MODE_TURN)
+  {
     return lcd.print("TURN ");
-  } else if (mode == MODE_FACE) {
+  }
+  else if (mode == MODE_FACE)
+  {
     return lcd.print("FACE ");
-  } else if (mode == MODE_CUT) {
+  }
+  else if (mode == MODE_CUT)
+  {
     return lcd.print("CUT ");
-  } else if (mode == MODE_THREAD) {
+  }
+  else if (mode == MODE_THREAD)
+  {
     return lcd.print("THRD ");
-  } else if (mode == MODE_ELLIPSE) {
+  }
+  else if (mode == MODE_ELLIPSE)
+  {
     return lcd.print("ELLI ");
-  } else if (mode == MODE_GCODE) {
+  }
+  else if (mode == MODE_GCODE)
+  {
     return lcd.print("GCODE ");
-  } else if (mode == MODE_A1) {
+  }
+  else if (mode == MODE_A1)
+  {
     return lcd.print("A1 ");
   }
   return 0;
 }
 
-void updateDisplay() {
+void updateDisplay()
+{
   int rpm = showTacho ? getApproxRpm() : 0;
   int charIndex = 0;
 
-  if (splashScreen) {
+  if (splashScreen)
+  {
     splashScreen = false;
     lcd.clear();
     lcd.setCursor(6, 1);
@@ -774,7 +863,8 @@ void updateDisplay() {
     lcdHashLine3 = LCD_HASH_INITIAL;
     delay(2000);
   }
-  if (lcdHashLine0 == LCD_HASH_INITIAL) {
+  if (lcdHashLine0 == LCD_HASH_INITIAL)
+  {
     // First run after reset.
     lcd.clear();
     lcdHashLine1 = LCD_HASH_INITIAL;
@@ -783,44 +873,62 @@ void updateDisplay() {
   }
 
   long newHashLine0 = isOn + (z.leftStop - z.rightStop) + (x.leftStop - x.rightStop) + spindlePosSync + moveStep + mode + measure + setupIndex;
-  if (lcdHashLine0 != newHashLine0) {
+  if (lcdHashLine0 != newHashLine0)
+  {
     lcdHashLine0 = newHashLine0;
     charIndex = 0;
     lcd.setCursor(0, 0);
-    if (setupIndex == 0 || !isPassMode()) {
+    if (setupIndex == 0 || !isPassMode())
+    {
       charIndex += printMode();
       charIndex += lcd.print(isOn ? "ON " : "off ");
       int beforeStops = charIndex;
-      if (z.leftStop != LONG_MAX) {
+      if (z.leftStop != LONG_MAX)
+      {
         charIndex += lcd.write(customCharLimLeftCode);
       }
-      if (x.leftStop != LONG_MAX && x.rightStop != LONG_MIN) {
+      if (x.leftStop != LONG_MAX && x.rightStop != LONG_MIN)
+      {
         charIndex += lcd.write(customCharLimUpDownCode);
-      } else if (x.leftStop != LONG_MAX) {
+      }
+      else if (x.leftStop != LONG_MAX)
+      {
         charIndex += lcd.write(customCharLimUpCode);
-      } else if (x.rightStop != LONG_MIN) {
+      }
+      else if (x.rightStop != LONG_MIN)
+      {
         charIndex += lcd.write(customCharLimDownCode);
       }
-      if (z.rightStop != LONG_MIN) {
+      if (z.rightStop != LONG_MIN)
+      {
         charIndex += lcd.write(customCharLimRightCode);
       }
-      if (beforeStops != charIndex) {
+      if (beforeStops != charIndex)
+      {
         charIndex += lcd.print(" ");
       }
 
-      if (spindlePosSync && !isPassMode()) {
+      if (spindlePosSync && !isPassMode())
+      {
         charIndex += lcd.print("SYN ");
       }
-      if (mode == MODE_NORMAL && !spindlePosSync) {
+      if (mode == MODE_NORMAL && !spindlePosSync)
+      {
         charIndex += lcd.print("step ");
       }
       charIndex += printDeciMicrons(moveStep, 5);
-    } else {
-      if (needZStops()) {
+    }
+    else
+    {
+      if (needZStops())
+      {
         charIndex += lcd.write(customCharLimLeftRightCode);
         charIndex += printAxisStopDiff(&z, true);
-        while (charIndex < 10) charIndex += lcd.print(" ");
-      } else {
+        while (charIndex < 10)
+          charIndex += lcd.print(" ");
+      }
+      else
+      {
         charIndex += printMode();
       }
       charIndex += lcd.write(customCharLimUpDownCode);
@@ -830,13 +938,15 @@ void updateDisplay() {
   }
 
   long newHashLine1 = dupr + starts + mode + measure + setupIndex;
-  if (lcdHashLine1 != newHashLine1) {
+  if (lcdHashLine1 != newHashLine1)
+  {
     lcdHashLine1 = newHashLine1;
     charIndex = 0;
     lcd.setCursor(0, 1);
     charIndex += lcd.print("Pitch ");
     charIndex += printDupr(dupr);
-    if (starts != 1) {
+    if (starts != 1)
+    {
       charIndex += lcd.print(" x");
       charIndex += lcd.print(starts);
     }
@@ -847,122 +957,176 @@ void updateDisplay() {
   long xDisplayPos = x.pos + x.originPos;
   long a1DisplayPos = a1.pos + a1.originPos;
   long newHashLine2 = zDisplayPos + xDisplayPos + a1DisplayPos + measure + z.disabled + x.disabled + mode;
-  if (lcdHashLine2 != newHashLine2) {
+  if (lcdHashLine2 != newHashLine2)
+  {
     lcdHashLine2 = newHashLine2;
     charIndex = 0;
     lcd.setCursor(0, 2);
     charIndex += printAxisPosWithName(&z, true);
-    while (charIndex < 10) charIndex += lcd.print(" ");
+    while (charIndex < 10)
+      charIndex += lcd.print(" ");
     charIndex += printAxisPosWithName(&x, true);
     printLcdSpaces(charIndex);
   }
 
   long numpadResult = getNumpadResult();
   long gcodeCommandHash = 0;
-  for (int i = 0; i < gcodeCommand.length(); i++) {
+  for (int i = 0; i < gcodeCommand.length(); i++)
+  {
     gcodeCommandHash += gcodeCommand.charAt(i);
   }
   long newHashLine3 = z.pos + (showAngle ? spindlePos : -1) + (showTacho ? rpm : -2) + measure + (numpadResult > 0 ? numpadResult : -1) + mode * 5 + dupr +
-      (mode == MODE_CONE ? round(coneRatio * 10000) : 0) + turnPasses + opIndex + setupIndex + (isOn ? 139 : -117) + (inNumpad ? 10 : 0) + (auxForward ? 17 : -31) +
-      (z.leftStop == LONG_MAX ? 123 : z.leftStop) + (z.rightStop == LONG_MIN ? 1234 : z.rightStop) +
-      (x.leftStop == LONG_MAX ? 1235 : x.leftStop) + (x.rightStop == LONG_MIN ? 123456 : x.rightStop) + gcodeCommandHash +
-      (mode == MODE_A1 ? a1.pos + a1.originPos + (a1.leftStop == LONG_MAX ? 123 : a1.leftStop) + (a1.rightStop == LONG_MIN ? 1234 : a1.rightStop) + a1.disabled : 0) + x.pos + z.pos;
-  if (lcdHashLine3 != newHashLine3) {
+                      (mode == MODE_CONE ? round(coneRatio * 10000) : 0) + turnPasses + opIndex + setupIndex + (isOn ? 139 : -117) + (inNumpad ? 10 : 0) + (auxForward ? 17 : -31) +
+                      (z.leftStop == LONG_MAX ? 123 : z.leftStop) + (z.rightStop == LONG_MIN ? 1234 : z.rightStop) +
+                      (x.leftStop == LONG_MAX ? 1235 : x.leftStop) + (x.rightStop == LONG_MIN ? 123456 : x.rightStop) + gcodeCommandHash +
+                      (mode == MODE_A1 ? a1.pos + a1.originPos + (a1.leftStop == LONG_MAX ? 123 : a1.leftStop) + (a1.rightStop == LONG_MIN ? 1234 : a1.rightStop) + a1.disabled : 0) + x.pos + z.pos;
+  if (lcdHashLine3 != newHashLine3)
+  {
     lcdHashLine3 = newHashLine3;
     charIndex = 0;
     lcd.setCursor(0, 3);
-    if (mode == MODE_A1 && !inNumpad) {
-      if (a1.leftStop != LONG_MAX && a1.rightStop != LONG_MIN) {
+    if (mode == MODE_A1 && !inNumpad)
+    {
+      if (a1.leftStop != LONG_MAX && a1.rightStop != LONG_MIN)
+      {
         charIndex += lcd.write(customCharLimUpDownCode);
         charIndex += lcd.print(" ");
-      } else if (a1.leftStop != LONG_MAX) {
+      }
+      else if (a1.leftStop != LONG_MAX)
+      {
         charIndex += lcd.write(customCharLimDownCode);
         charIndex += lcd.print(" ");
-      } else if (a1.rightStop != LONG_MIN) {
+      }
+      else if (a1.rightStop != LONG_MIN)
+      {
         charIndex += lcd.write(customCharLimUpCode);
         charIndex += lcd.print(" ");
       }
       charIndex += printAxisPosWithName(&a1, false);
-    } else if (mode == MODE_GCODE) {
+    }
+    else if (mode == MODE_GCODE)
+    {
       charIndex += lcd.print(gcodeCommand.substring(0, 20));
-    } else if (isPassMode()) {
+    }
+    else if (isPassMode())
+    {
       bool missingZStops = needZStops() && (z.leftStop == LONG_MAX || z.rightStop == LONG_MIN);
       bool missingStops = missingZStops || x.leftStop == LONG_MAX || x.rightStop == LONG_MIN;
-      if (!inNumpad && missingStops) {
+      if (!inNumpad && missingStops)
+      {
         charIndex += lcd.print(needZStops() ? "Set all stops" : "Set X stops");
-      } else if (numpadResult != 0 && setupIndex == 1) {
+      }
+      else if (numpadResult != 0 && setupIndex == 1)
+      {
         long passes = min(PASSES_MAX, numpadResult);
         charIndex += lcd.print(passes);
-        if (passes == 1) charIndex += lcd.print(" pass?");
-        else charIndex += lcd.print(" passes?");
-      } else if (!isOn && setupIndex == 1) {
+        if (passes == 1)
+          charIndex += lcd.print(" pass?");
+        else
+          charIndex += lcd.print(" passes?");
+      }
+      else if (!isOn && setupIndex == 1)
+      {
         charIndex += lcd.print(turnPasses);
-        if (turnPasses == 1) charIndex += lcd.print(" pass?");
-        else charIndex += lcd.print(" passes?");
-      } else if (!isOn && setupIndex == 2) {
-        if (mode == MODE_FACE) {
+        if (turnPasses == 1)
+          charIndex += lcd.print(" pass?");
+        else
+          charIndex += lcd.print(" passes?");
+      }
+      else if (!isOn && setupIndex == 2)
+      {
+        if (mode == MODE_FACE)
+        {
           charIndex += lcd.print(auxForward ? "Right to left?" : "Left to right?");
-        } else if (mode == MODE_CUT) {
+        }
+        else if (mode == MODE_CUT)
+        {
           charIndex += lcd.print(dupr >= 0 ? "Pitch > 0, external" : "Pitch < 0, internal");
-        } else {
+        }
+        else
+        {
           charIndex += lcd.print(auxForward ? "External?" : "Internal?");
         }
-      } else if (!isOn && setupIndex == 3) {
+      }
+      else if (!isOn && setupIndex == 3)
+      {
         long zOffset = getPassModeZStart() - z.pos;
         long xOffset = getPassModeXStart() - x.pos;
         charIndex += lcd.print("Go");
-        if (zOffset != 0) {
+        if (zOffset != 0)
+        {
           charIndex += lcd.print(" ");
           charIndex += lcd.print(z.name);
           charIndex += printDeciMicrons(stepsToDu(&z, zOffset), 2);
         }
-        if (xOffset != 0) {
+        if (xOffset != 0)
+        {
           charIndex += lcd.print(" ");
           charIndex += lcd.print(x.name);
           charIndex += printDeciMicrons(stepsToDu(&x, xOffset), 2);
         }
         charIndex += lcd.print("?");
-      } else if (isOn && numpadResult == 0) {
+      }
+      else if (isOn && numpadResult == 0)
+      {
         charIndex += lcd.print("Pass ");
         charIndex += lcd.print(opIndex);
         charIndex += lcd.print(" of ");
         charIndex += lcd.print(max(opIndex, long(turnPasses * starts)));
       }
-    } else if (mode == MODE_CONE) {
-      if (numpadResult != 0 && setupIndex == 1) {
+    }
+    else if (mode == MODE_CONE)
+    {
+      if (numpadResult != 0 && setupIndex == 1)
+      {
         charIndex += lcd.print("Use ratio ");
         charIndex += lcd.print(numpadToConeRatio(), 5);
         charIndex += lcd.print("?");
-      } else if (!isOn && setupIndex == 1) {
+      }
+      else if (!isOn && setupIndex == 1)
+      {
         charIndex += lcd.print("Use ratio ");
         charIndex += printNoTrailing0(coneRatio);
         charIndex += lcd.print("?");
-      } else if (!isOn && setupIndex == 2) {
+      }
+      else if (!isOn && setupIndex == 2)
+      {
         charIndex += lcd.print(auxForward ? "External?" : "Internal?");
-      } else if (!isOn && setupIndex == 3) {
+      }
+      else if (!isOn && setupIndex == 3)
+      {
         charIndex += lcd.print("Go?");
-      } else if (isOn && numpadResult == 0) {
+      }
+      else if (isOn && numpadResult == 0)
+      {
         charIndex += lcd.print("Cone ratio ");
         charIndex += printNoTrailing0(coneRatio);
       }
     }
 
-    if (charIndex == 0 && inNumpad) { // Also show for 0 input to allow setting limits to 0.
+    if (charIndex == 0 && inNumpad)
+    { // Also show for 0 input to allow setting limits to 0.
       charIndex += lcd.print("Use ");
       charIndex += printDupr(numpadToDeciMicrons());
       charIndex += lcd.print("?");
     }
 
-    if (charIndex > 0) {
+    if (charIndex > 0)
+    {
       // No space for shared RPM/angle text.
-    } else if (showAngle) {
+    }
+    else if (showAngle)
+    {
       charIndex += lcd.print("Angle ");
       charIndex += lcd.print(spindleModulo(spindlePos) * 360 / ENCODER_STEPS_FLOAT, 2);
       charIndex += lcd.print(char(223));
-    } else if (showTacho) {
+    }
+    else if (showTacho)
+    {
       charIndex += lcd.print("Tacho ");
       charIndex += lcd.print(rpm);
-      if (shownRpm != rpm) {
+      if (shownRpm != rpm)
+      {
         shownRpm = rpm;
         shownRpmTime = micros();
       }
@@ -973,7 +1137,8 @@ void updateDisplay() {
 }
 
 // Called on a FALLING interrupt for the spindle rotary encoder pin.
-void IRAM_ATTR spinEnc() {
+void IRAM_ATTR spinEnc()
+{
   spindlePosDelta += DREAD(ENC_B) ? -1 : 1;
 }
 
@@ -981,49 +1146,67 @@ unsigned long pulse1HighMicros = 0;
 unsigned long pulse2HighMicros = 0;
 
 // Called on a FALLING interrupt for the first axis rotary encoder pin.
-void IRAM_ATTR pulse1Enc() {
+void IRAM_ATTR pulse1Enc()
+{
   unsigned long now = micros();
-  if (DREAD(A12)) {
+  if (DREAD(A12))
+  {
     pulse1HighMicros = now;
-  } else if (now > pulse1HighMicros + PULSE_MIN_WIDTH_US) {
+  }
+  else if (now > pulse1HighMicros + PULSE_MIN_WIDTH_US)
+  {
     pulse1Delta += (DREAD(A13) ? -1 : 1) * (PULSE_1_INVERT ? -1 : 1);
   }
 }
 
 // Called on a FALLING interrupt for the second axis rotary encoder pin.
-void IRAM_ATTR pulse2Enc() {
+void IRAM_ATTR pulse2Enc()
+{
   unsigned long now = micros();
-  if (DREAD(A22)) {
+  if (DREAD(A22))
+  {
     pulse2HighMicros = now;
-  } else if (now > pulse2HighMicros + PULSE_MIN_WIDTH_US) {
+  }
+  else if (now > pulse2HighMicros + PULSE_MIN_WIDTH_US)
+  {
     pulse2Delta += (DREAD(A23) ? -1 : 1) * (PULSE_2_INVERT ? -1 : 1);
   }
 }
 
-void setAsyncTimerEnable(bool value) {
-  if (value) {
+void setAsyncTimerEnable(bool value)
+{
+  if (value)
+  {
     timerAlarmEnable(async_timer);
-  } else {
+  }
+  else
+  {
     timerAlarmDisable(async_timer);
   }
 }
 
-void taskDisplay(void *param) {
-  while (emergencyStop == ESTOP_NONE) {
+void taskDisplay(void *param)
+{
+  while (emergencyStop == ESTOP_NONE)
+  {
     updateDisplay();
     // Calling Preferences.commit() blocks all interrupts for 30ms, don't call saveIfChanged() if
     // encoder is likely to move soon.
     unsigned long now = micros();
-    if (!stepperIsRunning(&z) && !stepperIsRunning(&x) && (now > spindleEncTime + SAVE_DELAY_US) && (now < saveTime || now > saveTime + SAVE_DELAY_US) && (now < keypadTimeUs || now > keypadTimeUs + SAVE_DELAY_US)) {
-      if (saveIfChanged()) {
+    if (!stepperIsRunning(&z) && !stepperIsRunning(&x) && (now > spindleEncTime + SAVE_DELAY_US) && (now < saveTime || now > saveTime + SAVE_DELAY_US) && (now < keypadTimeUs || now > keypadTimeUs + SAVE_DELAY_US))
+    {
+      if (saveIfChanged())
+      {
         saveTime = now;
       }
     }
-    if (beepFlag) {
+    if (beepFlag)
+    {
       beepFlag = false;
       beep();
     }
-    if (abs(z.pendingPos) > z.estopSteps || abs(x.pendingPos) > x.estopSteps) {
+    if (abs(z.pendingPos) > z.estopSteps || abs(x.pendingPos) > x.estopSteps)
+    {
       setEmergencyStop(ESTOP_POS);
     }
     taskYIELD();
@@ -1032,23 +1215,32 @@ void taskDisplay(void *param) {
   lcd.setCursor(0, 0);
   lcd.print("EMERGENCY STOP");
   lcd.setCursor(0, 1);
-  if (emergencyStop == ESTOP_KEY) {
+  if (emergencyStop == ESTOP_KEY)
+  {
     lcd.print("Key down at power-up");
     lcd.setCursor(0, 2);
     lcd.print("Hardware failure?");
-  } else if (emergencyStop == ESTOP_POS) {
+  }
+  else if (emergencyStop == ESTOP_POS)
+  {
     lcd.print("Requested position");
     lcd.setCursor(0, 2);
     lcd.print("outside machine");
-  } else if (emergencyStop == ESTOP_MARK_ORIGIN) {
+  }
+  else if (emergencyStop == ESTOP_MARK_ORIGIN)
+  {
     lcd.print("Unable to");
     lcd.setCursor(0, 2);
     lcd.print("mark origin");
-  } else if (emergencyStop == ESTOP_ON_OFF) {
+  }
+  else if (emergencyStop == ESTOP_ON_OFF)
+  {
     lcd.print("Unable to");
     lcd.setCursor(0, 2);
     lcd.print("turn on/off");
-  } else if (emergencyStop == ESTOP_OFF_MANUAL_MOVE) {
+  }
+  else if (emergencyStop == ESTOP_OFF_MANUAL_MOVE)
+  {
     lcd.print("Off during");
     lcd.setCursor(0, 2);
     lcd.print("manual move");
@@ -1056,44 +1248,57 @@ void taskDisplay(void *param) {
   vTaskDelete(NULL);
 }
 
-void taskKeypad(void *param) {
-  while (emergencyStop == ESTOP_NONE) {
+void taskKeypad(void *param)
+{
+  while (emergencyStop == ESTOP_NONE)
+  {
     processKeypadEvent();
     taskYIELD();
   }
   vTaskDelete(NULL);
 }
 
-void waitForPendingPosNear0(Axis* a) {
-  while (abs(a->pendingPos) > a->motorSteps / 3) {
+void waitForPendingPosNear0(Axis *a)
+{
+  while (abs(a->pendingPos) > a->motorSteps / 3)
+  {
     taskYIELD();
   }
 }
 
-void waitForPendingPos0(Axis* a) {
-  while (a->pendingPos != 0) {
+void waitForPendingPos0(Axis *a)
+{
+  while (a->pendingPos != 0)
+  {
     taskYIELD();
   }
 }
 
-bool isContinuousStep() {
+bool isContinuousStep()
+{
   return moveStep == (measure == MEASURE_METRIC ? MOVE_STEP_1 : MOVE_STEP_IMP_1);
 }
 
 // For rotational axis the moveStep of 0.1" means 0.1°.
-long getMoveStepForAxis(Axis* a) {
+long getMoveStepForAxis(Axis *a)
+{
   return (a->rotational && measure != MEASURE_METRIC) ? (moveStep / 25.4) : moveStep;
 }
 
-long getStepMaxSpeed(Axis* a) {
+long getStepMaxSpeed(Axis *a)
+{
   return isContinuousStep() ? a->speedManualMove : min(long(a->speedManualMove), abs(getMoveStepForAxis(a)) * 1000 / STEP_TIME_MS);
 }
 
-void waitForStep(Axis* a) {
-  if (isContinuousStep()) {
+void waitForStep(Axis *a)
+{
+  if (isContinuousStep())
+  {
     // Move continuously for default step.
     waitForPendingPosNear0(a);
-  } else {
+  }
+  else
+  {
     // Move with tiny pauses allowing to stop precisely.
     a->continuous = false;
     waitForPendingPos0(a);
@@ -1101,27 +1306,37 @@ void waitForStep(Axis* a) {
   }
 }
 
-int getAndResetPulses(Axis* a) {
+int getAndResetPulses(Axis *a)
+{
   int delta = 0;
-  if (PULSE_1_AXIS == a->name) {
-    if (pulse1Delta < -PULSE_HALF_BACKLASH) {
+  if (PULSE_1_AXIS == a->name)
+  {
+    if (pulse1Delta < -PULSE_HALF_BACKLASH)
+    {
       noInterrupts();
       delta = pulse1Delta + PULSE_HALF_BACKLASH;
       pulse1Delta = -PULSE_HALF_BACKLASH;
       interrupts();
-    } else if (pulse1Delta > PULSE_HALF_BACKLASH) {
+    }
+    else if (pulse1Delta > PULSE_HALF_BACKLASH)
+    {
       noInterrupts();
       delta = pulse1Delta - PULSE_HALF_BACKLASH;
       pulse1Delta = PULSE_HALF_BACKLASH;
       interrupts();
     }
-  } else if (PULSE_2_AXIS == a->name) {
-    if (pulse2Delta < -PULSE_HALF_BACKLASH) {
+  }
+  else if (PULSE_2_AXIS == a->name)
+  {
+    if (pulse2Delta < -PULSE_HALF_BACKLASH)
+    {
       noInterrupts();
       delta = pulse2Delta + PULSE_HALF_BACKLASH;
       pulse2Delta = -PULSE_HALF_BACKLASH;
       interrupts();
-    } else if (pulse2Delta > PULSE_HALF_BACKLASH) {
+    }
+    else if (pulse2Delta > PULSE_HALF_BACKLASH)
+    {
       noInterrupts();
       delta = pulse2Delta - PULSE_HALF_BACKLASH;
       pulse2Delta = PULSE_HALF_BACKLASH;
@@ -1131,41 +1346,51 @@ int getAndResetPulses(Axis* a) {
   return delta;
 }
 
-void taskMoveZ(void *param) {
-  while (emergencyStop == ESTOP_NONE) {
+void taskMoveZ(void *param)
+{
+  while (emergencyStop == ESTOP_NONE)
+  {
     int pulseDelta = getAndResetPulses(&z);
     bool left = buttonLeftPressed;
     bool right = buttonRightPressed;
-    if (!left && !right && pulseDelta == 0) {
+    if (!left && !right && pulseDelta == 0)
+    {
       taskYIELD();
       continue;
     }
-    if (spindlePosSync != 0) {
+    if (spindlePosSync != 0)
+    {
       // Edge case.
       taskYIELD();
       continue;
     }
-    if (isOn && isPassMode()) {
+    if (isOn && isPassMode())
+    {
       setIsOnFromTask(false);
     }
     int sign = pulseDelta == 0 ? (left ? 1 : -1) : (pulseDelta > 0 ? 1 : -1);
     bool stepperOn = true;
     stepperEnable(&z, true);
     z.movingManually = true;
-    if (isOn && dupr != 0 && mode == MODE_NORMAL) {
+    if (isOn && dupr != 0 && mode == MODE_NORMAL)
+    {
       // Move by moveStep in the desired direction but stay in the thread by possibly traveling a little more.
       int diff = ceil(moveStep * 1.0 / abs(dupr * starts)) * ENCODER_STEPS_FLOAT * sign * (dupr > 0 ? 1 : -1);
       long prevSpindlePos = spindlePos;
       bool resting = false;
-      do {
+      do
+      {
         z.speedMax = z.speedManualMove;
-        if (xSemaphoreTake(motionMutex, 100) == pdTRUE) {
-          if (!resting) {
+        if (xSemaphoreTake(motionMutex, 100) == pdTRUE)
+        {
+          if (!resting)
+          {
             spindlePos += diff;
             spindlePosAvg += diff;
           }
           // If spindle is moving, it will be changing spindlePos at the same time. Account for it.
-          while (diff > 0 ? (spindlePos < prevSpindlePos) : (spindlePos > prevSpindlePos)) {
+          while (diff > 0 ? (spindlePos < prevSpindlePos) : (spindlePos > prevSpindlePos))
+          {
             spindlePos += diff;
             spindlePosAvg += diff;
           };
@@ -1174,37 +1399,48 @@ void taskMoveZ(void *param) {
         }
 
         long newPos = posFromSpindle(&z, prevSpindlePos, true);
-        if (newPos != z.pos) {
+        if (newPos != z.pos)
+        {
           stepToContinuous(&z, newPos);
           waitForPendingPosNear0(&z);
-        } else if (z.pos == (left ? z.leftStop : z.rightStop)) {
+        }
+        else if (z.pos == (left ? z.leftStop : z.rightStop))
+        {
           // We're standing on a stop with the L/R move button pressed.
           resting = true;
-          if (stepperOn) {
+          if (stepperOn)
+          {
             stepperEnable(&z, false);
             stepperOn = false;
           }
           DELAY(200);
         }
       } while (left ? buttonLeftPressed : buttonRightPressed);
-    } else {
+    }
+    else
+    {
       z.speedMax = getStepMaxSpeed(&z);
       int delta = 0;
-      do {
+      do
+      {
         float fractionalDelta = (pulseDelta == 0 ? moveStep * sign / z.screwPitch : pulseDelta / PULSE_PER_REVOLUTION) * z.motorSteps + z.fractionalPos;
         delta = round(fractionalDelta);
         // Don't lose fractional steps when moving by 0.01" or 0.001".
         z.fractionalPos = fractionalDelta - delta;
-        if (delta == 0) {
+        if (delta == 0)
+        {
           // When moveStep is e.g. 1 micron and MOTOR_STEPS_Z is 200, make delta non-zero.
           delta = sign;
         }
 
         long posCopy = z.pos + z.pendingPos;
         // Don't left-right move out of stops.
-        if (posCopy + delta > z.leftStop) {
+        if (posCopy + delta > z.leftStop)
+        {
           delta = z.leftStop - posCopy;
-        } else if (posCopy + delta < z.rightStop) {
+        }
+        else if (posCopy + delta < z.rightStop)
+        {
           delta = z.rightStop - posCopy;
         }
         z.speedMax = getStepMaxSpeed(&z);
@@ -1213,20 +1449,27 @@ void taskMoveZ(void *param) {
       } while (delta != 0 && (left ? buttonLeftPressed : buttonRightPressed));
       z.continuous = false;
       waitForPendingPos0(&z);
-      if (isOn && mode == MODE_CONE) {
-        if (xSemaphoreTake(motionMutex, 100) != pdTRUE) {
+      if (isOn && mode == MODE_CONE)
+      {
+        if (xSemaphoreTake(motionMutex, 100) != pdTRUE)
+        {
           setEmergencyStop(ESTOP_MARK_ORIGIN);
-        } else {
+        }
+        else
+        {
           markOrigin();
           xSemaphoreGive(motionMutex);
         }
-      } else if (isOn && mode == MODE_ASYNC) {
+      }
+      else if (isOn && mode == MODE_ASYNC)
+      {
         // Restore async direction.
         updateAsyncTimerSettings();
       }
     }
     z.movingManually = false;
-    if (stepperOn) {
+    if (stepperOn)
+    {
       stepperEnable(&z, false);
     }
     z.speedMax = LONG_MAX;
@@ -1235,16 +1478,20 @@ void taskMoveZ(void *param) {
   vTaskDelete(NULL);
 }
 
-void taskMoveX(void *param) {
-  while (emergencyStop == ESTOP_NONE) {
+void taskMoveX(void *param)
+{
+  while (emergencyStop == ESTOP_NONE)
+  {
     int pulseDelta = getAndResetPulses(&x);
     bool up = buttonUpPressed || pulseDelta > 0;
     bool down = buttonDownPressed || pulseDelta < 0;
-    if (!up && !down) {
+    if (!up && !down)
+    {
       taskYIELD();
       continue;
     }
-    if (isOn && isPassMode()) {
+    if (isOn && isPassMode())
+    {
       setIsOnFromTask(false);
     }
     x.movingManually = true;
@@ -1253,20 +1500,25 @@ void taskMoveX(void *param) {
 
     int delta = 0;
     int sign = up ? 1 : -1;
-    do {
+    do
+    {
       float fractionalDelta = (pulseDelta == 0 ? moveStep * sign / x.screwPitch : pulseDelta / PULSE_PER_REVOLUTION) * x.motorSteps + x.fractionalPos;
       delta = round(fractionalDelta);
       // Don't lose fractional steps when moving by 0.01" or 0.001".
       x.fractionalPos = fractionalDelta - delta;
-      if (delta == 0) {
+      if (delta == 0)
+      {
         // When moveStep is e.g. 1 micron and MOTOR_STEPS_Z is 200, make delta non-zero.
         delta = sign;
       }
 
       long posCopy = x.pos + x.pendingPos;
-      if (posCopy + delta > x.leftStop) {
+      if (posCopy + delta > x.leftStop)
+      {
         delta = x.leftStop - posCopy;
-      } else if (posCopy + delta < x.rightStop) {
+      }
+      else if (posCopy + delta < x.rightStop)
+      {
         delta = x.rightStop - posCopy;
       }
       stepToContinuous(&x, posCopy + delta);
@@ -1275,10 +1527,14 @@ void taskMoveX(void *param) {
     } while (delta != 0 && (pulseDelta != 0 || (up ? buttonUpPressed : buttonDownPressed)));
     x.continuous = false;
     waitForPendingPos0(&x);
-    if (isOn && mode == MODE_CONE) {
-      if (xSemaphoreTake(motionMutex, 100) != pdTRUE) {
+    if (isOn && mode == MODE_CONE)
+    {
+      if (xSemaphoreTake(motionMutex, 100) != pdTRUE)
+      {
         setEmergencyStop(ESTOP_MARK_ORIGIN);
-      } else {
+      }
+      else
+      {
         markOrigin();
         xSemaphoreGive(motionMutex);
       }
@@ -1292,11 +1548,14 @@ void taskMoveX(void *param) {
   vTaskDelete(NULL);
 }
 
-void taskMoveA1(void *param) {
-  while (emergencyStop == ESTOP_NONE) {
+void taskMoveA1(void *param)
+{
+  while (emergencyStop == ESTOP_NONE)
+  {
     bool plus = buttonTurnPressed;
     bool minus = buttonGearsPressed;
-    if (mode != MODE_A1 || (!plus && !minus)) {
+    if (mode != MODE_A1 || (!plus && !minus))
+    {
       taskYIELD();
       continue;
     }
@@ -1306,16 +1565,21 @@ void taskMoveA1(void *param) {
 
     int delta = 0;
     int sign = plus ? 1 : -1;
-    do {
+    do
+    {
       float fractionalDelta = getMoveStepForAxis(&a1) * sign / a1.screwPitch * a1.motorSteps + a1.fractionalPos;
       delta = round(fractionalDelta);
       a1.fractionalPos = fractionalDelta - delta;
-      if (delta == 0) delta = sign;
+      if (delta == 0)
+        delta = sign;
 
       long posCopy = a1.pos + a1.pendingPos;
-      if (posCopy + delta > a1.leftStop) {
+      if (posCopy + delta > a1.leftStop)
+      {
         delta = a1.leftStop - posCopy;
-      } else if (posCopy + delta < a1.rightStop) {
+      }
+      else if (posCopy + delta < a1.rightStop)
+      {
         delta = a1.rightStop - posCopy;
       }
       stepToContinuous(&a1, posCopy + delta);
@@ -1324,7 +1588,8 @@ void taskMoveA1(void *param) {
     a1.continuous = false;
     waitForPendingPos0(&a1);
     // Restore async direction.
-    if (isOn && mode == MODE_A1) updateAsyncTimerSettings();
+    if (isOn && mode == MODE_A1)
+      updateAsyncTimerSettings();
     a1.movingManually = false;
     a1.speedMax = LONG_MAX;
     stepperEnable(&a1, false);
@@ -1333,14 +1598,18 @@ void taskMoveA1(void *param) {
   vTaskDelete(NULL);
 }
 
-void taskGcode(void *param) {
-  while (emergencyStop == ESTOP_NONE) {
-    if (mode != MODE_GCODE) {
+void taskGcode(void *param)
+{
+  while (emergencyStop == ESTOP_NONE)
+  {
+    if (mode != MODE_GCODE)
+    {
       gcodeInitialized = false;
       taskYIELD();
       continue;
     }
-    if (!gcodeInitialized) {
+    if (!gcodeInitialized)
+    {
       gcodeInitialized = true;
       gcodeCommand = "";
       gcodeAbsolutePositioning = true;
@@ -1349,24 +1618,41 @@ void taskGcode(void *param) {
       gcodeInSemicolon = false;
     }
     // Implementing a relevant subset of RS274 (Gcode) and GRBL (state management) covering basic use cases.
-    if (Serial.available() > 0) {
+    if (Serial.available() > 0)
+    {
       char receivedChar = Serial.read();
       int charCode = int(receivedChar);
-      if (gcodeInBrace) {
-        if (receivedChar == ')') gcodeInBrace = false;
-      } else if (receivedChar == '(') {
+      if (gcodeInBrace)
+      {
+        if (receivedChar == ')')
+          gcodeInBrace = false;
+      }
+      else if (receivedChar == '(')
+      {
         gcodeInBrace = true;
-      } else if (receivedChar == ';' /* start of comment till end of line */) {
+      }
+      else if (receivedChar == ';' /* start of comment till end of line */)
+      {
         gcodeInSemicolon = true;
-      } else if (gcodeInSemicolon && charCode >= 32) {
+      }
+      else if (gcodeInSemicolon && charCode >= 32)
+      {
         // Ignoring comment.
-      } else if (receivedChar == '!' /* stop */) {
+      }
+      else if (receivedChar == '!' /* stop */)
+      {
         setIsOnFromTask(false);
-      } else if (receivedChar == '~' /* resume */) {
+      }
+      else if (receivedChar == '~' /* resume */)
+      {
         setIsOnFromTask(true);
-      } else if (receivedChar == '%' /* start/end marker */) {
+      }
+      else if (receivedChar == '%' /* start/end marker */)
+      {
         // Not using % markers in this implementation.
-      } else if (receivedChar == '?' /* status */) {
+      }
+      else if (receivedChar == '?' /* status */)
+      {
         Serial.print("<");
         Serial.print(isOn ? "Run" : "Idle");
         Serial.print("|WPos:");
@@ -1379,26 +1665,40 @@ void taskGcode(void *param) {
         Serial.print(",");
         Serial.print(getApproxRpm());
         Serial.print(">"); // no new line to allow client to easily cut out the status response
-      } else if (isOn) {
-        if (gcodeInBrace && charCode < 32) {
+      }
+      else if (isOn)
+      {
+        if (gcodeInBrace && charCode < 32)
+        {
           Serial.println("error: comment not closed");
           setIsOnFromTask(false);
-        } else if (charCode < 32 && gcodeCommand.length() > 1) {
-          if (handleGcodeCommand(gcodeCommand)) Serial.println("ok");
+        }
+        else if (charCode < 32 && gcodeCommand.length() > 1)
+        {
+          if (handleGcodeCommand(gcodeCommand))
+            Serial.println("ok");
           gcodeCommand = "";
           gcodeInSemicolon = false;
-        } else if (charCode < 32) {
+        }
+        else if (charCode < 32)
+        {
           Serial.println("ok");
           gcodeCommand = "";
-        } else if (charCode >= 32 && (charCode == 'G' || charCode == 'M')) {
+        }
+        else if (charCode >= 32 && (charCode == 'G' || charCode == 'M'))
+        {
           // Split consequent G and M commands on one line.
           // No "ok" for commands in the middle of the line.
           handleGcodeCommand(gcodeCommand);
           gcodeCommand = receivedChar;
-        } else if (charCode >= 32) {
+        }
+        else if (charCode >= 32)
+        {
           gcodeCommand += receivedChar;
         }
-      } else {
+      }
+      else
+      {
         // ignoring non-realtime command input when off
         // to flush any commands coming after an error
       }
@@ -1408,15 +1708,19 @@ void taskGcode(void *param) {
   vTaskDelete(NULL);
 }
 
-void taskAttachInterrupts(void *param) {
+void taskAttachInterrupts(void *param)
+{
   // Attaching interrupt on core 0 to have more time on core 1 where axes are moved.
   attachInterrupt(digitalPinToInterrupt(ENC_A), spinEnc, FALLING);
-  if (PULSE_1_USE) attachInterrupt(digitalPinToInterrupt(A12), pulse1Enc, CHANGE);
-  if (PULSE_2_USE) attachInterrupt(digitalPinToInterrupt(A22), pulse2Enc, CHANGE);
+  if (PULSE_1_USE)
+    attachInterrupt(digitalPinToInterrupt(A12), pulse1Enc, CHANGE);
+  if (PULSE_2_USE)
+    attachInterrupt(digitalPinToInterrupt(A22), pulse2Enc, CHANGE);
   vTaskDelete(NULL);
 }
 
-void setEmergencyStop(int kind) {
+void setEmergencyStop(int kind)
+{
   emergencyStop = kind;
   setAsyncTimerEnable(false);
   xSemaphoreTake(z.mutex, 10);
@@ -1424,7 +1728,8 @@ void setEmergencyStop(int kind) {
   xSemaphoreTake(a1.mutex, 10);
 }
 
-void setup() {
+void setup()
+{
   pinMode(ENC_A, INPUT_PULLUP);
   pinMode(ENC_B, INPUT_PULLUP);
 
@@ -1438,7 +1743,8 @@ void setup() {
   pinMode(X_ENA, OUTPUT);
   DHIGH(X_STEP);
 
-  if (ACTIVE_A1) {
+  if (ACTIVE_A1)
+  {
     pinMode(A12, OUTPUT);
     pinMode(A13, OUTPUT);
     pinMode(A11, OUTPUT);
@@ -1447,14 +1753,16 @@ void setup() {
 
   pinMode(BUZZ, OUTPUT);
 
-  if (PULSE_1_USE) {
+  if (PULSE_1_USE)
+  {
     pinMode(A11, OUTPUT);
     pinMode(A12, INPUT);
     pinMode(A13, INPUT);
     DLOW(A11);
   }
 
-  if (PULSE_2_USE) {
+  if (PULSE_2_USE)
+  {
     pinMode(A21, OUTPUT);
     pinMode(A22, INPUT);
     pinMode(A23, INPUT);
@@ -1463,7 +1771,8 @@ void setup() {
 
   Preferences pref;
   pref.begin(PREF_NAMESPACE);
-  if (pref.getInt(PREF_VERSION) != PREFERENCES_VERSION) {
+  if (pref.getInt(PREF_VERSION) != PREFERENCES_VERSION)
+  {
     pref.clear();
     pref.putInt(PREF_VERSION, PREFERENCES_VERSION);
   }
@@ -1511,13 +1820,16 @@ void setup() {
   savedAuxForward = auxForward = pref.getBool(PREF_AUX_FORWARD, true);
   pref.end();
 
-  if (!z.needsRest && !z.disabled) {
+  if (!z.needsRest && !z.disabled)
+  {
     DHIGH(z.ena);
   }
-  if (!x.needsRest && !x.disabled) {
+  if (!x.needsRest && !x.disabled)
+  {
     DHIGH(x.ena);
   }
-  if (a1.active && !a1.needsRest && !a1.disabled) {
+  if (a1.active && !a1.needsRest && !a1.disabled)
+  {
     DHIGH(a1.ena);
   }
 
@@ -1532,11 +1844,16 @@ void setup() {
 
   Serial.begin(115200);
 
-  if (!Wire.begin(SDA, SCL)) {
+  if (!Wire.begin(SDA, SCL))
+  {
     Serial.println("I2C initialization failed");
-  } else if (!keypad.begin(TCA8418_DEFAULT_ADDR, &Wire)) {
+  }
+  else if (!keypad.begin(TCA8418_DEFAULT_ADDR, &Wire))
+  {
     Serial.println("TCA8418 key controller not found");
-  } else {
+  }
+  else
+  {
     keypad.matrix(7, 7);
     keypad.flush();
   }
@@ -1545,78 +1862,123 @@ void setup() {
   xTaskCreatePinnedToCore(taskDisplay, "taskDisplay", 10000 /* stack size */, NULL, 0 /* priority */, NULL, 0 /* core */);
 
   delay(100);
-  if (keypad.available()) {
+  if (keypad.available())
+  {
     setEmergencyStop(ESTOP_KEY);
     return;
-  } else {
+  }
+  else
+  {
     xTaskCreatePinnedToCore(taskKeypad, "taskKeypad", 10000 /* stack size */, NULL, 0 /* priority */, NULL, 0 /* core */);
   }
 
   xTaskCreatePinnedToCore(taskMoveZ, "taskMoveZ", 10000 /* stack size */, NULL, 0 /* priority */, NULL, 0 /* core */);
   xTaskCreatePinnedToCore(taskMoveX, "taskMoveX", 10000 /* stack size */, NULL, 0 /* priority */, NULL, 0 /* core */);
-  if (a1.active) xTaskCreatePinnedToCore(taskMoveA1, "taskMoveA1", 10000 /* stack size */, NULL, 0 /* priority */, NULL, 0 /* core */);
+  if (a1.active)
+    xTaskCreatePinnedToCore(taskMoveA1, "taskMoveA1", 10000 /* stack size */, NULL, 0 /* priority */, NULL, 0 /* core */);
   xTaskCreatePinnedToCore(taskAttachInterrupts, "taskAttachInterrupts", 10000 /* stack size */, NULL, 0 /* priority */, NULL, 0 /* core */);
   xTaskCreatePinnedToCore(taskGcode, "taskGcode", 10000 /* stack size */, NULL, 0 /* priority */, NULL, 0 /* core */);
 }
 
-bool saveIfChanged() {
+bool saveIfChanged()
+{
   // Should avoid calling Preferences whenever possible to reduce memory wear and avoid ~20ms write delay that blocks interrupts.
   if (dupr == savedDupr && starts == savedStarts && z.pos == z.savedPos && z.originPos == z.savedOriginPos && z.posGlobal == z.savedPosGlobal && z.motorPos == z.savedMotorPos && z.leftStop == z.savedLeftStop && z.rightStop == z.savedRightStop && z.disabled == z.savedDisabled &&
       spindlePos == savedSpindlePos && spindlePosAvg == savedSpindlePosAvg && spindlePosSync == savedSpindlePosSync && savedSpindlePosGlobal == spindlePosGlobal && showAngle == savedShowAngle && showTacho == savedShowTacho && moveStep == savedMoveStep &&
       mode == savedMode && measure == savedMeasure && x.pos == x.savedPos && x.originPos == x.savedOriginPos && x.posGlobal == x.savedPosGlobal && x.motorPos == x.savedMotorPos && x.leftStop == x.savedLeftStop && x.rightStop == x.savedRightStop && x.disabled == x.savedDisabled &&
       a1.pos == a1.savedPos && a1.originPos == a1.savedOriginPos && a1.posGlobal == a1.savedPosGlobal && a1.motorPos == a1.savedMotorPos && a1.leftStop == a1.savedLeftStop && a1.rightStop == a1.savedRightStop && a1.disabled == a1.savedDisabled &&
-      coneRatio == savedConeRatio && turnPasses == savedTurnPasses && savedAuxForward == auxForward) return false;
+      coneRatio == savedConeRatio && turnPasses == savedTurnPasses && savedAuxForward == auxForward)
+    return false;
 
   Preferences pref;
   pref.begin(PREF_NAMESPACE);
-  if (dupr != savedDupr) pref.putLong(PREF_DUPR, savedDupr = dupr);
-  if (starts != savedStarts) pref.putInt(PREF_STARTS, savedStarts = starts);
-  if (z.pos != z.savedPos) pref.putLong(PREF_POS_Z, z.savedPos = z.pos);
-  if (z.posGlobal != z.savedPosGlobal) pref.putLong(PREF_POS_GLOBAL_Z, z.savedPosGlobal = z.posGlobal);
-  if (z.originPos != z.savedOriginPos) pref.putLong(PREF_ORIGIN_POS_Z, z.savedOriginPos = z.originPos);
-  if (z.motorPos != z.savedMotorPos) pref.putLong(PREF_MOTOR_POS_Z, z.savedMotorPos = z.motorPos);
-  if (z.leftStop != z.savedLeftStop) pref.putLong(PREF_LEFT_STOP_Z, z.savedLeftStop = z.leftStop);
-  if (z.rightStop != z.savedRightStop) pref.putLong(PREF_RIGHT_STOP_Z, z.savedRightStop = z.rightStop);
-  if (z.disabled != z.savedDisabled) pref.putBool(PREF_DISABLED_Z, z.savedDisabled = z.disabled);
-  if (spindlePos != savedSpindlePos) pref.putLong(PREF_SPINDLE_POS, savedSpindlePos = spindlePos);
-  if (spindlePosAvg != savedSpindlePosAvg) pref.putLong(PREF_SPINDLE_POS_AVG, savedSpindlePosAvg = spindlePosAvg);
-  if (spindlePosSync != savedSpindlePosSync) pref.putInt(PREF_OUT_OF_SYNC, savedSpindlePosSync = spindlePosSync);
-  if (spindlePosGlobal != savedSpindlePosGlobal) pref.putLong(PREF_SPINDLE_POS_GLOBAL, savedSpindlePosGlobal = spindlePosGlobal);
-  if (showAngle != savedShowAngle) pref.putBool(PREF_SHOW_ANGLE, savedShowAngle = showAngle);
-  if (showTacho != savedShowTacho) pref.putBool(PREF_SHOW_TACHO, savedShowTacho = showTacho);
-  if (moveStep != savedMoveStep) pref.putLong(PREF_MOVE_STEP, savedMoveStep = moveStep);
-  if (mode != savedMode) pref.putInt(PREF_MODE, savedMode = mode);
-  if (measure != savedMeasure) pref.putInt(PREF_MEASURE, savedMeasure = measure);
-  if (x.pos != x.savedPos) pref.putLong(PREF_POS_X, x.savedPos = x.pos);
-  if (x.posGlobal != x.savedPosGlobal) pref.putLong(PREF_POS_GLOBAL_X, x.savedPosGlobal = x.posGlobal);
-  if (x.originPos != x.savedOriginPos) pref.putLong(PREF_ORIGIN_POS_X, x.savedOriginPos = x.originPos);
-  if (x.motorPos != x.savedMotorPos) pref.putLong(PREF_MOTOR_POS_X, x.savedMotorPos = x.motorPos);
-  if (x.leftStop != x.savedLeftStop) pref.putLong(PREF_LEFT_STOP_X, x.savedLeftStop = x.leftStop);
-  if (x.rightStop != x.savedRightStop) pref.putLong(PREF_RIGHT_STOP_X, x.savedRightStop = x.rightStop);
-  if (x.disabled != x.savedDisabled) pref.putBool(PREF_DISABLED_X, x.savedDisabled = x.disabled);
-  if (a1.pos != a1.savedPos) pref.putLong(PREF_POS_A1, a1.savedPos = a1.pos);
-  if (a1.posGlobal != a1.savedPosGlobal) pref.putLong(PREF_POS_GLOBAL_A1, a1.savedPosGlobal = a1.posGlobal);
-  if (a1.originPos != a1.savedOriginPos) pref.putLong(PREF_ORIGIN_POS_A1, a1.savedOriginPos = a1.originPos);
-  if (a1.motorPos != a1.savedMotorPos) pref.putLong(PREF_MOTOR_POS_A1, a1.savedMotorPos = a1.motorPos);
-  if (a1.leftStop != a1.savedLeftStop) pref.putLong(PREF_LEFT_STOP_A1, a1.savedLeftStop = a1.leftStop);
-  if (a1.rightStop != a1.savedRightStop) pref.putLong(PREF_RIGHT_STOP_A1, a1.savedRightStop = a1.rightStop);
-  if (a1.disabled != a1.savedDisabled) pref.putBool(PREF_DISABLED_A1, a1.savedDisabled = a1.disabled);
-  if (coneRatio != savedConeRatio) pref.putFloat(PREF_CONE_RATIO, savedConeRatio = coneRatio);
-  if (turnPasses != savedTurnPasses) pref.putInt(PREF_TURN_PASSES, savedTurnPasses = turnPasses);
-  if (auxForward != savedAuxForward) pref.putBool(PREF_AUX_FORWARD, savedAuxForward = auxForward);
+  if (dupr != savedDupr)
+    pref.putLong(PREF_DUPR, savedDupr = dupr);
+  if (starts != savedStarts)
+    pref.putInt(PREF_STARTS, savedStarts = starts);
+  if (z.pos != z.savedPos)
+    pref.putLong(PREF_POS_Z, z.savedPos = z.pos);
+  if (z.posGlobal != z.savedPosGlobal)
+    pref.putLong(PREF_POS_GLOBAL_Z, z.savedPosGlobal = z.posGlobal);
+  if (z.originPos != z.savedOriginPos)
+    pref.putLong(PREF_ORIGIN_POS_Z, z.savedOriginPos = z.originPos);
+  if (z.motorPos != z.savedMotorPos)
+    pref.putLong(PREF_MOTOR_POS_Z, z.savedMotorPos = z.motorPos);
+  if (z.leftStop != z.savedLeftStop)
+    pref.putLong(PREF_LEFT_STOP_Z, z.savedLeftStop = z.leftStop);
+  if (z.rightStop != z.savedRightStop)
+    pref.putLong(PREF_RIGHT_STOP_Z, z.savedRightStop = z.rightStop);
+  if (z.disabled != z.savedDisabled)
+    pref.putBool(PREF_DISABLED_Z, z.savedDisabled = z.disabled);
+  if (spindlePos != savedSpindlePos)
+    pref.putLong(PREF_SPINDLE_POS, savedSpindlePos = spindlePos);
+  if (spindlePosAvg != savedSpindlePosAvg)
+    pref.putLong(PREF_SPINDLE_POS_AVG, savedSpindlePosAvg = spindlePosAvg);
+  if (spindlePosSync != savedSpindlePosSync)
+    pref.putInt(PREF_OUT_OF_SYNC, savedSpindlePosSync = spindlePosSync);
+  if (spindlePosGlobal != savedSpindlePosGlobal)
+    pref.putLong(PREF_SPINDLE_POS_GLOBAL, savedSpindlePosGlobal = spindlePosGlobal);
+  if (showAngle != savedShowAngle)
+    pref.putBool(PREF_SHOW_ANGLE, savedShowAngle = showAngle);
+  if (showTacho != savedShowTacho)
+    pref.putBool(PREF_SHOW_TACHO, savedShowTacho = showTacho);
+  if (moveStep != savedMoveStep)
+    pref.putLong(PREF_MOVE_STEP, savedMoveStep = moveStep);
+  if (mode != savedMode)
+    pref.putInt(PREF_MODE, savedMode = mode);
+  if (measure != savedMeasure)
+    pref.putInt(PREF_MEASURE, savedMeasure = measure);
+  if (x.pos != x.savedPos)
+    pref.putLong(PREF_POS_X, x.savedPos = x.pos);
+  if (x.posGlobal != x.savedPosGlobal)
+    pref.putLong(PREF_POS_GLOBAL_X, x.savedPosGlobal = x.posGlobal);
+  if (x.originPos != x.savedOriginPos)
+    pref.putLong(PREF_ORIGIN_POS_X, x.savedOriginPos = x.originPos);
+  if (x.motorPos != x.savedMotorPos)
+    pref.putLong(PREF_MOTOR_POS_X, x.savedMotorPos = x.motorPos);
+  if (x.leftStop != x.savedLeftStop)
+    pref.putLong(PREF_LEFT_STOP_X, x.savedLeftStop = x.leftStop);
+  if (x.rightStop != x.savedRightStop)
+    pref.putLong(PREF_RIGHT_STOP_X, x.savedRightStop = x.rightStop);
+  if (x.disabled != x.savedDisabled)
+    pref.putBool(PREF_DISABLED_X, x.savedDisabled = x.disabled);
+  if (a1.pos != a1.savedPos)
+    pref.putLong(PREF_POS_A1, a1.savedPos = a1.pos);
+  if (a1.posGlobal != a1.savedPosGlobal)
+    pref.putLong(PREF_POS_GLOBAL_A1, a1.savedPosGlobal = a1.posGlobal);
+  if (a1.originPos != a1.savedOriginPos)
+    pref.putLong(PREF_ORIGIN_POS_A1, a1.savedOriginPos = a1.originPos);
+  if (a1.motorPos != a1.savedMotorPos)
+    pref.putLong(PREF_MOTOR_POS_A1, a1.savedMotorPos = a1.motorPos);
+  if (a1.leftStop != a1.savedLeftStop)
+    pref.putLong(PREF_LEFT_STOP_A1, a1.savedLeftStop = a1.leftStop);
+  if (a1.rightStop != a1.savedRightStop)
+    pref.putLong(PREF_RIGHT_STOP_A1, a1.savedRightStop = a1.rightStop);
+  if (a1.disabled != a1.savedDisabled)
+    pref.putBool(PREF_DISABLED_A1, a1.savedDisabled = a1.disabled);
+  if (coneRatio != savedConeRatio)
+    pref.putFloat(PREF_CONE_RATIO, savedConeRatio = coneRatio);
+  if (turnPasses != savedTurnPasses)
+    pref.putInt(PREF_TURN_PASSES, savedTurnPasses = turnPasses);
+  if (auxForward != savedAuxForward)
+    pref.putBool(PREF_AUX_FORWARD, savedAuxForward = auxForward);
   pref.end();
   return true;
 }
 
-void markAxisOrigin(Axis* a) {
+void markAxisOrigin(Axis *a)
+{
   bool hasSemaphore = xSemaphoreTake(a->mutex, 10) == pdTRUE;
-  if (!hasSemaphore) {
+  if (!hasSemaphore)
+  {
     beepFlag = true;
   }
-  if (a->leftStop != LONG_MAX) {
+  if (a->leftStop != LONG_MAX)
+  {
     a->leftStop -= a->pos;
   }
-  if (a->rightStop != LONG_MIN) {
+  if (a->rightStop != LONG_MIN)
+  {
     a->rightStop -= a->pos;
   }
   a->motorPos -= a->pos;
@@ -1624,12 +1986,14 @@ void markAxisOrigin(Axis* a) {
   a->pos = 0;
   a->fractionalPos = 0;
   a->pendingPos = 0;
-  if (hasSemaphore) {
+  if (hasSemaphore)
+  {
     xSemaphoreGive(a->mutex);
   }
 }
 
-void zeroSpindlePos() {
+void zeroSpindlePos()
+{
   spindlePos = 0;
   spindlePosAvg = 0;
   spindlePosSync = 0;
@@ -1640,22 +2004,26 @@ void zeroSpindlePos() {
 // or ELS is turned on/off. Without this, changing dupr will
 // result in stepper rushing across the lathe to the new position.
 // Must be called while holding motionMutex.
-void markOrigin() {
+void markOrigin()
+{
   markAxisOrigin(&z);
   markAxisOrigin(&x);
   markAxisOrigin(&a1);
   zeroSpindlePos();
 }
 
-void markAxis0(Axis* a) {
+void markAxis0(Axis *a)
+{
   a->originPos = -a->pos;
 }
 
-Axis* getAsyncAxis() {
+Axis *getAsyncAxis()
+{
   return mode == MODE_A1 ? &a1 : &z;
 }
 
-void updateAsyncTimerSettings() {
+void updateAsyncTimerSettings()
+{
   // dupr and therefore direction can change while we're in async mode.
   setDir(getAsyncAxis(), dupr > 0);
 
@@ -1665,49 +2033,60 @@ void updateAsyncTimerSettings() {
   timerWrite(async_timer, 0);
 }
 
-void setDupr(long value) {
+void setDupr(long value)
+{
   // Can't apply changes right away since we might be in the middle of motion logic.
   nextDupr = value;
   nextDuprFlag = true;
 }
 
 // Must be called while holding motionMutex.
-void applyDupr() {
-  if (nextDupr == dupr) {
+void applyDupr()
+{
+  if (nextDupr == dupr)
+  {
     return;
   }
   dupr = nextDupr;
   markOrigin();
-  if (mode == MODE_ASYNC || mode == MODE_A1) {
+  if (mode == MODE_ASYNC || mode == MODE_A1)
+  {
     updateAsyncTimerSettings();
   }
 }
 
-void setStarts(int value) {
+void setStarts(int value)
+{
   // Can't apply changes right away since we might be in the middle of motion logic.
   nextStarts = value;
   nextStartsFlag = true;
 }
 
 // Must be called while holding motionMutex.
-void applyStarts() {
-  if (starts == nextStarts) {
+void applyStarts()
+{
+  if (starts == nextStarts)
+  {
     return;
   }
   starts = nextStarts;
   markOrigin();
 }
 
-void setMeasure(int value) {
-  if (measure == value) {
+void setMeasure(int value)
+{
+  if (measure == value)
+  {
     return;
   }
   measure = value;
   moveStep = measure == MEASURE_METRIC ? MOVE_STEP_1 : MOVE_STEP_IMP_1;
 }
 
-unsigned int getTimerLimit() {
-  if (dupr == 0) {
+unsigned int getTimerLimit()
+{
+  if (dupr == 0)
+  {
     return 65535;
   }
   return min(long(65535), long(1000000 / (z.motorSteps * abs(dupr) / z.screwPitch)) - 1); // 1000000/Hz - 1
@@ -1715,23 +2094,33 @@ unsigned int getTimerLimit() {
 
 // Only used for async movement in ASYNC and A1 modes.
 // Keep code in this method to absolute minimum to achieve high stepper speeds.
-void IRAM_ATTR onAsyncTimer() {
-  Axis* a = getAsyncAxis();
-  if (!isOn || a->movingManually || (mode != MODE_ASYNC && mode != MODE_A1)) {
+void IRAM_ATTR onAsyncTimer()
+{
+  Axis *a = getAsyncAxis();
+  if (!isOn || a->movingManually || (mode != MODE_ASYNC && mode != MODE_A1))
+  {
     return;
-  } else if (dupr > 0 && a->pos < a->leftStop) {
-    if (a->pos <= a->motorPos) {
+  }
+  else if (dupr > 0 && a->pos < a->leftStop)
+  {
+    if (a->pos <= a->motorPos)
+    {
       a->pos++;
     }
     a->motorPos++;
     a->posGlobal++;
-  } else if (dupr < 0 && a->pos > a->rightStop) {
-    if (a->pos >= a->motorPos + a->backlashSteps) {
+  }
+  else if (dupr < 0 && a->pos > a->rightStop)
+  {
+    if (a->pos >= a->motorPos + a->backlashSteps)
+    {
       a->pos--;
     }
     a->motorPos--;
     a->posGlobal--;
-  } else {
+  }
+  else
+  {
     return;
   }
 
@@ -1741,27 +2130,36 @@ void IRAM_ATTR onAsyncTimer() {
   DHIGH(a->step);
 }
 
-void setModeFromTask(int value) {
+void setModeFromTask(int value)
+{
   nextMode = value;
   nextModeFlag = true;
 }
 
-void setModeFromLoop(int value) {
-  if (mode == value) {
+void setModeFromLoop(int value)
+{
+  if (mode == value)
+  {
     return;
   }
-  if (isOn) {
+  if (isOn)
+  {
     setIsOnFromLoop(false);
   }
-  if (mode == MODE_THREAD) {
+  if (mode == MODE_THREAD)
+  {
     setStarts(1);
-  } else if (mode == MODE_ASYNC || mode == MODE_A1) {
+  }
+  else if (mode == MODE_ASYNC || mode == MODE_A1)
+  {
     setAsyncTimerEnable(false);
   }
   mode = value;
   setupIndex = 0;
-  if (mode == MODE_ASYNC || mode == MODE_A1) {
-    if (!timerAttached) {
+  if (mode == MODE_ASYNC || mode == MODE_A1)
+  {
+    if (!timerAttached)
+    {
       timerAttached = true;
       timerAttachInterrupt(async_timer, &onAsyncTimer, true);
     }
@@ -1770,29 +2168,37 @@ void setModeFromLoop(int value) {
   }
 }
 
-void setTurnPasses(int value) {
-  if (isOn) {
+void setTurnPasses(int value)
+{
+  if (isOn)
+  {
     beep();
-  } else {
+  }
+  else
+  {
     turnPasses = value;
   }
 }
 
-void setConeRatio(float value) {
+void setConeRatio(float value)
+{
   // Can't apply changes right away since we might be in the middle of motion logic.
   nextConeRatio = value;
   nextConeRatioFlag = true;
 }
 
-void applyConeRatio() {
-  if (nextConeRatio == coneRatio) {
+void applyConeRatio()
+{
+  if (nextConeRatio == coneRatio)
+  {
     return;
   }
   coneRatio = nextConeRatio;
   markOrigin();
 }
 
-void reset() {
+void reset()
+{
   z.leftStop = LONG_MAX;
   z.nextLeftStopFlag = false;
   z.rightStop = LONG_MIN;
@@ -1831,93 +2237,134 @@ void reset() {
   auxForward = true;
 }
 
-long normalizePitch(long pitch) {
+long normalizePitch(long pitch)
+{
   int scale = 1;
-  if (measure == MEASURE_METRIC) {
+  if (measure == MEASURE_METRIC)
+  {
     // Drop the 3rd and 4th precision point if any.
     scale = 100;
-  } else if (measure == MEASURE_INCH) {
+  }
+  else if (measure == MEASURE_INCH)
+  {
     // Always drop the 4th precision point in inch representation if any.
     scale = 254;
   }
   return round(pitch / scale) * scale;
 }
 
-void buttonPlusMinusPress(bool plus) {
+void buttonPlusMinusPress(bool plus)
+{
   // Mutex is aquired in setDupr() and setStarts().
   bool minus = !plus;
-  if (mode == MODE_THREAD && setupIndex == 2) {
-    if (minus && starts > 2) {
+  if (mode == MODE_THREAD && setupIndex == 2)
+  {
+    if (minus && starts > 2)
+    {
       setStarts(starts - 1);
-    } else if (plus && starts < STARTS_MAX) {
+    }
+    else if (plus && starts < STARTS_MAX)
+    {
       setStarts(starts + 1);
     }
-  } else if (isPassMode() && setupIndex == 1 && getNumpadResult() == 0) {
-    if (minus && turnPasses > 1) {
+  }
+  else if (isPassMode() && setupIndex == 1 && getNumpadResult() == 0)
+  {
+    if (minus && turnPasses > 1)
+    {
       setTurnPasses(turnPasses - 1);
-    } else if (plus && turnPasses < PASSES_MAX) {
+    }
+    else if (plus && turnPasses < PASSES_MAX)
+    {
       setTurnPasses(turnPasses + 1);
     }
-  } else if (measure != MEASURE_TPI) {
+  }
+  else if (measure != MEASURE_TPI)
+  {
     int delta = measure == MEASURE_METRIC ? MOVE_STEP_3 : MOVE_STEP_IMP_3;
     // Switching between mm/inch/tpi often results in getting non-0 3rd and 4th
     // precision points that can't be easily controlled. Remove them.
     long normalizedDupr = normalizePitch(dupr);
-    if (minus && dupr > -DUPR_MAX) {
+    if (minus && dupr > -DUPR_MAX)
+    {
       setDupr(max(-DUPR_MAX, normalizedDupr - delta));
-    } else if (plus && dupr < DUPR_MAX) {
+    }
+    else if (plus && dupr < DUPR_MAX)
+    {
       setDupr(min(DUPR_MAX, normalizedDupr + delta));
     }
-  } else { // TPI
-    if (dupr == 0) {
+  }
+  else
+  { // TPI
+    if (dupr == 0)
+    {
       setDupr(plus ? 1 : -1);
-    } else {
+    }
+    else
+    {
       long currentTpi = round(254000.0 / dupr);
       long tpi = currentTpi + (plus ? 1 : -1);
       long newDupr = tpi == 0 ? (plus ? DUPR_MAX : -DUPR_MAX) : round(254000.0 / tpi);
       // Happens for small pitches like 0.01mm.
-      if (newDupr == dupr) {
+      if (newDupr == dupr)
+      {
         newDupr += plus ? -1 : 1;
       }
-      if (newDupr != dupr && newDupr < DUPR_MAX && newDupr > -DUPR_MAX) {
+      if (newDupr != dupr && newDupr < DUPR_MAX && newDupr > -DUPR_MAX)
+      {
         setDupr(newDupr);
       }
     }
   }
 }
 
-void beep() {
+void beep()
+{
   tone(BUZZ, 1000, 500);
 }
 
-void buttonOnOffPress(bool on) {
+void buttonOnOffPress(bool on)
+{
   resetMillis = millis();
   bool missingZStops = needZStops() && (z.leftStop == LONG_MAX || z.rightStop == LONG_MIN);
-  if (on && isPassMode() && (missingZStops || x.leftStop == LONG_MAX || x.rightStop == LONG_MIN)) {
+  if (on && isPassMode() && (missingZStops || x.leftStop == LONG_MAX || x.rightStop == LONG_MIN))
+  {
     beep();
-  } else if (!isOn && on && setupIndex < getLastSetupIndex()) {
+  }
+  else if (!isOn && on && setupIndex < getLastSetupIndex())
+  {
     // Move to the next setup step.
     setupIndex++;
-  } else if (isOn && on && (mode == MODE_TURN || mode == MODE_FACE || mode == MODE_THREAD)) {
+  }
+  else if (isOn && on && (mode == MODE_TURN || mode == MODE_FACE || mode == MODE_THREAD))
+  {
     // Move to the next pass.
     opIndexAdvanceFlag = true;
-  } else if (!on && (z.movingManually || x.movingManually || x.movingManually)) {
+  }
+  else if (!on && (z.movingManually || x.movingManually || x.movingManually))
+  {
     setEmergencyStop(ESTOP_OFF_MANUAL_MOVE);
-  } else {
+  }
+  else
+  {
     setIsOnFromTask(on);
   }
 }
 
-void setIsOnFromTask(bool on) {
+void setIsOnFromTask(bool on)
+{
   nextIsOn = on;
   nextIsOnFlag = true;
 }
 
-void setIsOnFromLoop(bool on) {
-  if (isOn && on) {
+void setIsOnFromLoop(bool on)
+{
+  if (isOn && on)
+  {
     return;
   }
-  if (!on) {
+  if (!on)
+  {
     isOn = false;
     setupIndex = 0;
   }
@@ -1925,7 +2372,8 @@ void setIsOnFromLoop(bool on) {
   stepperEnable(&x, on);
   stepperEnable(&a1, on);
   markOrigin();
-  if (on) {
+  if (on)
+  {
     isOn = true;
     opDuprSign = dupr >= 0 ? 1 : -1;
     opDupr = dupr;
@@ -1936,31 +2384,39 @@ void setIsOnFromLoop(bool on) {
   }
 }
 
-void buttonOffRelease() {
-  if (millis() - resetMillis > 3000) {
+void buttonOffRelease()
+{
+  if (millis() - resetMillis > 3000)
+  {
     reset();
     splashScreen = true;
   }
 }
 
-void setLeftStop(Axis* a, long value) {
+void setLeftStop(Axis *a, long value)
+{
   // Can't apply changes right away since we might be in the middle of motion logic.
   a->nextLeftStop = value;
   a->nextLeftStopFlag = true;
 }
 
-void leaveStop(Axis* a, long oldStop) {
-  if (mode == MODE_CONE) {
+void leaveStop(Axis *a, long oldStop)
+{
+  if (mode == MODE_CONE)
+  {
     // To avoid rushing to a far away position if standing on limit.
     markOrigin();
-  } else if (mode == MODE_NORMAL && a == getPitchAxis() && a->pos == oldStop) {
+  }
+  else if (mode == MODE_NORMAL && a == getPitchAxis() && a->pos == oldStop)
+  {
     // Spindle is most likely out of sync with the stepper because
     // it was spinning while the lead screw was on the stop.
     spindlePosSync = spindleModulo(spindlePos - spindleFromPos(a, a->pos));
   }
 }
 
-void applyLeftStop(Axis* a) {
+void applyLeftStop(Axis *a)
+{
   // Accept left stop even if it's lower than pos.
   // Stop button press processing takes time during which motor could have moved.
   long oldStop = a->leftStop;
@@ -1968,13 +2424,15 @@ void applyLeftStop(Axis* a) {
   leaveStop(a, oldStop);
 }
 
-void setRightStop(Axis* a, long value) {
+void setRightStop(Axis *a, long value)
+{
   // Can't apply changes right away since we might be in the middle of motion logic.
   a->nextRightStop = value;
   a->nextRightStopFlag = true;
 }
 
-void applyRightStop(Axis* a) {
+void applyRightStop(Axis *a)
+{
   // Accept right stop even if it's higher than pos.
   // Stop button press processing takes time during which motor could have moved.
   long oldStop = a->rightStop;
@@ -1982,48 +2440,72 @@ void applyRightStop(Axis* a) {
   leaveStop(a, oldStop);
 }
 
-void buttonLeftStopPress(Axis* a) {
+void buttonLeftStopPress(Axis *a)
+{
   setLeftStop(a, a->leftStop == LONG_MAX ? a->pos : LONG_MAX);
 }
 
-void buttonRightStopPress(Axis* a) {
+void buttonRightStopPress(Axis *a)
+{
   setRightStop(a, a->rightStop == LONG_MIN ? a->pos : LONG_MIN);
 }
 
-void buttonDisplayPress() {
-  if (!showAngle && !showTacho) {
+void buttonDisplayPress()
+{
+  if (!showAngle && !showTacho)
+  {
     showAngle = true;
-  } else if (showAngle) {
+  }
+  else if (showAngle)
+  {
     showAngle = false;
     showTacho = true;
-  } else {
+  }
+  else
+  {
     showTacho = false;
   }
 }
 
-void buttonMoveStepPress() {
-  if (measure == MEASURE_METRIC) {
-    if (moveStep == MOVE_STEP_1) {
+void buttonMoveStepPress()
+{
+  if (measure == MEASURE_METRIC)
+  {
+    if (moveStep == MOVE_STEP_1)
+    {
       moveStep = MOVE_STEP_2;
-    } else if (moveStep == MOVE_STEP_2) {
+    }
+    else if (moveStep == MOVE_STEP_2)
+    {
       moveStep = MOVE_STEP_3;
-    } else {
+    }
+    else
+    {
       moveStep = MOVE_STEP_1;
     }
-  } else {
-    if (moveStep == MOVE_STEP_IMP_1) {
+  }
+  else
+  {
+    if (moveStep == MOVE_STEP_IMP_1)
+    {
       moveStep = MOVE_STEP_IMP_2;
-    } else if (moveStep == MOVE_STEP_IMP_2) {
+    }
+    else if (moveStep == MOVE_STEP_IMP_2)
+    {
       moveStep = MOVE_STEP_IMP_3;
-    } else {
+    }
+    else
+    {
       moveStep = MOVE_STEP_IMP_1;
     }
   }
 }
 
-void setDir(Axis* a, bool dir) {
+void setDir(Axis *a, bool dir)
+{
   // Start slow if direction changed.
-  if (a->direction != dir || !a->directionInitialized) {
+  if (a->direction != dir || !a->directionInitialized)
+  {
     a->speed = a->speedStart;
     a->direction = dir;
     a->directionInitialized = true;
@@ -2032,151 +2514,224 @@ void setDir(Axis* a, bool dir) {
   }
 }
 
-void buttonModePress() {
-  if (mode == MODE_NORMAL) {
+void buttonModePress()
+{
+  if (mode == MODE_NORMAL)
+  {
     setModeFromTask(ACTIVE_A1 ? MODE_A1 : MODE_ELLIPSE);
-  } else if (mode == MODE_A1) {
+  }
+  else if (mode == MODE_A1)
+  {
     setModeFromTask(MODE_ELLIPSE);
-  } else if (mode == MODE_ELLIPSE) {
+  }
+  else if (mode == MODE_ELLIPSE)
+  {
     setModeFromTask(MODE_GCODE);
-  } else if (mode == MODE_GCODE) {
+  }
+  else if (mode == MODE_GCODE)
+  {
     setModeFromTask(MODE_ASYNC);
-  } else {
+  }
+  else
+  {
     setModeFromTask(MODE_NORMAL);
   }
 }
 
-void buttonMeasurePress() {
-  if (measure == MEASURE_METRIC) {
+void buttonMeasurePress()
+{
+  if (measure == MEASURE_METRIC)
+  {
     setMeasure(MEASURE_INCH);
-  } else if (measure == MEASURE_INCH) {
+  }
+  else if (measure == MEASURE_INCH)
+  {
     setMeasure(MEASURE_TPI);
-  } else {
+  }
+  else
+  {
     setMeasure(MEASURE_METRIC);
   }
 }
 
-void buttonReversePress() {
+void buttonReversePress()
+{
   setDupr(-dupr);
 }
 
-void numpadPress(int digit) {
-  if (!inNumpad) {
+void numpadPress(int digit)
+{
+  if (!inNumpad)
+  {
     numpadIndex = 0;
   }
   numpadDigits[numpadIndex] = digit;
-  if (numpadIndex < 7) {
+  if (numpadIndex < 7)
+  {
     numpadIndex++;
-  } else {
+  }
+  else
+  {
     numpadIndex = 0;
   }
 }
 
-void numpadBackspace() {
-  if (inNumpad && numpadIndex > 0) {
+void numpadBackspace()
+{
+  if (inNumpad && numpadIndex > 0)
+  {
     numpadIndex--;
   }
 }
 
-void resetNumpad() {
+void resetNumpad()
+{
   numpadIndex = 0;
 }
 
-long getNumpadResult() {
+long getNumpadResult()
+{
   long result = 0;
-  for (int i = 0; i < numpadIndex; i++) {
+  for (int i = 0; i < numpadIndex; i++)
+  {
     result += numpadDigits[i] * pow(10, numpadIndex - 1 - i);
   }
   return result;
 }
 
-void numpadPlusMinus(bool plus) {
-  if (numpadDigits[numpadIndex - 1] < 9 && plus) {
+void numpadPlusMinus(bool plus)
+{
+  if (numpadDigits[numpadIndex - 1] < 9 && plus)
+  {
     numpadDigits[numpadIndex - 1]++;
-  } else if (numpadDigits[numpadIndex - 1] > 1 && !plus) {
+  }
+  else if (numpadDigits[numpadIndex - 1] > 1 && !plus)
+  {
     numpadDigits[numpadIndex - 1]--;
   }
   // TODO: implement going over 9 and below 1.
 }
 
-long numpadToDeciMicrons() {
+long numpadToDeciMicrons()
+{
   long result = getNumpadResult();
-  if (result == 0) {
+  if (result == 0)
+  {
     return 0;
   }
-  if (measure == MEASURE_INCH) {
+  if (measure == MEASURE_INCH)
+  {
     result = result * 254;
-  } else if (measure == MEASURE_TPI) {
+  }
+  else if (measure == MEASURE_TPI)
+  {
     result = round(254000.0 / result);
-  } else { // Metric
+  }
+  else
+  { // Metric
     result = result * 10;
   }
   return result;
 }
 
-float numpadToConeRatio() {
+float numpadToConeRatio()
+{
   return getNumpadResult() / 100000.0;
 }
 
-bool processNumpad(int keyCode) {
-  if (keyCode == B_0) {
+bool processNumpad(int keyCode)
+{
+  if (keyCode == B_0)
+  {
     numpadPress(0);
     inNumpad = true;
-  } else if (keyCode == B_1) {
+  }
+  else if (keyCode == B_1)
+  {
     numpadPress(1);
     inNumpad = true;
-  } else if (keyCode == B_2) {
+  }
+  else if (keyCode == B_2)
+  {
     numpadPress(2);
     inNumpad = true;
-  } else if (keyCode == B_3) {
+  }
+  else if (keyCode == B_3)
+  {
     numpadPress(3);
     inNumpad = true;
-  } else if (keyCode == B_4) {
+  }
+  else if (keyCode == B_4)
+  {
     numpadPress(4);
     inNumpad = true;
-  } else if (keyCode == B_5) {
+  }
+  else if (keyCode == B_5)
+  {
     numpadPress(5);
     inNumpad = true;
-  } else if (keyCode == B_6) {
+  }
+  else if (keyCode == B_6)
+  {
     numpadPress(6);
     inNumpad = true;
-  } else if (keyCode == B_7) {
+  }
+  else if (keyCode == B_7)
+  {
     numpadPress(7);
     inNumpad = true;
-  } else if (keyCode == B_8) {
+  }
+  else if (keyCode == B_8)
+  {
     numpadPress(8);
     inNumpad = true;
-  } else if (keyCode == B_9) {
+  }
+  else if (keyCode == B_9)
+  {
     numpadPress(9);
     inNumpad = true;
-  } else if (keyCode == B_BACKSPACE) {
+  }
+  else if (keyCode == B_BACKSPACE)
+  {
     numpadBackspace();
     inNumpad = true;
-  } else if (inNumpad && (keyCode == B_PLUS || keyCode == B_MINUS)) {
+  }
+  else if (inNumpad && (keyCode == B_PLUS || keyCode == B_MINUS))
+  {
     numpadPlusMinus(keyCode == B_PLUS);
     return true;
-  } else if (inNumpad) {
+  }
+  else if (inNumpad)
+  {
     inNumpad = false;
     return processNumpadResult(keyCode);
   }
   return inNumpad;
 }
 
-bool processNumpadResult(int keyCode) {
+bool processNumpadResult(int keyCode)
+{
   long newDu = numpadToDeciMicrons();
   float newConeRatio = numpadToConeRatio();
   long numpadResult = getNumpadResult();
   resetNumpad();
   // Ignore numpad input unless confirmed with ON.
-  if (keyCode == B_ON) {
-    if (isPassMode() && setupIndex == 1) {
+  if (keyCode == B_ON)
+  {
+    if (isPassMode() && setupIndex == 1)
+    {
       setTurnPasses(int(min(PASSES_MAX, numpadResult)));
       setupIndex++;
-    } else if (mode == MODE_CONE && setupIndex == 1) {
+    }
+    else if (mode == MODE_CONE && setupIndex == 1)
+    {
       setConeRatio(newConeRatio);
       setupIndex++;
-    } else {
-      if (abs(newDu) <= DUPR_MAX) {
+    }
+    else
+    {
+      if (abs(newDu) <= DUPR_MAX)
+      {
         setDupr(newDu);
       }
     }
@@ -2185,32 +2740,45 @@ bool processNumpadResult(int keyCode) {
   }
 
   // Shared piece for stops and moves.
-  Axis* a = (keyCode == B_STOPL || keyCode == B_STOPR || keyCode == B_LEFT || keyCode == B_RIGHT || keyCode == B_Z) ? &z : &x;
+  Axis *a = (keyCode == B_STOPL || keyCode == B_STOPR || keyCode == B_LEFT || keyCode == B_RIGHT || keyCode == B_Z) ? &z : &x;
   int sign = ((keyCode == B_STOPL || keyCode == B_STOPU || keyCode == B_LEFT || keyCode == B_UP || keyCode == B_Z || keyCode == B_X || keyCode == B_A) ? 1 : -1);
-  if (mode == MODE_A1 && (keyCode == B_MODE_GEARS || keyCode == B_MODE_TURN || keyCode == B_MODE_FACE || keyCode == B_MODE_CONE || keyCode == B_MODE_THREAD)) {
+  if (mode == MODE_A1 && (keyCode == B_MODE_GEARS || keyCode == B_MODE_TURN || keyCode == B_MODE_FACE || keyCode == B_MODE_CONE || keyCode == B_MODE_THREAD))
+  {
     a = &a1;
     sign = (keyCode == B_MODE_GEARS || keyCode == B_MODE_FACE) ? -1 : 1;
   }
   long pos = a->pos + (a->rotational ? numpadResult * 10 : newDu) / a->screwPitch * a->motorSteps * sign;
 
   // Potentially assign a new value to a limit. Treat newDu as a relative distance from current position.
-  if (keyCode == B_STOPL) {
+  if (keyCode == B_STOPL)
+  {
     setLeftStop(&z, pos);
     return true;
-  } else if (keyCode == B_STOPR) {
+  }
+  else if (keyCode == B_STOPR)
+  {
     setRightStop(&z, pos);
     return true;
-  } else if (keyCode == B_STOPU) {
+  }
+  else if (keyCode == B_STOPU)
+  {
     setLeftStop(&x, pos);
     return true;
-  } else if (keyCode == B_STOPD) {
+  }
+  else if (keyCode == B_STOPD)
+  {
     setRightStop(&x, pos);
     return true;
-  } else if (mode == MODE_A1) {
-    if (keyCode == B_MODE_CONE) {
+  }
+  else if (mode == MODE_A1)
+  {
+    if (keyCode == B_MODE_CONE)
+    {
       setLeftStop(&a1, pos);
       return true;
-    } else if (keyCode == B_MODE_FACE) {
+    }
+    else if (keyCode == B_MODE_FACE)
+    {
       setRightStop(&a1, pos);
       return true;
     }
@@ -2218,14 +2786,20 @@ bool processNumpadResult(int keyCode) {
 
   // Potentially move by newDu in the given direction.
   // We don't support precision manual moves when ON yet. Can't stay in the thread for most modes.
-  if (!isOn && (keyCode == B_LEFT || keyCode == B_RIGHT || keyCode == B_UP || keyCode == B_DOWN || (mode == MODE_A1 && (keyCode == B_MODE_GEARS || keyCode == B_MODE_TURN)))) {
-    if (pos < a->rightStop) {
+  if (!isOn && (keyCode == B_LEFT || keyCode == B_RIGHT || keyCode == B_UP || keyCode == B_DOWN || (mode == MODE_A1 && (keyCode == B_MODE_GEARS || keyCode == B_MODE_TURN))))
+  {
+    if (pos < a->rightStop)
+    {
       pos = a->rightStop;
       beep();
-    } else if (pos > a->leftStop) {
+    }
+    else if (pos > a->leftStop)
+    {
       pos = a->leftStop;
       beep();
-    } else if (abs(pos - a->pos) > a->estopSteps) {
+    }
+    else if (abs(pos - a->pos) > a->estopSteps)
+    {
       beep();
       return true;
     }
@@ -2235,21 +2809,27 @@ bool processNumpadResult(int keyCode) {
   }
 
   // Set axis 0 newDu ahead.
-  if (keyCode == B_Z || keyCode == B_X || (mode == MODE_A1 && keyCode == B_MODE_THREAD)) {
+  if (keyCode == B_Z || keyCode == B_X || (mode == MODE_A1 && keyCode == B_MODE_THREAD))
+  {
     a->originPos = -pos;
     return true;
   }
 
   // Set X axis 0 from diameter.
-  if (keyCode == B_A) {
+  if (keyCode == B_A)
+  {
     a->originPos = -(a->pos + pos) / 2;
     return true;
   }
 
-  if (keyCode == B_STEP) {
-    if (newDu > 0) {
+  if (keyCode == B_STEP)
+  {
+    if (newDu > 0)
+    {
       moveStep = newDu;
-    } else {
+    }
+    else
+    {
       beep();
     }
     return true;
@@ -2258,8 +2838,10 @@ bool processNumpadResult(int keyCode) {
   return false;
 }
 
-void processKeypadEvent() {
-  if (keypad.available() == 0) return;
+void processKeypadEvent()
+{
+  if (keypad.available() == 0)
+    return;
   int event = keypad.getEvent();
   int keyCode = event;
   bitWrite(keyCode, 7, 0);
@@ -2267,116 +2849,189 @@ void processKeypadEvent() {
   keypadTimeUs = micros();
 
   // Off button always gets handled.
-  if (keyCode == B_OFF) {
+  if (keyCode == B_OFF)
+  {
     buttonOffPressed = isPress;
     isPress ? buttonOnOffPress(false) : buttonOffRelease();
   }
 
-  if (mode == MODE_GCODE && isOn) {
+  if (mode == MODE_GCODE && isOn)
+  {
     // Not allowed to interfere other than turn off.
-    if (isPress && keyCode != B_OFF) beep();
+    if (isPress && keyCode != B_OFF)
+      beep();
     return;
   }
 
   // Releases don't matter in numpad but it has to run before LRUD since it might handle those keys.
-  if (isPress && processNumpad(keyCode)) {
+  if (isPress && processNumpad(keyCode))
+  {
     return;
   }
 
   // Setup wizard navigation.
-  if (isPress && setupIndex == 2 && (keyCode == B_LEFT || keyCode == B_RIGHT)) {
+  if (isPress && setupIndex == 2 && (keyCode == B_LEFT || keyCode == B_RIGHT))
+  {
     auxForward = !auxForward;
-  } else if (keyCode == B_LEFT) { // Make sure isPress=false propagates to motion flags.
+  }
+  else if (keyCode == B_LEFT)
+  { // Make sure isPress=false propagates to motion flags.
     buttonLeftPressed = isPress;
-  } else if (keyCode == B_RIGHT) {
+  }
+  else if (keyCode == B_RIGHT)
+  {
     buttonRightPressed = isPress;
-  } else if (keyCode == B_UP) {
+  }
+  else if (keyCode == B_UP)
+  {
     buttonUpPressed = isPress;
-  } else if (keyCode == B_DOWN) {
+  }
+  else if (keyCode == B_DOWN)
+  {
     buttonDownPressed = isPress;
-  } else if (keyCode == B_MODE_GEARS) {
+  }
+  else if (keyCode == B_MODE_GEARS)
+  {
     buttonGearsPressed = isPress;
-  } else if (keyCode == B_MODE_TURN) {
+  }
+  else if (keyCode == B_MODE_TURN)
+  {
     buttonTurnPressed = isPress;
   }
 
   // For all other keys we have no "release" logic.
-  if (!isPress) {
+  if (!isPress)
+  {
     return;
   }
 
   // Rest of the buttons.
-  if (keyCode == B_PLUS) {
+  if (keyCode == B_PLUS)
+  {
     buttonPlusMinusPress(true);
-  } else if (keyCode == B_MINUS) {
+  }
+  else if (keyCode == B_MINUS)
+  {
     buttonPlusMinusPress(false);
-  } else if (keyCode == B_ON) {
+  }
+  else if (keyCode == B_ON)
+  {
     buttonOnOffPress(true);
-  } else if (keyCode == B_STOPL) {
+  }
+  else if (keyCode == B_STOPL)
+  {
     buttonLeftStopPress(&z);
-  } else if (keyCode == B_STOPR) {
+  }
+  else if (keyCode == B_STOPR)
+  {
     buttonRightStopPress(&z);
-  } else if (keyCode == B_STOPU) {
+  }
+  else if (keyCode == B_STOPU)
+  {
     buttonLeftStopPress(&x);
-  } else if (keyCode == B_STOPD) {
+  }
+  else if (keyCode == B_STOPD)
+  {
     buttonRightStopPress(&x);
-  } else if (keyCode == B_MODE_OTHER) {
+  }
+  else if (keyCode == B_MODE_OTHER)
+  {
     buttonModePress();
-  } else if (keyCode == B_DISPL) {
+  }
+  else if (keyCode == B_DISPL)
+  {
     buttonDisplayPress();
-  } else if (keyCode == B_X) {
+  }
+  else if (keyCode == B_X)
+  {
     markAxis0(&x);
-  } else if (keyCode == B_Z) {
+  }
+  else if (keyCode == B_Z)
+  {
     markAxis0(&z);
-  } else if (keyCode == B_A) {
+  }
+  else if (keyCode == B_A)
+  {
     x.disabled = !x.disabled;
     updateEnable(&x);
-  } else if (keyCode == B_B) {
+  }
+  else if (keyCode == B_B)
+  {
     z.disabled = !z.disabled;
     updateEnable(&z);
-  } else if (keyCode == B_STEP) {
+  }
+  else if (keyCode == B_STEP)
+  {
     buttonMoveStepPress();
-  } else if (keyCode == B_SETTINGS) {
+  }
+  else if (keyCode == B_SETTINGS)
+  {
     // TODO.
-  } else if (keyCode == B_REVERSE) {
+  }
+  else if (keyCode == B_REVERSE)
+  {
     buttonReversePress();
-  } else if (keyCode == B_MEASURE) {
+  }
+  else if (keyCode == B_MEASURE)
+  {
     buttonMeasurePress();
-  } else if (keyCode == B_MODE_GEARS && mode != MODE_A1) {
+  }
+  else if (keyCode == B_MODE_GEARS && mode != MODE_A1)
+  {
     setModeFromTask(MODE_NORMAL);
-  } else if (keyCode == B_MODE_TURN && mode != MODE_A1) {
+  }
+  else if (keyCode == B_MODE_TURN && mode != MODE_A1)
+  {
     setModeFromTask(MODE_TURN);
-  } else if (keyCode == B_MODE_FACE) {
+  }
+  else if (keyCode == B_MODE_FACE)
+  {
     mode == MODE_A1 ? buttonRightStopPress(&a1) : setModeFromTask(MODE_FACE);
-  } else if (keyCode == B_MODE_CONE) {
+  }
+  else if (keyCode == B_MODE_CONE)
+  {
     mode == MODE_A1 ? buttonLeftStopPress(&a1) : setModeFromTask(MODE_CONE);
-  } else if (keyCode == B_MODE_CUT) {
-    if (mode == MODE_A1) {
+  }
+  else if (keyCode == B_MODE_CUT)
+  {
+    if (mode == MODE_A1)
+    {
       a1.disabled = !a1.disabled;
       updateEnable(&a1);
-    } else {
+    }
+    else
+    {
       setModeFromTask(MODE_CUT);
     }
-  } else if (keyCode == B_MODE_THREAD) {
+  }
+  else if (keyCode == B_MODE_THREAD)
+  {
     mode == MODE_A1 || (mode == MODE_GCODE && ACTIVE_A1) ? markAxis0(&a1) : setModeFromTask(MODE_THREAD);
   }
 }
 
 // Moves the stepper so that the tool is located at the newPos.
-bool stepToContinuous(Axis* a, long newPos) {
+bool stepToContinuous(Axis *a, long newPos)
+{
   return stepTo(a, newPos, true);
 }
 
-bool stepToFinal(Axis* a, long newPos) {
+bool stepToFinal(Axis *a, long newPos)
+{
   return stepTo(a, newPos, false);
 }
 
-bool stepTo(Axis* a, long newPos, bool continuous) {
-  if (xSemaphoreTake(a->mutex, 10) == pdTRUE) {
+bool stepTo(Axis *a, long newPos, bool continuous)
+{
+  if (xSemaphoreTake(a->mutex, 10) == pdTRUE)
+  {
     a->continuous = continuous;
-    if (newPos == a->pos) {
+    if (newPos == a->pos)
+    {
       a->pendingPos = 0;
-    } else {
+    }
+    else
+    {
       a->pendingPos = newPos - a->motorPos - (newPos > a->pos ? 0 : a->backlashSteps);
     }
     xSemaphoreGive(a->mutex);
@@ -2386,14 +3041,19 @@ bool stepTo(Axis* a, long newPos, bool continuous) {
 }
 
 // Calculates stepper position from spindle position.
-long posFromSpindle(Axis* a, long s, bool respectStops) {
+long posFromSpindle(Axis *a, long s, bool respectStops)
+{
   long newPos = s * a->motorSteps / a->screwPitch / ENCODER_STEPS_FLOAT * dupr * starts;
 
   // Respect left/right stops.
-  if (respectStops) {
-    if (newPos < a->rightStop) {
+  if (respectStops)
+  {
+    if (newPos < a->rightStop)
+    {
       newPos = a->rightStop;
-    } else if (newPos > a->leftStop) {
+    }
+    else if (newPos > a->leftStop)
+    {
       newPos = a->leftStop;
     }
   }
@@ -2402,41 +3062,56 @@ long posFromSpindle(Axis* a, long s, bool respectStops) {
 }
 
 // Calculates spindle position from stepper position.
-long spindleFromPos(Axis* a, long p) {
+long spindleFromPos(Axis *a, long p)
+{
   return p * a->screwPitch * ENCODER_STEPS_FLOAT / a->motorSteps / (dupr * starts);
 }
 
-void stepperEnable(Axis* a, bool value) {
-  if (!a->needsRest || !a->active) {
+void stepperEnable(Axis *a, bool value)
+{
+  if (!a->needsRest || !a->active)
+  {
     return;
   }
-  if (value) {
+  if (value)
+  {
     a->stepperEnableCounter++;
-    if (value == 1) {
+    if (value == 1)
+    {
       updateEnable(a);
     }
-  } else if (a->stepperEnableCounter > 0) {
+  }
+  else if (a->stepperEnableCounter > 0)
+  {
     a->stepperEnableCounter--;
-    if (a->stepperEnableCounter == 0) {
+    if (a->stepperEnableCounter == 0)
+    {
       updateEnable(a);
     }
   }
 }
 
-void updateEnable(Axis* a) {
-  if (!a->disabled && (!a->needsRest || a->stepperEnableCounter > 0)) {
+void updateEnable(Axis *a)
+{
+  if (!a->disabled && (!a->needsRest || a->stepperEnableCounter > 0))
+  {
     DHIGH(a->ena);
     // Stepper driver needs some time before it will react to pulses.
     DELAY(STEPPED_ENABLE_DELAY_MS);
-  } else {
+  }
+  else
+  {
     DLOW(a->ena);
   }
 }
 
-void moveAxis(Axis* a) {
+void moveAxis(Axis *a)
+{
   // Most of the time a step isn't needed.
-  if (a->pendingPos == 0) {
-    if (a->speed > a->speedStart) {
+  if (a->pendingPos == 0)
+  {
+    if (a->speed > a->speedStart)
+    {
       a->speed--;
     }
     return;
@@ -2444,23 +3119,29 @@ void moveAxis(Axis* a) {
 
   unsigned long nowUs = micros();
   float delayUs = 1000000.0 / a->speed;
-  if (nowUs - a->stepStartUs < delayUs - 5) {
+  if (nowUs - a->stepStartUs < delayUs - 5)
+  {
     // Not enough time has passed to issue this step.
     return;
   }
 
-  if (xSemaphoreTake(a->mutex, 1) == pdTRUE) {
+  if (xSemaphoreTake(a->mutex, 1) == pdTRUE)
+  {
     // Check pendingPos again now that we have the mutex.
-    if (a->pendingPos != 0) {
+    if (a->pendingPos != 0)
+    {
       bool dir = a->pendingPos > 0;
       setDir(a, dir);
 
       DLOW(a->step);
       int delta = dir ? 1 : -1;
       a->pendingPos -= delta;
-      if (dir && a->motorPos >= a->pos) {
+      if (dir && a->motorPos >= a->pos)
+      {
         a->pos++;
-      } else if (!dir && a->motorPos <= (a->pos - a->backlashSteps)) {
+      }
+      else if (!dir && a->motorPos <= (a->pos - a->backlashSteps))
+      {
         a->pos--;
       }
       a->motorPos += delta;
@@ -2468,9 +3149,12 @@ void moveAxis(Axis* a) {
 
       bool accelerate = a->continuous || a->pendingPos >= a->decelerateSteps || a->pendingPos <= -a->decelerateSteps;
       a->speed += (accelerate ? 1 : -1) * a->acceleration * delayUs / 1000000.0;
-      if (a->speed > a->speedMax) {
+      if (a->speed > a->speedMax)
+      {
         a->speed = a->speedMax;
-      } else if (a->speed < a->speedStart) {
+      }
+      else if (a->speed < a->speedStart)
+      {
         a->speed = a->speedStart;
       }
       a->stepStartUs = nowUs;
@@ -2481,28 +3165,34 @@ void moveAxis(Axis* a) {
   }
 }
 
-void modeGearbox() {
-  if (z.movingManually) {
+void modeGearbox()
+{
+  if (z.movingManually)
+  {
     return;
   }
   z.speedMax = LONG_MAX;
   stepToContinuous(&z, posFromSpindle(&z, spindlePosAvg, true));
 }
 
-long spindleModulo(long value) {
+long spindleModulo(long value)
+{
   value = value % ENCODER_STEPS_INT;
-  if (value < 0) {
+  if (value < 0)
+  {
     value += ENCODER_STEPS_INT;
   }
   return value;
 }
 
 long auxSafeDistance, startOffset;
-void modeTurn(Axis* main, Axis* aux) {
+void modeTurn(Axis *main, Axis *aux)
+{
   if (main->movingManually || aux->movingManually || turnPasses <= 0 ||
       main->leftStop == LONG_MAX || main->rightStop == LONG_MIN ||
       aux->leftStop == LONG_MAX || aux->rightStop == LONG_MIN ||
-      dupr == 0 || (dupr * opDuprSign < 0) || starts < 1) {
+      dupr == 0 || (dupr * opDuprSign < 0) || starts < 1)
+  {
     setIsOnFromLoop(false);
     return;
   }
@@ -2515,7 +3205,8 @@ void modeTurn(Axis* main, Axis* aux) {
   long auxEndStop = auxForward ? aux->leftStop : aux->rightStop;
 
   // opIndex 0 is only executed once, do setup calculations here.
-  if (opIndex == 0) {
+  if (opIndex == 0)
+  {
     auxSafeDistance = (auxForward ? -1 : 1) * SAFE_DISTANCE_DU * aux->motorSteps / aux->screwPitch;
     startOffset = starts == 1 ? 0 : round(ENCODER_STEPS_FLOAT / starts);
 
@@ -2527,28 +3218,35 @@ void modeTurn(Axis* main, Axis* aux) {
     long mainPos = mainStartStop + (opDuprSign > 0 ? -1 : 1);
     stepToFinal(main, mainPos);
     stepToFinal(aux, auxPos);
-    if (main->pos == mainPos && aux->pos == auxPos) {
+    if (main->pos == mainPos && aux->pos == auxPos)
+    {
       stepToFinal(main, mainStartStop);
       opIndex = 1;
       opSubIndex = 0;
     }
-  } else if (opIndex <= turnPasses * starts) {
-    if (opIndexAdvanceFlag && (opIndex + starts) < turnPasses * starts) {
+  }
+  else if (opIndex <= turnPasses * starts)
+  {
+    if (opIndexAdvanceFlag && (opIndex + starts) < turnPasses * starts)
+    {
       opIndexAdvanceFlag = false;
       opIndex += starts;
     }
     long auxPos = auxEndStop - (auxEndStop - auxStartStop) / turnPasses * (turnPasses - ceil(opIndex / float(starts)));
     // Bringing X to starting position.
-    if (opSubIndex == 0) {
+    if (opSubIndex == 0)
+    {
       stepToFinal(aux, auxPos);
-      if (aux->pos == auxPos) {
+      if (aux->pos == auxPos)
+      {
         opSubIndex = 1;
         spindlePosSync = spindleModulo(spindlePosGlobal - spindleFromPos(main, main->posGlobal) + startOffset * (opIndex - 1));
         return; // Instead of jumping to the next step, let spindlePosSync get to 0 first.
       }
     }
     // spindlePosSync counted down to 0, start thread from here.
-    if (opSubIndex == 1) {
+    if (opSubIndex == 1)
+    {
       markOrigin();
       main->speedMax = LONG_MAX;
       opSubIndex = 2;
@@ -2556,55 +3254,67 @@ void modeTurn(Axis* main, Axis* aux) {
       return;
     }
     // Doing the pass cut.
-    if (opSubIndex == 2) {
+    if (opSubIndex == 2)
+    {
       // In case we were pushed to the next opIndex before finishing the current one.
       stepToFinal(aux, auxPos);
       stepToContinuous(main, posFromSpindle(main, spindlePosAvg, true));
-      if (main->pos == mainEndStop) {
+      if (main->pos == mainEndStop)
+      {
         opSubIndex = 3;
       }
     }
     // Retracting the tool
-    if (opSubIndex == 3) {
+    if (opSubIndex == 3)
+    {
       long auxPos = auxStartStop + auxSafeDistance;
       stepToFinal(aux, auxPos);
-      if (aux->pos == auxPos) {
+      if (aux->pos == auxPos)
+      {
         opSubIndex = 4;
       }
     }
     // Returning to start of main.
-    if (opSubIndex == 4) {
+    if (opSubIndex == 4)
+    {
       main->speedMax = main->speedManualMove;
       // Overstep by 1 so that "main" backlash is taken out before "opSubIndex == 2".
       long mainPos = mainStartStop + (opDuprSign > 0 ? -1 : 1);
       stepToFinal(main, mainPos);
-      if (main->pos == mainPos) {
+      if (main->pos == mainPos)
+      {
         stepToFinal(main, mainStartStop);
         opSubIndex = 0;
         opIndex++;
       }
     }
-  } else {
+  }
+  else
+  {
     // Move to right-bottom limit.
     main->speedMax = main->speedManualMove;
     long auxPos = auxStartStop;
     long mainPos = mainStartStop;
     stepToFinal(main, mainPos);
     stepToFinal(aux, auxPos);
-    if (main->pos == mainPos && aux->pos == auxPos) {
+    if (main->pos == mainPos && aux->pos == auxPos)
+    {
       setIsOnFromLoop(false);
       beep();
     }
   }
 }
 
-void modeCone() {
-  if (z.movingManually || x.movingManually || coneRatio == 0) {
+void modeCone()
+{
+  if (z.movingManually || x.movingManually || coneRatio == 0)
+  {
     return;
   }
 
   float zToXRatio = -coneRatio / 2 / z.motorSteps * x.motorSteps / x.screwPitch * z.screwPitch * (auxForward ? 1 : -1);
-  if (zToXRatio == 0) {
+  if (zToXRatio == 0)
+  {
     return;
   }
 
@@ -2616,31 +3326,44 @@ void modeCone() {
   long spindle = spindlePosAvg;
   long spindleMin = LONG_MIN;
   long spindleMax = LONG_MAX;
-  if (z.leftStop != LONG_MAX) {
+  if (z.leftStop != LONG_MAX)
+  {
     (dupr > 0 ? spindleMax : spindleMin) = spindleFromPos(&z, z.leftStop);
   }
-  if (z.rightStop != LONG_MIN) {
-    (dupr > 0 ? spindleMin: spindleMax) = spindleFromPos(&z, z.rightStop);
+  if (z.rightStop != LONG_MIN)
+  {
+    (dupr > 0 ? spindleMin : spindleMax) = spindleFromPos(&z, z.rightStop);
   }
-  if (x.leftStop != LONG_MAX) {
+  if (x.leftStop != LONG_MAX)
+  {
     long lim = spindleFromPos(&z, round(x.leftStop / zToXRatio));
-    if (zToXRatio < 0) {
-      (dupr > 0 ? spindleMin: spindleMax) = lim;
-    } else {
+    if (zToXRatio < 0)
+    {
+      (dupr > 0 ? spindleMin : spindleMax) = lim;
+    }
+    else
+    {
       (dupr > 0 ? spindleMax : spindleMin) = lim;
     }
   }
-  if (x.rightStop != LONG_MIN) {
+  if (x.rightStop != LONG_MIN)
+  {
     long lim = spindleFromPos(&z, round(x.rightStop / zToXRatio));
-    if (zToXRatio < 0) {
+    if (zToXRatio < 0)
+    {
       (dupr > 0 ? spindleMax : spindleMin) = lim;
-    } else {
-      (dupr > 0 ? spindleMin: spindleMax) = lim;
+    }
+    else
+    {
+      (dupr > 0 ? spindleMin : spindleMax) = lim;
     }
   }
-  if (spindle > spindleMax) {
+  if (spindle > spindleMax)
+  {
     spindle = spindleMax;
-  } else if (spindle < spindleMin) {
+  }
+  else if (spindle < spindleMin)
+  {
     spindle = spindleMin;
   }
 
@@ -2648,8 +3371,10 @@ void modeCone() {
   stepToContinuous(&x, round(z.pos * zToXRatio));
 }
 
-void modeCut() {
-  if (x.movingManually || turnPasses <= 0 || x.leftStop == LONG_MAX || x.rightStop == LONG_MIN || dupr == 0 || dupr * opDuprSign < 0) {
+void modeCut()
+{
+  if (x.movingManually || turnPasses <= 0 || x.leftStop == LONG_MAX || x.rightStop == LONG_MIN || dupr == 0 || dupr * opDuprSign < 0)
+  {
     setIsOnFromLoop(false);
     return;
   }
@@ -2657,55 +3382,70 @@ void modeCut() {
   long startStop = opDuprSign > 0 ? x.rightStop : x.leftStop;
   long endStop = opDuprSign > 0 ? x.leftStop : x.rightStop;
 
-  if (opIndex == 0) {
+  if (opIndex == 0)
+  {
     // Move to back limit.
     x.speedMax = x.speedManualMove;
     long xPos = startStop;
     stepToFinal(&x, xPos);
-    if (x.pos == xPos) {
+    if (x.pos == xPos)
+    {
       opIndex = 1;
       opSubIndex = 0;
     }
-  } else if (opIndex <= turnPasses) {
+  }
+  else if (opIndex <= turnPasses)
+  {
     // Set spindlePos and x.pos in sync.
-    if (opSubIndex == 0) {
+    if (opSubIndex == 0)
+    {
       spindlePosAvg = spindlePos = spindleFromPos(&x, x.pos);
       opSubIndex = 1;
     }
     // Doing the pass cut.
-    if (opSubIndex == 1) {
+    if (opSubIndex == 1)
+    {
       x.speedMax = LONG_MAX;
       long endPos = endStop - (endStop - startStop) / turnPasses * (turnPasses - opIndex);
       long xPos = posFromSpindle(&x, spindlePosAvg, true);
-      if (dupr > 0 && xPos > endPos) xPos = endPos;
-      else if (dupr < 0 && xPos < endPos) xPos = endPos;
+      if (dupr > 0 && xPos > endPos)
+        xPos = endPos;
+      else if (dupr < 0 && xPos < endPos)
+        xPos = endPos;
       stepToContinuous(&x, xPos);
-      if (x.pos == endPos) {
+      if (x.pos == endPos)
+      {
         opSubIndex = 2;
       }
     }
     // Returning to start.
-    if (opSubIndex == 2) {
+    if (opSubIndex == 2)
+    {
       x.speedMax = x.speedManualMove;
       stepToFinal(&x, startStop);
-      if (x.pos == startStop) {
+      if (x.pos == startStop)
+      {
         opSubIndex = 0;
         opIndex++;
       }
     }
-  } else {
+  }
+  else
+  {
     setIsOnFromLoop(false);
     beep();
   }
 }
 
-void modeEllipse(Axis* main, Axis* aux) {
+void modeEllipse(Axis *main, Axis *aux)
+{
   if (main->movingManually || aux->movingManually || turnPasses <= 0 ||
       main->leftStop == LONG_MAX || main->rightStop == LONG_MIN ||
       aux->leftStop == LONG_MAX || aux->rightStop == LONG_MIN ||
       main->leftStop == main->rightStop ||
       aux->leftStop == aux->rightStop ||
-      dupr == 0 || dupr != opDupr) {
+      dupr == 0 || dupr != opDupr)
+  {
     setIsOnFromLoop(false);
     return;
   }
@@ -2719,37 +3459,50 @@ void modeEllipse(Axis* main, Axis* aux) {
   main->speedMax = main->speedManualMove;
   aux->speedMax = aux->speedManualMove;
 
-  if (opIndex == 0) {
+  if (opIndex == 0)
+  {
     opIndex = 1;
     opSubIndex = 0;
     spindlePos = 0;
     spindlePosAvg = 0;
-  } else if (opIndex <= turnPasses) {
+  }
+  else if (opIndex <= turnPasses)
+  {
     float pass0to1 = opIndex / float(turnPasses);
     long mainDelta = round(pass0to1 * (mainEndStop - mainStartStop));
     long auxDelta = round(pass0to1 * (auxEndStop - auxStartStop));
     long spindleDelta = spindleFromPos(main, mainDelta);
 
     // Move to starting position.
-    if (opSubIndex == 0) {
+    if (opSubIndex == 0)
+    {
       long auxPos = auxStartStop;
       stepToFinal(aux, auxPos);
-      if (aux->pos == auxPos) {
+      if (aux->pos == auxPos)
+      {
         opSubIndex = 1;
       }
-    } else if (opSubIndex == 1) {
+    }
+    else if (opSubIndex == 1)
+    {
       long mainPos = mainEndStop - mainDelta;
       stepToFinal(main, mainPos);
-      if (main->pos == mainPos) {
+      if (main->pos == mainPos)
+      {
         opSubIndex = 2;
         spindlePos = 0;
         spindlePosAvg = 0;
       }
-    } else if (opSubIndex == 2) {
+    }
+    else if (opSubIndex == 2)
+    {
       float progress0to1 = 0;
-      if ((spindleDelta > 0 && spindlePosAvg >= spindleDelta) || (spindleDelta < 0 && spindlePosAvg <= spindleDelta)) {
+      if ((spindleDelta > 0 && spindlePosAvg >= spindleDelta) || (spindleDelta < 0 && spindlePosAvg <= spindleDelta))
+      {
         progress0to1 = 1;
-      } else {
+      }
+      else
+      {
         progress0to1 = spindlePosAvg / float(spindleDelta);
       }
       float mainCoeff = auxForward ? cos(HALF_PI * (3 + progress0to1)) : (1 + sin(HALF_PI * (progress0to1 - 1)));
@@ -2758,69 +3511,90 @@ void modeEllipse(Axis* main, Axis* aux) {
       long auxPos = auxStartStop + round(auxDelta * auxCoeff);
       stepToContinuous(main, mainPos);
       stepToContinuous(aux, auxPos);
-      if (progress0to1 == 1 && main->pos == mainPos && aux->pos == auxPos) {
+      if (progress0to1 == 1 && main->pos == mainPos && aux->pos == auxPos)
+      {
         opIndex++;
         opSubIndex = 0;
       }
     }
-  } else if (opIndex == turnPasses + 1) {
+  }
+  else if (opIndex == turnPasses + 1)
+  {
     stepToFinal(aux, auxStartStop);
-    if (aux->pos == auxStartStop) {
+    if (aux->pos == auxStartStop)
+    {
       setIsOnFromLoop(false);
       beep();
     }
   }
 }
 
-long mmOrInchToAbsolutePos(Axis* a, float mmOrInch) {
+long mmOrInchToAbsolutePos(Axis *a, float mmOrInch)
+{
   long scaleToDu = measure == MEASURE_METRIC ? 10000 : 254000;
   long part1 = a->gcodeRelativePos;
   long part2 = round(mmOrInch * scaleToDu / a->screwPitch * a->motorSteps);
   return part1 + part2;
 }
 
-String getValueString(const String& command, char letter) {
+String getValueString(const String &command, char letter)
+{
   int index = command.indexOf(letter);
-  if (index == -1) {
+  if (index == -1)
+  {
     return "";
   }
   String valueString;
-  for (int i = index + 1; i < command.length(); i++) {
+  for (int i = index + 1; i < command.length(); i++)
+  {
     char c = command.charAt(i);
-    if (isDigit(c) || c == '.' || c == '-') {
+    if (isDigit(c) || c == '.' || c == '-')
+    {
       valueString += c;
-    } else {
+    }
+    else
+    {
       break;
     }
   }
   return valueString;
 }
 
-float getFloat(const String& command, char letter) {
+float getFloat(const String &command, char letter)
+{
   return getValueString(command, letter).toFloat();
 }
 
-int getInt(const String& command, char letter) {
+int getInt(const String &command, char letter)
+{
   return getValueString(command, letter).toInt();
 }
 
-void updateAxisSpeeds(long diffX, long diffZ, long diffA1) {
-  if (diffX == 0 && diffZ == 0 && diffA1 == 0) return;
+void updateAxisSpeeds(long diffX, long diffZ, long diffA1)
+{
+  if (diffX == 0 && diffZ == 0 && diffA1 == 0)
+    return;
   long absX = abs(diffX);
   long absZ = abs(diffZ);
   long absC = abs(diffA1);
   float stepsPerSecX = gcodeFeedDuPerSec * x.motorSteps / x.screwPitch;
   float minStepsPerSecX = GCODE_FEED_MIN_DU_SEC * x.motorSteps / x.screwPitch;
-  if (stepsPerSecX > x.speedManualMove) stepsPerSecX = x.speedManualMove;
-  else if (stepsPerSecX < minStepsPerSecX) stepsPerSecX = minStepsPerSecX;
+  if (stepsPerSecX > x.speedManualMove)
+    stepsPerSecX = x.speedManualMove;
+  else if (stepsPerSecX < minStepsPerSecX)
+    stepsPerSecX = minStepsPerSecX;
   float stepsPerSecZ = gcodeFeedDuPerSec * z.motorSteps / z.screwPitch;
   float minStepsPerSecZ = GCODE_FEED_MIN_DU_SEC * z.motorSteps / z.screwPitch;
-  if (stepsPerSecZ > z.speedManualMove) stepsPerSecZ = z.speedManualMove;
-  else if (stepsPerSecZ < minStepsPerSecZ) stepsPerSecZ = minStepsPerSecZ;
+  if (stepsPerSecZ > z.speedManualMove)
+    stepsPerSecZ = z.speedManualMove;
+  else if (stepsPerSecZ < minStepsPerSecZ)
+    stepsPerSecZ = minStepsPerSecZ;
   float stepsPerSecA1 = gcodeFeedDuPerSec * a1.motorSteps / a1.screwPitch;
   float minStepsPerSecA1 = GCODE_FEED_MIN_DU_SEC * a1.motorSteps / a1.screwPitch;
-  if (stepsPerSecA1 > a1.speedManualMove) stepsPerSecA1 = a1.speedManualMove;
-  else if (stepsPerSecA1 < minStepsPerSecA1) stepsPerSecA1 = minStepsPerSecA1;
+  if (stepsPerSecA1 > a1.speedManualMove)
+    stepsPerSecA1 = a1.speedManualMove;
+  else if (stepsPerSecA1 < minStepsPerSecA1)
+    stepsPerSecA1 = minStepsPerSecA1;
   float secX = absX / stepsPerSecX;
   float secZ = absZ / stepsPerSecZ;
   float secA1 = absC / stepsPerSecA1;
@@ -2830,28 +3604,35 @@ void updateAxisSpeeds(long diffX, long diffZ, long diffA1) {
   a1.speedMax = sec > 0 ? absC / sec : a1.speedManualMove;
 }
 
-void setFeedRate(const String& command) {
+void setFeedRate(const String &command)
+{
   float feed = getFloat(command, 'F');
-  if (feed <= 0) return;
+  if (feed <= 0)
+    return;
   gcodeFeedDuPerSec = round(feed * (measure == MEASURE_METRIC ? 10000 : 254000) / 60.0);
 }
 
-void gcodeWaitEpsilon(int epsilon) {
-  while (abs(x.pendingPos) > epsilon || abs(z.pendingPos) > epsilon || abs(a1.pendingPos) > epsilon) {
+void gcodeWaitEpsilon(int epsilon)
+{
+  while (abs(x.pendingPos) > epsilon || abs(z.pendingPos) > epsilon || abs(a1.pendingPos) > epsilon)
+  {
     taskYIELD();
   }
 }
 
-void gcodeWaitNear() {
+void gcodeWaitNear()
+{
   gcodeWaitEpsilon(GCODE_WAIT_EPSILON_STEPS);
 }
 
-void gcodeWaitStop() {
+void gcodeWaitStop()
+{
   gcodeWaitEpsilon(0);
 }
 
 // Rapid positioning / linear interpolation.
-void G00_01(const String& command) {
+void G00_01(const String &command)
+{
   long xStart = x.pos;
   long zStart = z.pos;
   long a1Start = a1.pos;
@@ -2863,34 +3644,50 @@ void G00_01(const String& command) {
   long a1Diff = a1End - a1Start;
   updateAxisSpeeds(xDiff, zDiff, a1Diff);
   long chunks = round(max(max(abs(xDiff), abs(zDiff)), abs(a1Diff)) * LINEAR_INTERPOLATION_PRECISION);
-  for (long i = 0; i < chunks; i++) {
-    if (!isOn) return;
+  for (long i = 0; i < chunks; i++)
+  {
+    if (!isOn)
+      return;
     float scale = i / float(chunks);
     stepToContinuous(&x, xStart + xDiff * scale);
     stepToContinuous(&z, zStart + zDiff * scale);
-    if (ACTIVE_A1) stepToContinuous(&a1, a1Start + a1Diff * scale);
+    if (ACTIVE_A1)
+      stepToContinuous(&a1, a1Start + a1Diff * scale);
     gcodeWaitNear();
   }
   // To avoid any rounding error, move to precise position.
   stepToFinal(&x, xEnd);
   stepToFinal(&z, zEnd);
-  if (ACTIVE_A1) stepToFinal(&a1, a1End);
+  if (ACTIVE_A1)
+    stepToFinal(&a1, a1End);
   gcodeWaitStop();
 }
 
-bool handleGcode(const String& command) {
+bool handleGcode(const String &command)
+{
   int op = getInt(command, 'G');
-  if (op == 0 || op == 1) { // 0 also covers X and Z commands without G.
+  if (op == 0 || op == 1)
+  { // 0 also covers X and Z commands without G.
     G00_01(command);
-  } else if (op == 20 || op == 21) {
+  }
+  else if (op == 20 || op == 21)
+  {
     setMeasure(op == 20 ? MEASURE_INCH : MEASURE_METRIC);
-  } else if (op == 90 || op == 91) {
+  }
+  else if (op == 90 || op == 91)
+  {
     gcodeAbsolutePositioning = op == 90;
-  } else if (op == 94) {
+  }
+  else if (op == 94)
+  {
     /* no-op feed per minute */
-  } else if (op == 18) {
+  }
+  else if (op == 18)
+  {
     /* no-op ZX plane selection */
-  } else {
+  }
+  else
+  {
     Serial.print("error: unsupported command ");
     Serial.println(command);
     return false;
@@ -2898,11 +3695,15 @@ bool handleGcode(const String& command) {
   return true;
 }
 
-bool handleMcode(const String& command) {
+bool handleMcode(const String &command)
+{
   int op = getInt(command, 'M');
-  if (op == 0 || op == 1 || op == 2 || op == 30) {
+  if (op == 0 || op == 1 || op == 2 || op == 30)
+  {
     setIsOnFromTask(false);
-  } else {
+  }
+  else
+  {
     setIsOnFromTask(false);
     Serial.print("error: unsupported command ");
     Serial.println(command);
@@ -2912,14 +3713,17 @@ bool handleMcode(const String& command) {
 }
 
 // Process one command, return ok flag.
-bool handleGcodeCommand(String command) {
+bool handleGcodeCommand(String command)
+{
   command.trim();
-  if (command.length() == 0) return false;
+  if (command.length() == 0)
+    return false;
 
   // Trim N.. prefix.
   char code = command.charAt(0);
   int spaceIndex = command.indexOf(' ');
-  if (code == 'N' && spaceIndex > 0) {
+  if (code == 'N' && spaceIndex > 0)
+  {
     command = command.substring(spaceIndex + 1);
     code = command.charAt(0);
   }
@@ -2930,58 +3734,84 @@ bool handleGcodeCommand(String command) {
   a1.gcodeRelativePos = gcodeAbsolutePositioning ? -a1.originPos : a1.pos;
 
   setFeedRate(command);
-  switch (code) {
-    case 'G':
-    case NAME_Z:
-    case NAME_X:
-    case NAME_A1: return handleGcode(command);
-    case 'F': return true; /* feed already handled above */
-    case 'M': return handleMcode(command);
-    case 'T': return true; /* ignoring tool changes */
-    default: Serial.print("error: unsupported command "); Serial.println(code); return false;
+  switch (code)
+  {
+  case 'G':
+  case NAME_Z:
+  case NAME_X:
+  case NAME_A1:
+    return handleGcode(command);
+  case 'F':
+    return true; /* feed already handled above */
+  case 'M':
+    return handleMcode(command);
+  case 'T':
+    return true; /* ignoring tool changes */
+  default:
+    Serial.print("error: unsupported command ");
+    Serial.println(code);
+    return false;
   }
   return false;
 }
 
-void discountFullSpindleTurns() {
+void discountFullSpindleTurns()
+{
   // When standing at the stop, ignore full spindle turns.
   // This allows to avoid waiting when spindle direction reverses
   // and reduces the chance of the skipped stepper steps since
   // after a reverse the spindle starts slow.
-  if (dupr != 0 && !stepperIsRunning(&z) && (mode == MODE_NORMAL || mode == MODE_CONE)) {
+  if (dupr != 0 && !stepperIsRunning(&z) && (mode == MODE_NORMAL || mode == MODE_CONE))
+  {
     int spindlePosDiff = 0;
-    if (z.pos == z.rightStop) {
+    if (z.pos == z.rightStop)
+    {
       long stopSpindlePos = spindleFromPos(&z, z.rightStop);
-      if (dupr > 0) {
-        if (spindlePos < stopSpindlePos - ENCODER_STEPS_INT) {
+      if (dupr > 0)
+      {
+        if (spindlePos < stopSpindlePos - ENCODER_STEPS_INT)
+        {
           spindlePosDiff = ENCODER_STEPS_INT;
         }
-      } else {
-        if (spindlePos > stopSpindlePos + ENCODER_STEPS_INT) {
+      }
+      else
+      {
+        if (spindlePos > stopSpindlePos + ENCODER_STEPS_INT)
+        {
           spindlePosDiff = -ENCODER_STEPS_INT;
         }
       }
-    } else if (z.pos == z.leftStop) {
+    }
+    else if (z.pos == z.leftStop)
+    {
       long stopSpindlePos = spindleFromPos(&z, z.leftStop);
-      if (dupr > 0) {
-        if (spindlePos > stopSpindlePos + ENCODER_STEPS_INT) {
+      if (dupr > 0)
+      {
+        if (spindlePos > stopSpindlePos + ENCODER_STEPS_INT)
+        {
           spindlePosDiff = -ENCODER_STEPS_INT;
         }
-      } else {
-        if (spindlePos < stopSpindlePos - ENCODER_STEPS_INT) {
+      }
+      else
+      {
+        if (spindlePos < stopSpindlePos - ENCODER_STEPS_INT)
+        {
           spindlePosDiff = ENCODER_STEPS_INT;
         }
       }
     }
-    if (spindlePosDiff != 0) {
+    if (spindlePosDiff != 0)
+    {
       spindlePos += spindlePosDiff;
       spindlePosAvg += spindlePosDiff;
     }
   }
 }
 
-void processSpindlePosDelta() {
-  if (spindlePosDelta == 0) {
+void processSpindlePosDelta()
+{
+  if (spindlePosDelta == 0)
+  {
     return;
   }
 
@@ -2991,118 +3821,161 @@ void processSpindlePosDelta() {
   interrupts();
 
   unsigned long microsNow = micros();
-  if (showTacho || mode == MODE_GCODE) {
-    if (spindleEncTimeIndex >= RPM_BULK) {
+  if (showTacho || mode == MODE_GCODE)
+  {
+    if (spindleEncTimeIndex >= RPM_BULK)
+    {
       spindleEncTimeDiffBulk = microsNow - spindleEncTimeAtIndex0;
       spindleEncTimeAtIndex0 = microsNow;
       spindleEncTimeIndex = 0;
     }
     spindleEncTimeIndex += abs(delta);
-  } else {
+  }
+  else
+  {
     spindleEncTimeDiffBulk = 0;
   }
 
   spindlePos += delta;
   spindlePosGlobal += delta;
-  if (spindlePosGlobal > ENCODER_STEPS_INT) {
+  if (spindlePosGlobal > ENCODER_STEPS_INT)
+  {
     spindlePosGlobal -= ENCODER_STEPS_INT;
-  } else if (spindlePosGlobal < 0) {
+  }
+  else if (spindlePosGlobal < 0)
+  {
     spindlePosGlobal += ENCODER_STEPS_INT;
   }
-  if (spindlePos > spindlePosAvg) {
+  if (spindlePos > spindlePosAvg)
+  {
     spindlePosAvg = spindlePos;
-  } else if (spindlePos < spindlePosAvg - ENCODER_BACKLASH) {
+  }
+  else if (spindlePos < spindlePosAvg - ENCODER_BACKLASH)
+  {
     spindlePosAvg = spindlePos + ENCODER_BACKLASH;
   }
   spindleEncTime = microsNow;
 
-  if (spindlePosSync != 0) {
+  if (spindlePosSync != 0)
+  {
     spindlePosSync += delta;
-    if (spindlePosSync % ENCODER_STEPS_INT == 0) {
+    if (spindlePosSync % ENCODER_STEPS_INT == 0)
+    {
       spindlePosSync = 0;
-      Axis* a = getPitchAxis();
+      Axis *a = getPitchAxis();
       spindlePosAvg = spindlePos = spindleFromPos(a, a->pos);
     }
   }
 }
 
 // Apply changes requested by the keyboard thread.
-void applySettings() {
-  if (nextDuprFlag) {
+void applySettings()
+{
+  if (nextDuprFlag)
+  {
     applyDupr();
     nextDuprFlag = false;
   }
-  if (nextStartsFlag) {
+  if (nextStartsFlag)
+  {
     applyStarts();
     nextStartsFlag = false;
   }
-  if (z.nextLeftStopFlag) {
+  if (z.nextLeftStopFlag)
+  {
     applyLeftStop(&z);
     z.nextLeftStopFlag = false;
   }
-  if (z.nextRightStopFlag) {
+  if (z.nextRightStopFlag)
+  {
     applyRightStop(&z);
     z.nextRightStopFlag = false;
   }
-  if (x.nextLeftStopFlag) {
+  if (x.nextLeftStopFlag)
+  {
     applyLeftStop(&x);
     x.nextLeftStopFlag = false;
   }
-  if (x.nextRightStopFlag) {
+  if (x.nextRightStopFlag)
+  {
     applyRightStop(&x);
     x.nextRightStopFlag = false;
   }
-  if (a1.nextLeftStopFlag) {
+  if (a1.nextLeftStopFlag)
+  {
     applyLeftStop(&a1);
     a1.nextLeftStopFlag = false;
   }
-  if (a1.nextRightStopFlag) {
+  if (a1.nextRightStopFlag)
+  {
     applyRightStop(&a1);
     a1.nextRightStopFlag = false;
   }
-  if (nextConeRatioFlag) {
+  if (nextConeRatioFlag)
+  {
     applyConeRatio();
     nextConeRatioFlag = false;
   }
-  if (nextIsOnFlag) {
+  if (nextIsOnFlag)
+  {
     setIsOnFromLoop(nextIsOn);
     nextIsOnFlag = false;
   }
-  if (nextModeFlag) {
+  if (nextModeFlag)
+  {
     setModeFromLoop(nextMode);
     nextModeFlag = false;
   }
 }
 
-void loop() {
-  if (emergencyStop != ESTOP_NONE) {
+void loop()
+{
+  if (emergencyStop != ESTOP_NONE)
+  {
     return;
   }
-  if (xSemaphoreTake(motionMutex, 1) != pdTRUE) {
+  if (xSemaphoreTake(motionMutex, 1) != pdTRUE)
+  {
     return;
   }
   applySettings();
   processSpindlePosDelta();
   discountFullSpindleTurns();
-  if (!isOn || dupr == 0 || spindlePosSync != 0) {
+  if (!isOn || dupr == 0 || spindlePosSync != 0)
+  {
     // None of the modes work.
-  } else if (mode == MODE_NORMAL) {
+  }
+  else if (mode == MODE_NORMAL)
+  {
     modeGearbox();
-  } else if (mode == MODE_TURN) {
+  }
+  else if (mode == MODE_TURN)
+  {
     modeTurn(&z, &x);
-  } else if (mode == MODE_FACE) {
+  }
+  else if (mode == MODE_FACE)
+  {
     modeTurn(&x, &z);
-  } else if (mode == MODE_CUT) {
+  }
+  else if (mode == MODE_CUT)
+  {
     modeCut();
-  } else if (mode == MODE_CONE) {
+  }
+  else if (mode == MODE_CONE)
+  {
     modeCone();
-  } else if (mode == MODE_THREAD) {
+  }
+  else if (mode == MODE_THREAD)
+  {
     modeTurn(&z, &x);
-  } else if (mode == MODE_ELLIPSE) {
+  }
+  else if (mode == MODE_ELLIPSE)
+  {
     modeEllipse(&z, &x);
   }
   moveAxis(&z);
   moveAxis(&x);
-  if (ACTIVE_A1) moveAxis(&a1);
+  if (ACTIVE_A1)
+    moveAxis(&a1);
   xSemaphoreGive(motionMutex);
 }
