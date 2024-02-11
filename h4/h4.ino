@@ -286,21 +286,33 @@ int savedStarts = 0; // starts saved in Preferences
 int nextStarts = starts; // number of starts that should be used asap
 bool nextStartsFlag = false; // whether nextStarts requires attention
 
+constexpr int MAX_TOOLS = 10;
+
 struct ToolOffset {
     float xOffsetDu;
     float zOffsetDu;
 };
 
 // Tool offsets in deci-microns (DU). 1mm = 10000 DU.
-ToolOffset toolOffsets[4] = {
-    {0, 0}, //primary tool always 0,0
-    {30000, 20000}, //secondary tool 3mm X, 2mm Z
-    {0, 0},
-    {0, 0}
+ToolOffset toolOffsets[MAX_TOOLS] = {
+    {0, 0},           //T0 external grooving tool 0,0
+    {5000, -10000},   //T1 turning tool 0.5mm X, 1mm Z
+    {53750, -58000},  //T2 internal grooving tool 5.375mm X, 5.8mm Z
+    {57750, -69000},  //T3 trepanning tool 5.775mm X, 6.9mm Z
+    {0, 0},           //T4 undefined tool 0,0
+    {0, 0},           //T5 undefined tool 0,0
+    {0, 0},           //T6 undefined tool 0,0
+    {0, 0},           //T7 undefined tool 0,0
+    {0, 0},           //T8 undefined tool 0,0
+    {0, 0}            //T9 undefined tool 0,0
 };
 
+int nextTool = 0;
+bool nextToolFlag = false;
+ToolOffset nextToolOffset = {0, 0};
+
 ToolOffset toolOffset = {0, 0};
-int tool = 0;
+int currentTool = 0;
 
 struct Axis {
   SemaphoreHandle_t mutex;
@@ -871,15 +883,15 @@ void updateDisplay() {
   long zDisplayPos = z.pos + z.originPos;
   long xDisplayPos = x.pos + x.originPos;
   long a1DisplayPos = a1.pos + a1.originPos;
-  long newHashLine2 = zDisplayPos + xDisplayPos + a1DisplayPos + measure + z.disabled + x.disabled + mode + tool;
+  long newHashLine2 = zDisplayPos + xDisplayPos + a1DisplayPos + measure + z.disabled + x.disabled + mode + currentTool;
   if (lcdHashLine2 != newHashLine2) {
     lcdHashLine2 = newHashLine2;
     charIndex = 0;
     lcd.setCursor(0, 2);
 
-    if (tool != 0 && mode == MODE_GCODE) {
+    if (mode == MODE_GCODE) {
       charIndex += lcd.print("T");
-      charIndex += lcd.print(tool);
+      charIndex += lcd.print(currentTool);
       charIndex += lcd.print(" ");
     }
 
@@ -1423,6 +1435,8 @@ void taskGcode(void *param) {
         Serial.print("|Id:");
         Serial.print("H" + String(HARDWARE_VERSION) + "V" + String(SOFTWARE_VERSION));
         Serial.print(">"); // no new line to allow client to easily cut out the status response
+      } else if (receivedChar == '#' /* custom command for listing tool offsets */) {
+        listToolOffsets();
       } else if (isOn) {
         if (gcodeInBrace && charCode < 32) {
           Serial.println("error: comment not closed");
@@ -1453,6 +1467,22 @@ void taskGcode(void *param) {
     taskYIELD();
   }
   vTaskDelete(NULL);
+}
+
+void listToolOffsets() {
+    Serial.print("<ToolOffsets>");
+    for (int i = 0; i < MAX_TOOLS; ++i) {
+        // Assuming toolOffsets[i].xOffsetDu and toolOffsets[i].zOffsetDu are the offsets
+        Serial.print("T");
+        Serial.print(i);
+        Serial.print(": X=");
+        // Convert deci-microns to millimeters for display
+        Serial.print(toolOffsets[i].xOffsetDu / 10000.0, 3); // 3 decimal places precision
+        Serial.print("mm, Z=");
+        Serial.print(toolOffsets[i].zOffsetDu / 10000.0, 3);
+        Serial.print("mm");
+    }
+    Serial.print("</ToolOffsets>"); // End marker
 }
 
 void taskAttachInterrupts(void *param) {
@@ -1556,7 +1586,7 @@ void setup() {
   savedConeRatio = coneRatio = pref.getFloat(PREF_CONE_RATIO, coneRatio);
   savedTurnPasses = turnPasses = pref.getInt(PREF_TURN_PASSES, turnPasses);
   savedAuxForward = auxForward = pref.getBool(PREF_AUX_FORWARD, true);
-  savedTool = tool = pref.getInt(PREF_TOOL, 0);
+  savedTool = currentTool = pref.getInt(PREF_TOOL, 0);
   pref.end();
 
   if (!z.needsRest && !z.disabled) {
@@ -1613,7 +1643,7 @@ bool saveIfChanged() {
       spindlePos == savedSpindlePos && spindlePosAvg == savedSpindlePosAvg && spindlePosSync == savedSpindlePosSync && savedSpindlePosGlobal == spindlePosGlobal && showAngle == savedShowAngle && showTacho == savedShowTacho && moveStep == savedMoveStep &&
       mode == savedMode && measure == savedMeasure && x.pos == x.savedPos && x.originPos == x.savedOriginPos && x.posGlobal == x.savedPosGlobal && x.motorPos == x.savedMotorPos && x.leftStop == x.savedLeftStop && x.rightStop == x.savedRightStop && x.disabled == x.savedDisabled &&
       a1.pos == a1.savedPos && a1.originPos == a1.savedOriginPos && a1.posGlobal == a1.savedPosGlobal && a1.motorPos == a1.savedMotorPos && a1.leftStop == a1.savedLeftStop && a1.rightStop == a1.savedRightStop && a1.disabled == a1.savedDisabled &&
-      coneRatio == savedConeRatio && turnPasses == savedTurnPasses && savedAuxForward == auxForward && tool == savedTool) return false;
+      coneRatio == savedConeRatio && turnPasses == savedTurnPasses && savedAuxForward == auxForward && currentTool == savedTool) return false;
 
   Preferences pref;
   pref.begin(PREF_NAMESPACE);
@@ -1652,7 +1682,7 @@ bool saveIfChanged() {
   if (coneRatio != savedConeRatio) pref.putFloat(PREF_CONE_RATIO, savedConeRatio = coneRatio);
   if (turnPasses != savedTurnPasses) pref.putInt(PREF_TURN_PASSES, savedTurnPasses = turnPasses);
   if (auxForward != savedAuxForward) pref.putBool(PREF_AUX_FORWARD, savedAuxForward = auxForward);
-  if (tool != savedTool) pref.putInt(PREF_TOOL, savedTool = tool);
+  if (currentTool != savedTool) pref.putInt(PREF_TOOL, savedTool = currentTool);
   pref.end();
   return true;
 }
@@ -2937,6 +2967,8 @@ bool handleGcode(const String& command) {
   int op = getInt(command, 'G');
   if (op == 0 || op == 1) { // 0 also covers X and Z commands without G.
     G00_01(command);
+  } else if (op == 10) {
+    handleG10(command);
   } else if (op == 20 || op == 21) {
     setMeasure(op == 20 ? MEASURE_INCH : MEASURE_METRIC);
   } else if (op == 90 || op == 91) {
@@ -2966,11 +2998,33 @@ bool handleMcode(const String& command) {
   return true;
 }
 
+bool handleG10(const String& command) {
+    int toolIndex = getInt(command, 'P'); // Assuming 'P' specifies the tool number.
+    float xOffset = getFloat(command, 'X'); // Get X offset
+    float zOffset = getFloat(command, 'Z'); // Get Z offset
+
+    // Check if toolIndex is within the valid range
+    if (toolIndex < 1 || toolIndex >= MAX_TOOLS) {
+        Serial.println("error: invalid tool number");
+        return false;
+    }
+
+    // Convert offsets from mm to deci-microns if necessary
+    toolOffsets[toolIndex].xOffsetDu = xOffset * 10000; // adjusting to deci-microns
+    toolOffsets[toolIndex].zOffsetDu = zOffset * 10000;
+
+    Serial.println("ok");
+
+    return true;
+}
+
 bool handleChangeToolCommand(String command) {
   int toolNumber = command.substring(1).toInt();
-  if (toolNumber >= 0 && toolNumber < sizeof(toolOffsets)/sizeof(toolOffsets[0])) {
-    changeTool(toolNumber);
-    return true;
+  if (toolNumber >= 0 && toolNumber < MAX_TOOLS) {
+        nextTool = toolNumber;
+        nextToolOffset = toolOffsets[toolNumber]; // Store the next tool's offset
+        nextToolFlag = true; // Indicate a tool change is pending
+        return true;
   } else {
     Serial.println("error: invalid tool number");
     return false;
@@ -2978,7 +3032,7 @@ bool handleChangeToolCommand(String command) {
 }
 
 void changeTool(int newToolNumber) {
-    tool = newToolNumber;
+    currentTool = newToolNumber;
     ToolOffset newToolOffset = toolOffsets[newToolNumber];
 
     // Calculate the net offset needed to apply
@@ -2994,17 +3048,9 @@ void changeTool(int newToolNumber) {
 void applyToolOffset(ToolOffset offset) {
     long xOffsetSteps = duToSteps(&x, offset.xOffsetDu);
     long zOffsetSteps = duToSteps(&z, offset.zOffsetDu);
-
-    // Lock the axes before making changes
-    xSemaphoreTake(x.mutex, portMAX_DELAY);
-    xSemaphoreTake(z.mutex, portMAX_DELAY);
     
     x.originPos += xOffsetSteps;
     z.originPos += zOffsetSteps;
-
-    // Release the axes
-    xSemaphoreGive(x.mutex);
-    xSemaphoreGive(z.mutex);
 }
 
 // Process one command, return ok flag.
@@ -3167,6 +3213,10 @@ void applySettings() {
   if (nextModeFlag) {
     setModeFromLoop(nextMode);
     nextModeFlag = false;
+  }
+  if (nextToolFlag) {
+    changeTool(nextTool);
+    nextToolFlag = false;
   }
 }
 
