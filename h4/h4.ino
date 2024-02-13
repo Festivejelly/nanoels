@@ -87,7 +87,7 @@ const long STEPPED_ENABLE_DELAY_MS = 100; // Delay after stepper is enabled and 
 // GCode-related constants.
 const float LINEAR_INTERPOLATION_PRECISION = 0.1; // 0 < x <= 1, smaller values make for quicker G0 and G1 moves
 const long GCODE_WAIT_EPSILON_STEPS = 10;
-const bool SPINDLE_PAUSES_GCODE = true; // pause GCode execution when spindle stops
+const bool SPINDLE_PAUSES_GCODE = false; // pause GCode execution when spindle stops
 const int GCODE_MIN_RPM = 30; // pause GCode execution if RPM is below this
 
 // To be incremented whenever a measurable improvement is made.
@@ -1763,7 +1763,6 @@ void setup() {
   savedTool = currentTool = pref.getInt(PREF_TOOL, 0);
 
   loadToolOffsets(pref);
-  copyToolOffsets(toolOffsets, savedToolOffsets);
   
   pref.end();
 
@@ -1827,20 +1826,28 @@ void setup() {
 }
 
 bool saveIfChanged() {
+
+  bool changed = false;
+
   // Should avoid calling Preferences whenever possible to reduce memory wear and avoid ~20ms write delay that blocks interrupts.
   if (dupr == savedDupr && starts == savedStarts && z.pos == z.savedPos && z.originPos == z.savedOriginPos && z.posGlobal == z.savedPosGlobal && z.motorPos == z.savedMotorPos && z.leftStop == z.savedLeftStop && z.rightStop == z.savedRightStop && z.disabled == z.savedDisabled &&
       spindlePos == savedSpindlePos && spindlePosAvg == savedSpindlePosAvg && spindlePosSync == savedSpindlePosSync && savedSpindlePosGlobal == spindlePosGlobal && showAngle == savedShowAngle && showTacho == savedShowTacho && moveStep == savedMoveStep &&
       mode == savedMode && measure == savedMeasure && x.pos == x.savedPos && x.originPos == x.savedOriginPos && x.posGlobal == x.savedPosGlobal && x.motorPos == x.savedMotorPos && x.leftStop == x.savedLeftStop && x.rightStop == x.savedRightStop && x.disabled == x.savedDisabled &&
       a1.pos == a1.savedPos && a1.originPos == a1.savedOriginPos && a1.posGlobal == a1.savedPosGlobal && a1.motorPos == a1.savedMotorPos && a1.leftStop == a1.savedLeftStop && a1.rightStop == a1.savedRightStop && a1.disabled == a1.savedDisabled &&
-      coneRatio == savedConeRatio && turnPasses == savedTurnPasses && savedAuxForward == auxForward && currentTool == savedTool) return false;
+      coneRatio == savedConeRatio && turnPasses == savedTurnPasses && savedAuxForward == auxForward && currentTool == savedTool) changed = false;
 
 
   //check if current tool offsets have changed from saved tool offsets
   for (int i = 0; i < MAX_TOOLS; ++i) {
     if (toolOffsets[i].xOffsetDu == savedToolOffsets[i].xOffsetDu && toolOffsets[i].zOffsetDu == savedToolOffsets[i].zOffsetDu) {
-      return false;
+      changed = false;
+    } else {
+      changed = true;
+      break;
     }
   }
+
+  if (!changed) return false;
 
   Preferences pref;
   pref.begin(PREF_NAMESPACE);
@@ -1880,10 +1887,19 @@ bool saveIfChanged() {
   if (turnPasses != savedTurnPasses) pref.putInt(PREF_TURN_PASSES, savedTurnPasses = turnPasses);
   if (auxForward != savedAuxForward) pref.putBool(PREF_AUX_FORWARD, savedAuxForward = auxForward);
   if (currentTool != savedTool) pref.putInt(PREF_TOOL, savedTool = currentTool);
-  if (toolOffsets != savedToolOffsets) saveToolOffsets(pref);
+  if (areToolOffsetsChanged()) saveToolOffsets(pref);
 
   pref.end();
   return true;
+}
+
+bool areToolOffsetsChanged() {
+  for (int i = 0; i < MAX_TOOLS; ++i) {
+    if (toolOffsets[i].xOffsetDu != savedToolOffsets[i].xOffsetDu || toolOffsets[i].zOffsetDu != savedToolOffsets[i].zOffsetDu) {
+      return true;
+    }
+  }
+  return false;
 }
 
 void saveToolOffsets(Preferences pref) {
@@ -1901,16 +1917,10 @@ void loadToolOffsets(Preferences pref) {
         String zKey = "tool" + String(i) + "Z";
         toolOffsets[i].xOffsetDu = pref.getFloat(xKey.c_str(), 0.0);
         toolOffsets[i].zOffsetDu = pref.getFloat(zKey.c_str(), 0.0);
-    }
-}
-
-void copyToolOffsets(ToolOffset* toolOffsets, ToolOffset* savedToolOffsets) {
-    for (int i = 0; i < MAX_TOOLS; ++i) {
         savedToolOffsets[i].xOffsetDu = toolOffsets[i].xOffsetDu;
         savedToolOffsets[i].zOffsetDu = toolOffsets[i].zOffsetDu;
     }
 }
-
 
 void markAxisOrigin(Axis* a) {
   bool hasSemaphore = xSemaphoreTake(a->mutex, 10) == pdTRUE;
@@ -3303,6 +3313,12 @@ void applyToolOffset(ToolOffset offset) {
     long xOffsetSteps = duToSteps(&x, offset.xOffsetDu);
     long zOffsetSteps = duToSteps(&z, offset.zOffsetDu);
     
+    Serial.print("Applying tool offset: ");
+    Serial.print("X: ");
+    Serial.print(xOffsetSteps);
+    Serial.print(" Z: ");
+    Serial.println(zOffsetSteps);
+
     x.originPos += xOffsetSteps;
     z.originPos += zOffsetSteps;
 }
