@@ -1830,20 +1830,19 @@ bool saveIfChanged() {
   bool changed = false;
 
   // Should avoid calling Preferences whenever possible to reduce memory wear and avoid ~20ms write delay that blocks interrupts.
-  if (dupr == savedDupr && starts == savedStarts && z.pos == z.savedPos && z.originPos == z.savedOriginPos && z.posGlobal == z.savedPosGlobal && z.motorPos == z.savedMotorPos && z.leftStop == z.savedLeftStop && z.rightStop == z.savedRightStop && z.disabled == z.savedDisabled &&
-      spindlePos == savedSpindlePos && spindlePosAvg == savedSpindlePosAvg && spindlePosSync == savedSpindlePosSync && savedSpindlePosGlobal == spindlePosGlobal && showAngle == savedShowAngle && showTacho == savedShowTacho && moveStep == savedMoveStep &&
-      mode == savedMode && measure == savedMeasure && x.pos == x.savedPos && x.originPos == x.savedOriginPos && x.posGlobal == x.savedPosGlobal && x.motorPos == x.savedMotorPos && x.leftStop == x.savedLeftStop && x.rightStop == x.savedRightStop && x.disabled == x.savedDisabled &&
-      a1.pos == a1.savedPos && a1.originPos == a1.savedOriginPos && a1.posGlobal == a1.savedPosGlobal && a1.motorPos == a1.savedMotorPos && a1.leftStop == a1.savedLeftStop && a1.rightStop == a1.savedRightStop && a1.disabled == a1.savedDisabled &&
-      coneRatio == savedConeRatio && turnPasses == savedTurnPasses && savedAuxForward == auxForward && currentTool == savedTool) changed = false;
+  changed = dupr != savedDupr || starts != savedStarts || z.pos != z.savedPos || z.originPos != z.savedOriginPos || z.posGlobal != z.savedPosGlobal || z.motorPos != z.savedMotorPos || z.leftStop != z.savedLeftStop || z.rightStop != z.savedRightStop || z.disabled != z.savedDisabled ||
+      spindlePos != savedSpindlePos || spindlePosAvg != savedSpindlePosAvg || spindlePosSync != savedSpindlePosSync || savedSpindlePosGlobal != spindlePosGlobal || showAngle != savedShowAngle || showTacho != savedShowTacho || moveStep != savedMoveStep ||
+      mode != savedMode || measure != savedMeasure || x.pos != x.savedPos || x.originPos != x.savedOriginPos || x.posGlobal != x.savedPosGlobal || x.motorPos != x.savedMotorPos || x.leftStop != x.savedLeftStop || x.rightStop != x.savedRightStop || x.disabled != x.savedDisabled ||
+      a1.pos != a1.savedPos || a1.originPos != a1.savedOriginPos || a1.posGlobal != a1.savedPosGlobal || a1.motorPos != a1.savedMotorPos || a1.leftStop != a1.savedLeftStop || a1.rightStop != a1.savedRightStop || a1.disabled != a1.savedDisabled ||
+      coneRatio != savedConeRatio || turnPasses != savedTurnPasses || savedAuxForward != auxForward || currentTool != savedTool;
 
-
-  //check if current tool offsets have changed from saved tool offsets
-  for (int i = 0; i < MAX_TOOLS; ++i) {
-    if (toolOffsets[i].xOffsetDu == savedToolOffsets[i].xOffsetDu && toolOffsets[i].zOffsetDu == savedToolOffsets[i].zOffsetDu) {
-      changed = false;
-    } else {
-      changed = true;
-      break;
+  if(!changed) {
+    //check if current tool offsets have changed from saved tool offsets
+    for (int i = 0; i < MAX_TOOLS; ++i) {
+      if (toolOffsets[i].xOffsetDu != savedToolOffsets[i].xOffsetDu || toolOffsets[i].zOffsetDu != savedToolOffsets[i].zOffsetDu) {
+        changed = true;
+        break;
+      }
     }
   }
 
