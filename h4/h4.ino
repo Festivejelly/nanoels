@@ -1478,6 +1478,8 @@ void taskGcode(void *param) {
         Serial.print("|Id:");
         Serial.print("H" + String(HARDWARE_VERSION) + "V" + String(SOFTWARE_VERSION));
         Serial.print(">"); // no new line to allow client to easily cut out the status response
+      } else if (receivedChar == '#' /* custom command for listing tool offsets */) {
+        listToolOffsets();
       } else if (gcodeInSave && receivedChar == '"' /* end of saved program */) {
         gcodeInSave = false;
         if (gcodeSaveName.length() == 0) {
@@ -1518,18 +1520,20 @@ void taskGcode(void *param) {
           gcodeInSemicolon = false;
           Serial.println("ok");
         }
-      } else if (receivedChar == '#' /* custom command for listing tool offsets */) {
-        listToolOffsets();
       } else if (isOn) {
         if (gcodeInBrace && charCode < 32) {
           Serial.println("error: comment not closed");
           setIsOnFromTask(false);
         } else if (charCode < 32 && gcodeCommand.length() > 1) {
-          if (handleGcodeCommand(gcodeCommand) && isSerial) Serial.println("ok");
+          if (handleGcodeCommand(gcodeCommand) && isSerial) {
+              Serial.println("ok");
+            }
           gcodeCommand = "";
           gcodeInSemicolon = false;
         } else if (charCode < 32) {
-          if (isSerial) Serial.println("ok");
+          if (isSerial) {
+              Serial.println("ok");
+            }
           gcodeCommand = "";
         } else if (charCode >= 32 && (charCode == 'G' || charCode == 'M')) {
           // Split consequent G and M commands on one line.
@@ -1556,19 +1560,21 @@ void taskGcode(void *param) {
 }
 
 void listToolOffsets() {
-    Serial.print("<ToolOffsets>");
+    Serial.print("<toolOffsets:");
     for (int i = 0; i < MAX_TOOLS; ++i) {
-        // Assuming toolOffsets[i].xOffsetDu and toolOffsets[i].zOffsetDu are the offsets
         Serial.print("T");
         Serial.print(i);
-        Serial.print(": X=");
-        // Convert deci-microns to millimeters for display
-        Serial.print(toolOffsets[i].xOffsetDu / 10000.0, 3); // 3 decimal places precision
-        Serial.print("mm, Z=");
+        Serial.print(":");
+        Serial.print("X=");
+        Serial.print(toolOffsets[i].xOffsetDu / 10000.0, 3);
+        Serial.print(",");
+        Serial.print("Z=");
         Serial.print(toolOffsets[i].zOffsetDu / 10000.0, 3);
-        Serial.print("mm");
+        if(i < MAX_TOOLS -1) {
+          Serial.print("|");
+        }
     }
-    Serial.print("</ToolOffsets>");
+    Serial.println(">");
 }
 
 bool saveGcode() {
@@ -1659,9 +1665,9 @@ void startPulseCounter(pcnt_unit_t unit, int gpioA, int gpioB) {
   pcnt_counter_resume(unit);
 }
 
+// Attaching interrupt on core 0 to have more time on core 1 where axes are moved.
 void taskAttachInterrupts(void *param) {
-  // Attaching interrupt on core 0 to have more time on core 1 where axes are moved.
-  attachInterrupt(digitalPinToInterrupt(ENC_A), spinEnc, FALLING);
+  startPulseCounter(PCNT_UNIT_0, ENC_A, ENC_B);
   if (PULSE_1_USE) attachInterrupt(digitalPinToInterrupt(A12), pulse1Enc, CHANGE);
   if (PULSE_2_USE) attachInterrupt(digitalPinToInterrupt(A22), pulse2Enc, CHANGE);
   vTaskDelete(NULL);
@@ -3276,8 +3282,6 @@ bool handleG10(const String& command) {
     toolOffsets[toolIndex].xOffsetDu = xOffset * 10000; // adjusting to deci-microns
     toolOffsets[toolIndex].zOffsetDu = zOffset * 10000;
 
-    Serial.println("ok");
-
     return true;
 }
 
@@ -3312,12 +3316,6 @@ void applyToolOffset(ToolOffset offset) {
     long xOffsetSteps = duToSteps(&x, offset.xOffsetDu);
     long zOffsetSteps = duToSteps(&z, offset.zOffsetDu);
     
-    Serial.print("Applying tool offset: ");
-    Serial.print("X: ");
-    Serial.print(xOffsetSteps);
-    Serial.print(" Z: ");
-    Serial.println(zOffsetSteps);
-
     x.originPos += xOffsetSteps;
     z.originPos += zOffsetSteps;
 }
