@@ -305,16 +305,16 @@ struct ToolOffset {
 
 // Tool offsets in deci-microns (DU). 1mm = 10000 DU.
 ToolOffset toolOffsets[MAX_TOOLS] = {
-    {0, 0},           //T0 external grooving tool 0,0
-    {5000, -10000},   //T1 turning tool 0.5mm X, 1mm Z
-    {53750, -58000},  //T2 internal grooving tool 5.375mm X, 5.8mm Z
-    {57750, -69000},  //T3 trepanning tool 5.775mm X, 6.9mm Z
-    {0, 0},           //T4 undefined tool 0,0
-    {0, 0},           //T5 undefined tool 0,0
-    {0, 0},           //T6 undefined tool 0,0
-    {0, 0},           //T7 undefined tool 0,0
-    {0, 0},           //T8 undefined tool 0,0
-    {0, 0}            //T9 undefined tool 0,0
+    {0, 0},             //T0 primary tool, all offsets are based off this tool
+    {-287600, 59000},   //T1 internal grooving tool
+    {-276500, 112000},  //T2 universal turning and drilling tool
+    {-289200, 69200},   //T3 trepanning tool
+    {-260800, 563000},  //T4 M3 drill in toolpost
+    {0, 0},             //T5 undefined tool 0,0
+    {0, 0},             //T6 undefined tool 0,0
+    {0, 0},             //T7 undefined tool 0,0
+    {0, 0},             //T8 undefined tool 0,0
+    {0, 0}              //T9 undefined tool 0,0
 };
 
 int nextTool = 0;
@@ -1535,7 +1535,7 @@ void taskGcode(void *param) {
               Serial.println("ok");
             }
           gcodeCommand = "";
-        } else if (charCode >= 32 && (charCode == 'G' || charCode == 'M')) {
+        } else if (charCode >= 32 && (charCode == 'G' || charCode == 'M' || charCode == 'T')) {
           // Split consequent G and M commands on one line.
           // No "ok" for commands in the middle of the line.
           handleGcodeCommand(gcodeCommand);
@@ -1560,21 +1560,21 @@ void taskGcode(void *param) {
 }
 
 void listToolOffsets() {
-    Serial.print("<toolOffsets:");
+    String toolOffsetsStr = "toolOffsets:";
     for (int i = 0; i < MAX_TOOLS; ++i) {
-        Serial.print("T");
-        Serial.print(i);
-        Serial.print(":");
-        Serial.print("X=");
-        Serial.print(toolOffsets[i].xOffsetDu / 10000.0, 3);
-        Serial.print(",");
-        Serial.print("Z=");
-        Serial.print(toolOffsets[i].zOffsetDu / 10000.0, 3);
+        toolOffsetsStr += "T";
+        toolOffsetsStr += String(i);
+        toolOffsetsStr += ":";
+        toolOffsetsStr += "X=";
+        toolOffsetsStr += String(toolOffsets[i].xOffsetDu / 10000.0, 3);
+        toolOffsetsStr += ",";
+        toolOffsetsStr += "Z=";
+        toolOffsetsStr += String(toolOffsets[i].zOffsetDu / 10000.0, 3);
         if(i < MAX_TOOLS -1) {
-          Serial.print("|");
+          toolOffsetsStr += "|";
         }
     }
-    Serial.println(">");
+    Serial.println(toolOffsetsStr);
 }
 
 bool saveGcode() {
@@ -3281,7 +3281,7 @@ bool handleG10(const String& command) {
     // Convert offsets from mm to deci-microns if necessary
     toolOffsets[toolIndex].xOffsetDu = xOffset * 10000; // adjusting to deci-microns
     toolOffsets[toolIndex].zOffsetDu = zOffset * 10000;
-
+    Serial.println("Tool set: T"+ String(toolIndex) + " X:" + String(xOffset) + " Z:" + String(zOffset));
     return true;
 }
 
