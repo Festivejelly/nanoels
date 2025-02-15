@@ -11,27 +11,27 @@ const int ENCODER_BACKLASH = 3; // Numer of impulses encoder can issue without m
 #define ENC_B 15
 
 // Main lead screw (Z) parameters.
-const long SCREW_Z_DU = 20000; // 2mm lead screw in deci-microns (10^-7 of a meter)
-const long MOTOR_STEPS_Z = 200;
+const long SCREW_Z_DU = 50000; // 2mm lead screw in deci-microns (10^-7 of a meter)
+const long MOTOR_STEPS_Z = 800;
 const long SPEED_START_Z = 2 * MOTOR_STEPS_Z; // Initial speed of a motor, steps / second.
 const long ACCELERATION_Z = 30 * MOTOR_STEPS_Z; // Acceleration of a motor, steps / second ^ 2.
 const long SPEED_MANUAL_MOVE_Z = 6 * MOTOR_STEPS_Z; // Maximum speed of a motor during manual move, steps / second.
 const bool INVERT_Z = true; // change (true/false) if the carriage moves e.g. "left" when you press "right".
 const bool NEEDS_REST_Z = false; // Set to false for closed-loop drivers, true for open-loop.
 const long MAX_TRAVEL_MM_Z = 300; // Lathe bed doesn't allow to travel more than this in one go, 30cm / ~1 foot
-const long BACKLASH_DU_Z = 200; // 0.02mm backlash in deci-microns (10^-7 of a meter)
+const long BACKLASH_DU_Z = 1000; // 2750 0.275mm backlash in deci-microns (10^-7 of a meter)
 const char NAME_Z = 'Z'; // Text shown on screen before axis position value, GCode axis name
 
 // Cross-slide lead screw (X) parameters.
 const long SCREW_X_DU = 10000; // 1.0mm lead screw with 3x reduction in deci-microns (10^-7) of a meter
-const long MOTOR_STEPS_X = 600; // 200 steps at 3x reduction
+const long MOTOR_STEPS_X = 2400; // 200 steps at 3x reduction
 const long SPEED_START_X = MOTOR_STEPS_X; // Initial speed of a motor, steps / second.
 const long ACCELERATION_X = 10 * MOTOR_STEPS_X; // Acceleration of a motor, steps / second ^ 2.
 const long SPEED_MANUAL_MOVE_X = 3 * MOTOR_STEPS_X; // Maximum speed of a motor during manual move, steps / second.
 const bool INVERT_X = false; // change (true/false) if the carriage moves e.g. "left" when you press "right".
 const bool NEEDS_REST_X = false; // Set to false for all kinds of drivers or X will be unlocked when not moving.
 const long MAX_TRAVEL_MM_X = 100; // Cross slide doesn't allow to travel more than this in one go, 10cm
-const long BACKLASH_DU_X = 1500; // 0.15mm backlash in deci-microns (10^-7 of a meter)
+const long BACKLASH_DU_X = 200; // 500 0.05mm backlash in deci-microns (10^-7 of a meter)
 const char NAME_X = 'X'; // Text shown on screen before axis position value, GCode axis name
 
 // Manual stepping with left/right/up/down buttons. Only used when step isn't default continuous (1mm or 0.1").
@@ -296,7 +296,23 @@ int savedStarts = 0; // starts saved in Preferences
 int nextStarts = starts; // number of starts that should be used asap
 bool nextStartsFlag = false; // whether nextStarts requires attention
 
-constexpr int MAX_TOOLS = 10;
+enum ToolMode {
+  TOOL_IDLE,
+  TOOL_SELECT,
+  TOOL_CONFIRM,
+  TOOL_SET_X,
+  TOOL_SET_Z
+};
+
+ToolMode currentToolMode = TOOL_IDLE;
+int pendingToolNumber = -1;
+String pendingInput = "";
+float pendingOffset = 0;
+bool editingOffsets = false;
+bool forceDisplayRefresh = false;
+bool offsetsChanged = false;
+
+constexpr int MAX_TOOLS = 20;
 
 struct ToolOffset {
     float xOffsetDu;
@@ -304,17 +320,11 @@ struct ToolOffset {
 };
 
 // Tool offsets in deci-microns (DU). 1mm = 10000 DU.
+// Format is {xOffsetDu, zOffsetDu}
+// set with G10 P{toolNumber} X{xOffsetInMM} Z{zOffsetInMM}
+// or set on the controller by pressing the gear icon
 ToolOffset toolOffsets[MAX_TOOLS] = {
-    {0, 0},             //T0 primary tool, all offsets are based off this tool
-    {-287600, 59000},   //T1 internal grooving tool
-    {-276500, 112000},  //T2 universal turning and drilling tool
-    {-289200, 69200},   //T3 trepanning tool
-    {-260800, 563000},  //T4 M3 drill in toolpost
-    {0, 0},             //T5 undefined tool 0,0
-    {0, 0},             //T6 undefined tool 0,0
-    {0, 0},             //T7 undefined tool 0,0
-    {0, 0},             //T8 undefined tool 0,0
-    {0, 0}              //T9 undefined tool 0,0
+    {0, 0}             //T0 primary tool (parting), all offsets are based off this tool
 };
 
 int nextTool = 0;
@@ -820,6 +830,11 @@ int printMode() {
 }
 
 void updateDisplay() {
+
+  if (currentToolMode != TOOL_IDLE) {
+    return;
+  }
+
   int rpm = showTacho ? getApproxRpm() : 0;
   int charIndex = 0;
 
@@ -829,13 +844,14 @@ void updateDisplay() {
     lcd.setCursor(6, 1);
     lcd.print("NanoEls");
     lcd.setCursor(6, 2);
-    lcd.print("H" + String(HARDWARE_VERSION) + " V" + String(SOFTWARE_VERSION));
+    lcd.print("H" + String(HARDWARE_VERSION) + " V" + String(SOFTWARE_VERSION) + " FJ");
     lcdHashLine0 = LCD_HASH_INITIAL;
     lcdHashLine1 = LCD_HASH_INITIAL;
     lcdHashLine2 = LCD_HASH_INITIAL;
     lcdHashLine3 = LCD_HASH_INITIAL;
     delay(2000);
   }
+  
   if (lcdHashLine0 == LCD_HASH_INITIAL) {
     // First run after reset.
     lcd.clear();
@@ -844,8 +860,11 @@ void updateDisplay() {
     lcdHashLine3 = LCD_HASH_INITIAL;
   }
 
-  long newHashLine0 = isOn + (z.leftStop - z.rightStop) + (x.leftStop - x.rightStop) + spindlePosSync + moveStep + mode + measure + setupIndex * 10;
+  long newHashLine0 = isOn + (z.leftStop - z.rightStop) + (x.leftStop - x.rightStop) + spindlePosSync + moveStep + mode + measure + setupIndex * 10 + currentTool + forceDisplayRefresh;
   if (lcdHashLine0 != newHashLine0) {
+    if(forceDisplayRefresh) {
+      forceDisplayRefresh = false;
+    }
     lcdHashLine0 = newHashLine0;
     charIndex = 0;
     lcd.setCursor(0, 0);
@@ -888,7 +907,22 @@ void updateDisplay() {
       charIndex += lcd.write(customCharLimUpDownCode);
       charIndex += printAxisStopDiff(&x, false);
     }
-    printLcdSpaces(charIndex);
+
+    if (mode == MODE_GCODE) {
+      String toolStr = "T" + String(currentTool);
+      int remainingSpace = 20 - charIndex; // Assuming 20 character width LCD
+      int spacesToAdd = remainingSpace - toolStr.length();
+      
+      if (spacesToAdd > 0) {
+        for (int i = 0; i < spacesToAdd; i++) {
+          lcd.print(" ");
+        }
+      }
+      lcd.print(toolStr);
+      charIndex = 20; // We've filled the line
+    } else {
+      printLcdSpaces(charIndex);
+    }
   }
 
   long newHashLine1 = dupr + starts + mode + measure + setupIndex;
@@ -908,17 +942,11 @@ void updateDisplay() {
   long zDisplayPos = z.pos + z.originPos;
   long xDisplayPos = x.pos + x.originPos;
   long a1DisplayPos = a1.pos + a1.originPos;
-  long newHashLine2 = zDisplayPos + xDisplayPos + a1DisplayPos + measure + z.disabled + x.disabled + mode + currentTool;
+  long newHashLine2 = zDisplayPos + xDisplayPos + a1DisplayPos + measure + z.disabled + x.disabled + mode;
   if (lcdHashLine2 != newHashLine2) {
     lcdHashLine2 = newHashLine2;
     charIndex = 0;
     lcd.setCursor(0, 2);
-
-    if (mode == MODE_GCODE) {
-      charIndex += lcd.print("T");
-      charIndex += lcd.print(currentTool);
-      charIndex += lcd.print(" ");
-    }
 
     charIndex += printAxisPosWithName(&z, true);
     while (charIndex < 10) charIndex += lcd.print(" ");
@@ -1053,6 +1081,47 @@ void updateDisplay() {
       charIndex += lcd.print("rpm");
     }
     printLcdSpaces(charIndex);
+  }
+}
+
+void updateToolDisplay() {
+  lcd.clear();
+  lcd.setCursor(0, 0);
+  lcd.print("Tool Management");
+  
+  switch (currentToolMode) {
+    case TOOL_SELECT:
+      lcd.setCursor(0, 1);
+      lcd.print("Enter tool number:");
+      lcd.setCursor(0, 2);
+      lcd.print("T");
+      lcd.print(pendingInput.isEmpty() ? "_" : pendingInput);
+      lcd.setCursor(0, 3);
+      lcd.print("ON:Select OFF:Cancel");
+      break;
+    case TOOL_CONFIRM:
+      lcd.setCursor(0, 1);
+      lcd.print("Confirm tool T");
+      lcd.print(pendingToolNumber);
+      lcd.setCursor(0, 2);
+      lcd.print("ON:Select OFF:Edit");
+      break;
+    case TOOL_SET_X:
+      lcd.setCursor(0, 1);
+      lcd.print("Edit X offset (mm):");
+      lcd.setCursor(0, 2);
+      lcd.print(pendingInput.isEmpty() ? "0" : pendingInput);
+      lcd.setCursor(0, 3);
+      lcd.print("ON:Set Z  OFF:Cancel");
+      break;
+    case TOOL_SET_Z:
+      lcd.setCursor(0, 1);
+      lcd.print("Edit Z offset (mm):");
+      lcd.setCursor(0, 2);
+      lcd.print(pendingInput.isEmpty() ? "0" : pendingInput);
+      lcd.setCursor(0, 3);
+      lcd.print("ON:Save   OFF:Cancel");
+      break;
   }
 }
 
@@ -1476,7 +1545,7 @@ void taskGcode(void *param) {
         Serial.print(",");
         Serial.print(getApproxRpm());
         Serial.print("|Id:");
-        Serial.print("H" + String(HARDWARE_VERSION) + "V" + String(SOFTWARE_VERSION));
+        Serial.print("H" + String(HARDWARE_VERSION) + "V" + String(SOFTWARE_VERSION) + "FJ");
         Serial.print(">"); // no new line to allow client to easily cut out the status response
       } else if (receivedChar == '#' /* custom command for listing tool offsets */) {
         listToolOffsets();
@@ -1840,17 +1909,7 @@ bool saveIfChanged() {
       spindlePos != savedSpindlePos || spindlePosAvg != savedSpindlePosAvg || spindlePosSync != savedSpindlePosSync || savedSpindlePosGlobal != spindlePosGlobal || showAngle != savedShowAngle || showTacho != savedShowTacho || moveStep != savedMoveStep ||
       mode != savedMode || measure != savedMeasure || x.pos != x.savedPos || x.originPos != x.savedOriginPos || x.posGlobal != x.savedPosGlobal || x.motorPos != x.savedMotorPos || x.leftStop != x.savedLeftStop || x.rightStop != x.savedRightStop || x.disabled != x.savedDisabled ||
       a1.pos != a1.savedPos || a1.originPos != a1.savedOriginPos || a1.posGlobal != a1.savedPosGlobal || a1.motorPos != a1.savedMotorPos || a1.leftStop != a1.savedLeftStop || a1.rightStop != a1.savedRightStop || a1.disabled != a1.savedDisabled ||
-      coneRatio != savedConeRatio || turnPasses != savedTurnPasses || savedAuxForward != auxForward || currentTool != savedTool;
-
-  if(!changed) {
-    //check if current tool offsets have changed from saved tool offsets
-    for (int i = 0; i < MAX_TOOLS; ++i) {
-      if (toolOffsets[i].xOffsetDu != savedToolOffsets[i].xOffsetDu || toolOffsets[i].zOffsetDu != savedToolOffsets[i].zOffsetDu) {
-        changed = true;
-        break;
-      }
-    }
-  }
+      coneRatio != savedConeRatio || turnPasses != savedTurnPasses || savedAuxForward != auxForward || currentTool != savedTool  || offsetsChanged;
 
   if (!changed) return false;
 
@@ -1893,6 +1952,8 @@ bool saveIfChanged() {
   if (auxForward != savedAuxForward) pref.putBool(PREF_AUX_FORWARD, savedAuxForward = auxForward);
   if (currentTool != savedTool) pref.putInt(PREF_TOOL, savedTool = currentTool);
   if (areToolOffsetsChanged()) saveToolOffsets(pref);
+
+  offsetsChanged = false;
 
   pref.end();
   return true;
@@ -2598,6 +2659,27 @@ bool processNumpadResult(int keyCode) {
   return false;
 }
 
+bool isNumericKey(int keyCode) {
+  return keyCode == B_0 || keyCode == B_1 || keyCode == B_2 || keyCode == B_3 || keyCode == B_4 ||
+         keyCode == B_5 || keyCode == B_6 || keyCode == B_7 || keyCode == B_8 || keyCode == B_9;
+}
+
+int getNumericValue(int keyCode) {
+  switch(keyCode) {
+    case B_0: return 0;
+    case B_1: return 1;
+    case B_2: return 2;
+    case B_3: return 3;
+    case B_4: return 4;
+    case B_5: return 5;
+    case B_6: return 6;
+    case B_7: return 7;
+    case B_8: return 8;
+    case B_9: return 9;
+    default: return -1; // Should never happen if isNumericKey is checked first
+  }
+}
+
 void processKeypadEvent() {
   int event = 0;
   if (serialKeycode != 0) {
@@ -2622,6 +2704,31 @@ void processKeypadEvent() {
     // Not allowed to interfere other than turn off.
     if (isPress && keyCode != B_OFF) beep();
     return;
+  }
+
+  if (currentToolMode != TOOL_IDLE) {
+    
+    if (isPress) {
+      if (isNumericKey(keyCode)) {
+        int numericValue = getNumericValue(keyCode);
+        processToolNumericInput(numericValue);
+      } else if (keyCode == B_MINUS || keyCode == B_STEP || keyCode == B_BACKSPACE) {
+        processToolSpecialInput(keyCode);
+      } else if (keyCode == B_ON) {
+        processToolConfirmation();
+      } else if (keyCode == B_OFF) {
+        if (currentToolMode == TOOL_CONFIRM) {
+          handleToolConfirmOff();
+        } else {
+          exitToolMode();
+        }
+      } else if (keyCode == B_SETTINGS) {;
+        exitToolMode();
+      } else {
+        beep();
+      }
+    }
+    return; // Don't process other buttons while in tool mode
   }
 
   // Releases don't matter in numpad but it has to run before LRUD since it might handle those keys.
@@ -2691,7 +2798,7 @@ void processKeypadEvent() {
   } else if (keyCode == B_STEP) {
     buttonMoveStepPress();
   } else if (keyCode == B_SETTINGS) {
-    // TODO.
+    enterToolMode();
   } else if (keyCode == B_REVERSE) {
     buttonReversePress();
   } else if (keyCode == B_MEASURE) {
@@ -3237,7 +3344,14 @@ bool handleGcode(const String& command) {
   if (op == 0 || op == 1) { // 0 also covers X and Z commands without G.
     G00_01(command);
   } else if (op == 10) {
-    handleG10(command);
+      if (!handleG10(command)) {
+          Serial.println("error: invalid tool number");
+          return false;
+      }
+      Serial.println("Tool set successfully");
+      return true;
+  } else if (op == 33) {
+    return handleG33(command);
   } else if (op == 20 || op == 21) {
     setMeasure(op == 20 ? MEASURE_INCH : MEASURE_METRIC);
   } else if (op == 90 || op == 91) {
@@ -3267,21 +3381,108 @@ bool handleMcode(const String& command) {
   return true;
 }
 
-bool handleG10(const String& command) {
-    int toolIndex = getInt(command, 'P'); // Assuming 'P' specifies the tool number.
-    float xOffset = getFloat(command, 'X'); // Get X offset
-    float zOffset = getFloat(command, 'Z'); // Get Z offset
-
-    // Check if toolIndex is within the valid range
-    if (toolIndex < 1 || toolIndex >= MAX_TOOLS) {
-        Serial.println("error: invalid tool number");
+// G33 Threading command handler
+// Format: G33 Z[end] X[end] P[pitch] H[passes] Q[start_z] R[start_x]
+// Example: G33 Z-20 X-1 P1.5 H5 Q0 R0 - Create thread from Z0 to Z-20, X0 to X-1, 1.5mm pitch, 5 passes
+bool handleG33(const String& command) {
+    // Extract parameters
+    if (command.indexOf('Z') == -1 || command.indexOf('X') == -1 || command.indexOf('P') == -1) {
+        Serial.println("error: G33 requires Z, X, and P parameters");
         return false;
     }
 
-    // Convert offsets from mm to deci-microns if necessary
-    toolOffsets[toolIndex].xOffsetDu = xOffset * 10000; // adjusting to deci-microns
+    // Get end positions
+    long zEnd = mmOrInchToAbsolutePos(&z, getFloat(command, 'Z'));
+    long xEnd = mmOrInchToAbsolutePos(&x, getFloat(command, 'X'));
+    
+    // Get start positions (optional, default to current position)
+    long zStart = command.indexOf('Q') >= 0 ? 
+        mmOrInchToAbsolutePos(&z, getFloat(command, 'Q')) : 
+        z.pos;
+    long xStart = command.indexOf('R') >= 0 ? 
+        mmOrInchToAbsolutePos(&x, getFloat(command, 'R')) : 
+        x.pos;
+
+    // Get pitch in machine units (deci-microns)
+    float pitchMm = getFloat(command, 'P');
+    if (pitchMm <= 0) {
+        Serial.println("error: Invalid pitch value");
+        return false;
+    }
+    long threadPitch = round(pitchMm * 10000); // Convert mm to deci-microns
+
+    // Store current mode and settings
+    int previousMode = mode;
+    long previousDupr = dupr;
+    bool previousIsOn = isOn;
+    
+    // Set up for threading
+    setModeFromLoop(MODE_THREAD);
+    setDupr(threadPitch);
+    
+    // Set thread boundaries
+    setLeftStop(&z, max(zStart, zEnd));
+    setRightStop(&z, min(zStart, zEnd));
+    setLeftStop(&x, max(xStart, xEnd));
+    setRightStop(&x, min(xStart, xEnd));
+
+    // Wait for stops to be applied
+    while (z.nextLeftStopFlag || z.nextRightStopFlag || 
+           x.nextLeftStopFlag || x.nextRightStopFlag) {
+        delay(10);
+    }
+
+    // Get and validate number of passes
+    int passes = command.indexOf('H') >= 0 ? getInt(command, 'H') : 3;
+    if (passes <= 0 || passes > PASSES_MAX) {
+        Serial.println("error: Invalid number of passes (1-" + String(PASSES_MAX) + ")");
+        return false;
+    }
+    setTurnPasses(passes);
+
+    // Start threading operation
+    setIsOnFromLoop(true);
+    
+    // Wait for threading to complete
+    while (isOn) {
+        delay(10);
+        if (!isOn) break;
+    }
+
+    // Clear the soft stops
+    setLeftStop(&z, LONG_MAX);
+    setRightStop(&z, LONG_MIN);
+    setLeftStop(&x, LONG_MAX);
+    setRightStop(&x, LONG_MIN);
+
+    // Wait for stops to be cleared
+    while (z.nextLeftStopFlag || z.nextRightStopFlag || 
+           x.nextLeftStopFlag || x.nextRightStopFlag) {
+        delay(10);
+    }
+
+    // Restore previous mode and settings
+    setModeFromLoop(previousMode);
+    setDupr(previousDupr);
+    setIsOnFromLoop(previousIsOn);
+
+    return true;
+}
+
+bool handleG10(const String& command) {
+    int toolIndex = getInt(command, 'P'); // Assuming 'P' specifies the tool number.
+    float xOffset = getFloat(command, 'X'); // Get X offset in MM
+    float zOffset = getFloat(command, 'Z'); // Get Z offset in MM
+
+    // Check if toolIndex is within the valid range
+    if (toolIndex < 1 || toolIndex >= MAX_TOOLS) {
+        return false;
+    }
+
+    // Convert offsets from mm to deci-microns
+    toolOffsets[toolIndex].xOffsetDu = xOffset * 10000;
     toolOffsets[toolIndex].zOffsetDu = zOffset * 10000;
-    Serial.println("Tool set: T"+ String(toolIndex) + " X:" + String(xOffset) + " Z:" + String(zOffset));
+    offsetsChanged = true;
     return true;
 }
 
@@ -3296,6 +3497,140 @@ bool handleChangeToolCommand(String command) {
     Serial.println("error: invalid tool number");
     return false;
   }
+}
+
+void loadExistingOffset(int toolNumber, bool isXOffset) {
+  float existingOffset = isXOffset ? 
+    toolOffsets[toolNumber].xOffsetDu / 10000.0 : 
+    toolOffsets[toolNumber].zOffsetDu / 10000.0;
+  pendingOffset = existingOffset;
+  pendingInput = String(existingOffset, 3);  // Convert to string with 3 decimal places
+  // Remove trailing zeros and decimal point if it's a whole number
+  while (pendingInput.endsWith("0")) {
+    pendingInput = pendingInput.substring(0, pendingInput.length() - 1);
+  }
+  if (pendingInput.endsWith(".")) {
+    pendingInput = pendingInput.substring(0, pendingInput.length() - 1);
+  }
+}
+
+void enterToolMode() {
+  currentToolMode = TOOL_SELECT;
+  pendingToolNumber = -1;
+  pendingOffset = 0;
+  pendingInput = "";
+  editingOffsets = false;
+  updateToolDisplay();
+}
+
+void exitToolMode() {
+  lcd.clear();
+  currentToolMode = TOOL_IDLE;
+  lcdHashLine0 = LCD_HASH_INITIAL;
+  lcdHashLine1 = LCD_HASH_INITIAL;
+  lcdHashLine2 = LCD_HASH_INITIAL;
+  lcdHashLine3 = LCD_HASH_INITIAL;
+  forceDisplayRefresh = true;
+}
+
+void processToolNumericInput(int inputValue) {
+  switch (currentToolMode) {
+    case TOOL_SELECT:
+      pendingInput += String(inputValue);
+      pendingToolNumber = pendingInput.toInt();
+      if (pendingToolNumber >= MAX_TOOLS) {
+        pendingToolNumber = MAX_TOOLS - 1;
+        pendingInput = String(pendingToolNumber);
+      }
+      break;
+    case TOOL_SET_X:
+    case TOOL_SET_Z:
+      pendingInput += String(inputValue);
+      pendingOffset = pendingInput.toFloat();
+      break;
+    default:
+      break;
+  }
+  
+  updateToolDisplay();
+}
+
+void processToolSpecialInput(int keyCode) {
+  
+  if (currentToolMode == TOOL_SET_X || currentToolMode == TOOL_SET_Z) {
+    if (keyCode == B_STEP && pendingInput.indexOf('.') == -1) {
+      pendingInput += ".";
+    } else if (keyCode == B_MINUS) {
+      if (pendingInput.charAt(0) == '-') {
+        pendingInput = pendingInput.substring(1);
+      } else {
+        pendingInput = "-" + pendingInput;
+      }
+      pendingOffset = pendingInput.toFloat();
+    } else if (keyCode == B_BACKSPACE) {
+      if (pendingInput.length() > 0) {
+        pendingInput = pendingInput.substring(0, pendingInput.length() - 1);
+        pendingOffset = pendingInput.length() > 0 ? pendingInput.toFloat() : 0;
+      }
+    }
+  } else if (currentToolMode == TOOL_SELECT && keyCode == B_BACKSPACE) {
+    if (pendingInput.length() > 0) {
+      pendingInput = pendingInput.substring(0, pendingInput.length() - 1);
+      pendingToolNumber = pendingInput.length() > 0 ? pendingInput.toInt() : -1;
+    }
+  }
+  
+  updateToolDisplay();
+}
+
+void processToolConfirmation() {
+  switch (currentToolMode) {
+    case TOOL_SELECT:
+      if (pendingToolNumber >= 0 && pendingToolNumber < MAX_TOOLS) {
+        currentToolMode = TOOL_CONFIRM;
+      } else {
+        lcd.setCursor(0, 3);
+        lcd.print("Invalid tool number");
+        delay(2000);
+        pendingToolNumber = -1;
+        pendingInput = "";
+      }
+      break;
+    case TOOL_CONFIRM:
+      // Here we'll change the tool without editing
+      changeTool(pendingToolNumber);
+      lcd.clear();
+      lcd.setCursor(0, 1);
+      lcd.print("Tool changed to T");
+      lcd.print(pendingToolNumber);
+      delay(2000);
+      exitToolMode();
+      break;
+    case TOOL_SET_X:
+      toolOffsets[pendingToolNumber].xOffsetDu = pendingOffset * 10000;
+      currentToolMode = TOOL_SET_Z;
+      loadExistingOffset(pendingToolNumber, false);  // Load Z offset
+      break;
+    case TOOL_SET_Z:
+      toolOffsets[pendingToolNumber].zOffsetDu = pendingOffset * 10000;
+      offsetsChanged = true;
+      changeTool(pendingToolNumber);
+      lcd.clear();
+      lcd.setCursor(0, 1);
+      lcd.print("Tool T");
+      lcd.print(pendingToolNumber);
+      lcd.print(" updated");
+      delay(2000);
+      exitToolMode();
+      break;
+  }
+  updateToolDisplay();
+}
+
+void handleToolConfirmOff() {
+  currentToolMode = TOOL_SET_X;
+  loadExistingOffset(pendingToolNumber, true);  // Load X offset
+  updateToolDisplay();
 }
 
 void changeTool(int newToolNumber) {
@@ -3313,11 +3648,32 @@ void changeTool(int newToolNumber) {
 }
 
 void applyToolOffset(ToolOffset offset) {
+    // Record the current directions before applying the offset
+    bool xLastDirection = x.direction;
+    bool zLastDirection = z.direction;
+
     long xOffsetSteps = duToSteps(&x, offset.xOffsetDu);
     long zOffsetSteps = duToSteps(&z, offset.zOffsetDu);
     
     x.originPos += xOffsetSteps;
     z.originPos += zOffsetSteps;
+
+    // Define the movement distance
+    long extraDistance = 500; // 0.05mm extra
+    long xMoveDu = BACKLASH_DU_X + extraDistance;
+    long zMoveDu = BACKLASH_DU_Z + extraDistance;
+
+    // Use the recorded directions to determine the movement
+    long xMove = xLastDirection ? xMoveDu : -xMoveDu;
+    long zMove = zLastDirection ? zMoveDu : -zMoveDu;
+
+    // Convert Du to steps
+    long xMoveSteps = duToSteps(&x, xMove);
+    long zMoveSteps = duToSteps(&z, zMove);
+
+    //move a little bit to take up any backlash after tool change.
+    stepToFinal(&x, x.pos + xMoveSteps);
+    stepToFinal(&z, z.pos + zMoveSteps);
 }
 
 // Process one command, return ok flag.
