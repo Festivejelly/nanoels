@@ -12,7 +12,7 @@ const int ENCODER_BACKLASH = 3; // Numer of impulses encoder can issue without m
 
 // Main lead screw (Z) parameters.
 const long SCREW_Z_DU = 50000; // 2mm lead screw in deci-microns (10^-7 of a meter)
-const long MOTOR_STEPS_Z = 800;
+const long MOTOR_STEPS_Z = 2000;
 const long SPEED_START_Z = 2 * MOTOR_STEPS_Z; // Initial speed of a motor, steps / second.
 const long ACCELERATION_Z = 30 * MOTOR_STEPS_Z; // Acceleration of a motor, steps / second ^ 2.
 const long SPEED_MANUAL_MOVE_Z = 6 * MOTOR_STEPS_Z; // Maximum speed of a motor during manual move, steps / second.
@@ -299,39 +299,35 @@ bool nextStartsFlag = false; // whether nextStarts requires attention
 enum ToolMode {
   TOOL_IDLE,
   TOOL_SELECT,
-  TOOL_CONFIRM,
-  TOOL_SET_X,
-  TOOL_SET_Z
+  TOOL_CONFIRM
 };
 
 ToolMode currentToolMode = TOOL_IDLE;
 int pendingToolNumber = -1;
 String pendingInput = "";
-float pendingOffset = 0;
-bool editingOffsets = false;
 bool forceDisplayRefresh = false;
 bool offsetsChanged = false;
 
-constexpr int MAX_TOOLS = 20;
+constexpr int MAX_TOOLS = 30;
 
 struct ToolOffset {
-    float xOffsetDu;
     float zOffsetDu;
+    float xOffsetDu;
+    float zCompDu;
+    float xCompDu;
 };
 
 // Tool offsets in deci-microns (DU). 1mm = 10000 DU.
-// Format is {xOffsetDu, zOffsetDu}
-// set with G10 P{toolNumber} X{xOffsetInMM} Z{zOffsetInMM}
+// set with G10 P{toolNumber} Z{zOffsetInMM} X{xOffsetInMM} 
 // or set on the controller by pressing the gear icon
 ToolOffset toolOffsets[MAX_TOOLS] = {
-    {0, 0}             //T0 primary tool (parting), all offsets are based off this tool
+    {0, 0, 0, 0}             //T0 primary tool (parting), all offsets are based off this tool
 };
 
 int nextTool = 0;
 bool nextToolFlag = false;
-ToolOffset nextToolOffset = {0, 0};
 
-ToolOffset toolOffset = {0, 0};
+ToolOffset toolOffset = {0, 0, 0, 0};
 int currentTool = 0;
 
 struct Axis {
@@ -1104,23 +1100,7 @@ void updateToolDisplay() {
       lcd.print("Confirm tool T");
       lcd.print(pendingToolNumber);
       lcd.setCursor(0, 2);
-      lcd.print("ON:Select OFF:Edit");
-      break;
-    case TOOL_SET_X:
-      lcd.setCursor(0, 1);
-      lcd.print("Edit X offset (mm):");
-      lcd.setCursor(0, 2);
-      lcd.print(pendingInput.isEmpty() ? "0" : pendingInput);
-      lcd.setCursor(0, 3);
-      lcd.print("ON:Set Z  OFF:Cancel");
-      break;
-    case TOOL_SET_Z:
-      lcd.setCursor(0, 1);
-      lcd.print("Edit Z offset (mm):");
-      lcd.setCursor(0, 2);
-      lcd.print(pendingInput.isEmpty() ? "0" : pendingInput);
-      lcd.setCursor(0, 3);
-      lcd.print("ON:Save   OFF:Cancel");
+      lcd.print("ON:Select OFF:Back");
       break;
   }
 }
@@ -1628,22 +1608,30 @@ void taskGcode(void *param) {
   vTaskDelete(NULL);
 }
 
-void listToolOffsets() {
+bool listToolOffsets() {
     String toolOffsetsStr = "toolOffsets:";
     for (int i = 0; i < MAX_TOOLS; ++i) {
         toolOffsetsStr += "T";
         toolOffsetsStr += String(i);
         toolOffsetsStr += ":";
+        toolOffsetsStr += "Z=";
+        toolOffsetsStr += String(toolOffsets[i].zOffsetDu / 10000.0, 3);
+        toolOffsetsStr += ",";
         toolOffsetsStr += "X=";
         toolOffsetsStr += String(toolOffsets[i].xOffsetDu / 10000.0, 3);
         toolOffsetsStr += ",";
-        toolOffsetsStr += "Z=";
-        toolOffsetsStr += String(toolOffsets[i].zOffsetDu / 10000.0, 3);
+        toolOffsetsStr += "W=";
+        toolOffsetsStr += String(toolOffsets[i].zCompDu / 10000.0, 3);
+        toolOffsetsStr += ",";
+        toolOffsetsStr += "U=";
+        toolOffsetsStr += String(toolOffsets[i].xCompDu / 10000.0, 3);
         if(i < MAX_TOOLS -1) {
           toolOffsetsStr += "|";
         }
     }
-    Serial.println(toolOffsetsStr);
+    Serial.print(toolOffsetsStr);
+
+    return true;
 }
 
 bool saveGcode() {
@@ -1972,8 +1960,13 @@ void saveToolOffsets(Preferences pref) {
     for (int i = 0; i < MAX_TOOLS; ++i) {
         String xKey = "tool" + String(i) + "X";
         String zKey = "tool" + String(i) + "Z";
+        String xCompKey = "tool" + String(i) + "U";  // Using U to match G-code parameter
+        String zCompKey = "tool" + String(i) + "W";  // Using W to match G-code parameter
+
         pref.putFloat(xKey.c_str(), toolOffsets[i].xOffsetDu);
         pref.putFloat(zKey.c_str(), toolOffsets[i].zOffsetDu);
+        pref.putFloat(xCompKey.c_str(), toolOffsets[i].xCompDu);
+        pref.putFloat(zCompKey.c_str(), toolOffsets[i].zCompDu);
     }
 }
 
@@ -1981,10 +1974,16 @@ void loadToolOffsets(Preferences pref) {
     for (int i = 0; i < MAX_TOOLS; ++i) {
         String xKey = "tool" + String(i) + "X";
         String zKey = "tool" + String(i) + "Z";
+        String xCompKey = "tool" + String(i) + "U";
+        String zCompKey = "tool" + String(i) + "W";
+
         toolOffsets[i].xOffsetDu = pref.getFloat(xKey.c_str(), 0.0);
         toolOffsets[i].zOffsetDu = pref.getFloat(zKey.c_str(), 0.0);
-        savedToolOffsets[i].xOffsetDu = toolOffsets[i].xOffsetDu;
-        savedToolOffsets[i].zOffsetDu = toolOffsets[i].zOffsetDu;
+        toolOffsets[i].xCompDu = pref.getFloat(xCompKey.c_str(), 0.0);
+        toolOffsets[i].zCompDu = pref.getFloat(zCompKey.c_str(), 0.0);
+
+        // Update saved values
+        savedToolOffsets[i] = toolOffsets[i];
     }
 }
 
@@ -2998,7 +2997,18 @@ void modeTurn(Axis* main, Axis* aux) {
       opIndexAdvanceFlag = false;
       opIndex += starts;
     }
-    long auxPos = auxEndStop - (auxEndStop - auxStartStop) / turnPasses * (turnPasses - ceil(opIndex / float(starts)));
+
+    long auxPos;
+    if (mode == MODE_THREAD) {
+        // Progressive depth for threading
+        float fraction = (turnPasses - ceil(opIndex / float(starts))) / turnPasses;
+        fraction = fraction * fraction;  // Square it for non-linear progression
+        auxPos = auxEndStop - (auxEndStop - auxStartStop) * fraction;
+    } else {
+        // Linear depth for regular turning/facing operations
+        auxPos = auxEndStop - (auxEndStop - auxStartStop) / turnPasses * (turnPasses - ceil(opIndex / float(starts)));
+    }
+
     // Bringing X to starting position.
     if (opSubIndex == 0) {
       stepToFinal(aux, auxPos);
@@ -3383,7 +3393,15 @@ bool handleMcode(const String& command) {
 
 // G33 Threading command handler
 // Format: G33 Z[end] X[end] P[pitch] H[passes] Q[start_z] R[start_x]
-// Example: G33 Z-20 X-1 P1.5 H5 Q0 R0 - Create thread from Z0 to Z-20, X0 to X-1, 1.5mm pitch, 5 passes
+// Parameters:
+//   Z - End Z position
+//   X - End X position
+//   P - Thread pitch in mm
+//   H - Number of passes (optional, default 3)
+//   Q - Start Z position (optional, defaults to current position)
+//   R - Start X position (optional, defaults to current position)
+// Example: G33 Z20 X-4.188 P1.5 H4 Q0 R-5 - External M10x1.5 thread
+// Example: G33 Z20 X-5.1 P1.5 H4 Q0 R-4.5 - Internal M10x1.5 thread
 bool handleG33(const String& command) {
     // Extract parameters
     if (command.indexOf('Z') == -1 || command.indexOf('X') == -1 || command.indexOf('P') == -1) {
@@ -3415,7 +3433,7 @@ bool handleG33(const String& command) {
     int previousMode = mode;
     long previousDupr = dupr;
     bool previousIsOn = isOn;
-    
+
     // Set up for threading
     setModeFromLoop(MODE_THREAD);
     setDupr(threadPitch);
@@ -3423,6 +3441,7 @@ bool handleG33(const String& command) {
     // Set thread boundaries
     setLeftStop(&z, max(zStart, zEnd));
     setRightStop(&z, min(zStart, zEnd));
+
     setLeftStop(&x, max(xStart, xEnd));
     setRightStop(&x, min(xStart, xEnd));
 
@@ -3464,15 +3483,46 @@ bool handleG33(const String& command) {
     // Restore previous mode and settings
     setModeFromLoop(previousMode);
     setDupr(previousDupr);
-    setIsOnFromLoop(previousIsOn);
+    setIsOnFromLoop(false);
 
     return true;
 }
 
+/**
+ * G10 - Set Tool Offset and Compensation Values
+ * 
+ * Sets the tool offset and optional compensation values for a specified tool.
+ * Tool 0 is reserved as the reference tool.
+ * 
+ * Format: G10 P[tool] Z[z_offset] X[x_offset] W[z_comp] U[x_comp]
+ * 
+ * Parameters:
+ * P - Tool number (1-9)
+ * Z - Z axis offset from reference tool (mm)
+ * X - X axis offset from reference tool (mm)
+ * W - Z axis cutting compensation (mm, optional)
+ * U - X axis cutting compensation (mm, optional)
+ * 
+ * Example:
+ * G10 P2 Z1 X-3        // Set tool 2 offset: Z=1mm, X=-3mm
+ * G10 P2 Z1 X-3 W-0.05 U-0.1  // Same offset plus compensations
+ * 
+ * Notes:
+ * - Offsets (Z,X) define the tool's geometric position relative to tool 0
+ * - Compensation values (W,U) adjust for tool deflection or cutting variations
+ * - If W/U are omitted, existing compensation values are preserved
+ * - All values are in millimeters
+ * - Positive X moves tool away from spindle center
+ * - Positive Z moves tool away from chuck
+ * 
+ * @param command The G10 command string to parse
+ * @return true if command was valid and executed, false otherwise
+ */
 bool handleG10(const String& command) {
     int toolIndex = getInt(command, 'P'); // Assuming 'P' specifies the tool number.
-    float xOffset = getFloat(command, 'X'); // Get X offset in MM
     float zOffset = getFloat(command, 'Z'); // Get Z offset in MM
+    float xOffset = getFloat(command, 'X'); // Get X offset in MM
+    
 
     // Check if toolIndex is within the valid range
     if (toolIndex < 1 || toolIndex >= MAX_TOOLS) {
@@ -3482,6 +3532,19 @@ bool handleG10(const String& command) {
     // Convert offsets from mm to deci-microns
     toolOffsets[toolIndex].xOffsetDu = xOffset * 10000;
     toolOffsets[toolIndex].zOffsetDu = zOffset * 10000;
+
+    // Get compensation values if present, otherwise leave existing values unchanged
+
+    if (!command.indexOf('U') == -1) {
+        float xComp = getFloat(command, 'U');
+        toolOffsets[toolIndex].xCompDu = xComp * 10000;
+    }
+
+    if (!command.indexOf('W') == -1) {
+        float zComp = getFloat(command, 'W');
+        toolOffsets[toolIndex].zCompDu = zComp * 10000;
+    }
+
     offsetsChanged = true;
     return true;
 }
@@ -3490,7 +3553,6 @@ bool handleChangeToolCommand(String command) {
   int toolNumber = command.substring(1).toInt();
   if (toolNumber >= 0 && toolNumber < MAX_TOOLS) {
         nextTool = toolNumber;
-        nextToolOffset = toolOffsets[toolNumber]; // Store the next tool's offset
         nextToolFlag = true; // Indicate a tool change is pending
         return true;
   } else {
@@ -3499,27 +3561,10 @@ bool handleChangeToolCommand(String command) {
   }
 }
 
-void loadExistingOffset(int toolNumber, bool isXOffset) {
-  float existingOffset = isXOffset ? 
-    toolOffsets[toolNumber].xOffsetDu / 10000.0 : 
-    toolOffsets[toolNumber].zOffsetDu / 10000.0;
-  pendingOffset = existingOffset;
-  pendingInput = String(existingOffset, 3);  // Convert to string with 3 decimal places
-  // Remove trailing zeros and decimal point if it's a whole number
-  while (pendingInput.endsWith("0")) {
-    pendingInput = pendingInput.substring(0, pendingInput.length() - 1);
-  }
-  if (pendingInput.endsWith(".")) {
-    pendingInput = pendingInput.substring(0, pendingInput.length() - 1);
-  }
-}
-
 void enterToolMode() {
   currentToolMode = TOOL_SELECT;
   pendingToolNumber = -1;
-  pendingOffset = 0;
   pendingInput = "";
-  editingOffsets = false;
   updateToolDisplay();
 }
 
@@ -3534,53 +3579,25 @@ void exitToolMode() {
 }
 
 void processToolNumericInput(int inputValue) {
-  switch (currentToolMode) {
-    case TOOL_SELECT:
-      pendingInput += String(inputValue);
-      pendingToolNumber = pendingInput.toInt();
-      if (pendingToolNumber >= MAX_TOOLS) {
-        pendingToolNumber = MAX_TOOLS - 1;
-        pendingInput = String(pendingToolNumber);
-      }
-      break;
-    case TOOL_SET_X:
-    case TOOL_SET_Z:
-      pendingInput += String(inputValue);
-      pendingOffset = pendingInput.toFloat();
-      break;
-    default:
-      break;
-  }
-  
-  updateToolDisplay();
+    if (currentToolMode == TOOL_SELECT) {
+        pendingInput += String(inputValue);
+        pendingToolNumber = pendingInput.toInt();
+        if (pendingToolNumber >= MAX_TOOLS) {
+            pendingToolNumber = MAX_TOOLS - 1;
+            pendingInput = String(pendingToolNumber);
+        }
+    }
+    updateToolDisplay();
 }
 
 void processToolSpecialInput(int keyCode) {
-  
-  if (currentToolMode == TOOL_SET_X || currentToolMode == TOOL_SET_Z) {
-    if (keyCode == B_STEP && pendingInput.indexOf('.') == -1) {
-      pendingInput += ".";
-    } else if (keyCode == B_MINUS) {
-      if (pendingInput.charAt(0) == '-') {
-        pendingInput = pendingInput.substring(1);
-      } else {
-        pendingInput = "-" + pendingInput;
-      }
-      pendingOffset = pendingInput.toFloat();
-    } else if (keyCode == B_BACKSPACE) {
-      if (pendingInput.length() > 0) {
-        pendingInput = pendingInput.substring(0, pendingInput.length() - 1);
-        pendingOffset = pendingInput.length() > 0 ? pendingInput.toFloat() : 0;
-      }
+    if (currentToolMode == TOOL_SELECT && keyCode == B_BACKSPACE) {
+        if (pendingInput.length() > 0) {
+            pendingInput = pendingInput.substring(0, pendingInput.length() - 1);
+            pendingToolNumber = pendingInput.length() > 0 ? pendingInput.toInt() : -1;
+        }
     }
-  } else if (currentToolMode == TOOL_SELECT && keyCode == B_BACKSPACE) {
-    if (pendingInput.length() > 0) {
-      pendingInput = pendingInput.substring(0, pendingInput.length() - 1);
-      pendingToolNumber = pendingInput.length() > 0 ? pendingInput.toInt() : -1;
-    }
-  }
-  
-  updateToolDisplay();
+    updateToolDisplay();
 }
 
 void processToolConfirmation() {
@@ -3606,74 +3623,37 @@ void processToolConfirmation() {
       delay(2000);
       exitToolMode();
       break;
-    case TOOL_SET_X:
-      toolOffsets[pendingToolNumber].xOffsetDu = pendingOffset * 10000;
-      currentToolMode = TOOL_SET_Z;
-      loadExistingOffset(pendingToolNumber, false);  // Load Z offset
-      break;
-    case TOOL_SET_Z:
-      toolOffsets[pendingToolNumber].zOffsetDu = pendingOffset * 10000;
-      offsetsChanged = true;
-      changeTool(pendingToolNumber);
-      lcd.clear();
-      lcd.setCursor(0, 1);
-      lcd.print("Tool T");
-      lcd.print(pendingToolNumber);
-      lcd.print(" updated");
-      delay(2000);
-      exitToolMode();
-      break;
   }
   updateToolDisplay();
 }
 
 void handleToolConfirmOff() {
-  currentToolMode = TOOL_SET_X;
-  loadExistingOffset(pendingToolNumber, true);  // Load X offset
-  updateToolDisplay();
+  currentToolMode = TOOL_SELECT;
+    pendingInput = "";  // Clear input
+    updateToolDisplay();
 }
 
 void changeTool(int newToolNumber) {
     currentTool = newToolNumber;
     ToolOffset newToolOffset = toolOffsets[newToolNumber];
 
-    // Calculate the net offset needed to apply
-    ToolOffset netOffset = {
-        newToolOffset.xOffsetDu - toolOffset.xOffsetDu,
-        newToolOffset.zOffsetDu - toolOffset.zOffsetDu
-    };
+    // Calculate the net offset needed to apply, including compensation
+    ToolOffset netOffset;
+    netOffset.zOffsetDu = (newToolOffset.zOffsetDu + newToolOffset.zCompDu) - 
+                         (toolOffset.zOffsetDu + toolOffset.zCompDu);
+    netOffset.xOffsetDu = (newToolOffset.xOffsetDu + newToolOffset.xCompDu) - 
+                         (toolOffset.xOffsetDu + toolOffset.xCompDu);
 
     applyToolOffset(netOffset);
     toolOffset = newToolOffset;
 }
 
 void applyToolOffset(ToolOffset offset) {
-    // Record the current directions before applying the offset
-    bool xLastDirection = x.direction;
-    bool zLastDirection = z.direction;
-
     long xOffsetSteps = duToSteps(&x, offset.xOffsetDu);
     long zOffsetSteps = duToSteps(&z, offset.zOffsetDu);
     
     x.originPos += xOffsetSteps;
     z.originPos += zOffsetSteps;
-
-    // Define the movement distance
-    long extraDistance = 500; // 0.05mm extra
-    long xMoveDu = BACKLASH_DU_X + extraDistance;
-    long zMoveDu = BACKLASH_DU_Z + extraDistance;
-
-    // Use the recorded directions to determine the movement
-    long xMove = xLastDirection ? xMoveDu : -xMoveDu;
-    long zMove = zLastDirection ? zMoveDu : -zMoveDu;
-
-    // Convert Du to steps
-    long xMoveSteps = duToSteps(&x, xMove);
-    long zMoveSteps = duToSteps(&z, zMove);
-
-    //move a little bit to take up any backlash after tool change.
-    stepToFinal(&x, x.pos + xMoveSteps);
-    stepToFinal(&z, z.pos + zMoveSteps);
 }
 
 // Process one command, return ok flag.
