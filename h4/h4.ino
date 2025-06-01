@@ -206,6 +206,7 @@ const int GCODE_MIN_RPM = 30; // pause GCode execution if RPM is below this
 #define MOVE_STEP_1 10000 // 1mm
 #define MOVE_STEP_2 1000 // 0.1mm
 #define MOVE_STEP_3 100 // 0.01mm
+#define MOVE_STEP_4 10 // 0.001mm
 
 #define MOVE_STEP_IMP_1 25400 // 1/10"
 #define MOVE_STEP_IMP_2 2540 // 1/100"
@@ -2560,6 +2561,8 @@ void buttonMoveStepPress() {
       moveStep = MOVE_STEP_2;
     } else if (moveStep == MOVE_STEP_2) {
       moveStep = MOVE_STEP_3;
+    } else if (moveStep == MOVE_STEP_3) {
+      moveStep = MOVE_STEP_4;  
     } else {
       moveStep = MOVE_STEP_1;
     }
