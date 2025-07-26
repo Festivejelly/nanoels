@@ -35,7 +35,7 @@ const long SPEED_MANUAL_MOVE_X = 3 * MOTOR_STEPS_X; // Maximum speed of a motor 
 const bool INVERT_X = false; // change (true/false) if the carriage moves e.g. "left" when you press "right".
 const bool NEEDS_REST_X = false; // Set to false for all kinds of drivers or X will be unlocked when not moving.
 const long MAX_TRAVEL_MM_X = 100; // Cross slide doesn't allow to travel more than this in one go, 10cm
-const long BACKLASH_DU_X = 500; // 500 0.05mm backlash in deci-microns (10^-7 of a meter)
+const long BACKLASH_DU_X = 100; // 500 0.05mm backlash in deci-microns (10^-7 of a meter)
 const char NAME_X = 'X'; // Text shown on screen before axis position value, GCode axis name
 
 // Manual stepping with left/right/up/down buttons. Only used when step isn't default continuous (1mm or 0.1").
@@ -516,7 +516,7 @@ int turnPasses = 3; // In turn mode, how many turn passes to make
 int savedTurnPasses = 0; // value of turnPasses saved in Preferences
 
 long setupIndex = 0; // Index of automation setup step
-bool auxForward = true; // True for external, false for external thread
+bool auxForward = true; // True for external, false for internal thread
 bool savedAuxForward = false; // value of auxForward saved in Preferences
 
 long opIndex = 0; // Index of an automation operation
@@ -3511,8 +3511,8 @@ void G00_01(const String& command) {
     delayMicroseconds(100); // Tune for smoothness/CPU
   }
 
-  stepToContinuous(&x, xEnd);
-  stepToContinuous(&z, zEnd);
+  stepToFinal(&x, xEnd);
+  stepToFinal(&z, zEnd);
   if (ACTIVE_A1) stepToContinuous(&a1, a1End);
   gcodeWaitStop();
 }
@@ -3552,6 +3552,8 @@ bool handleGcode(const String& command) {
   }
   return true;
 }
+
+
 
 bool handleMcode(const String& command) {
   int op = getInt(command, 'M');
@@ -3715,29 +3717,7 @@ bool handleG33(const String& command) {
         Serial.println("error: Invalid pitch value");
         return false;
     }
-    long threadPitch = round(pitchMm * 10000); // Convert mm to deci-microns
-
-    // Store current mode and settings
-    int previousMode = mode;
-    long previousDupr = dupr;
-    bool previousIsOn = isOn;
-
-    // Set up for threading
-    setModeFromLoop(MODE_THREAD);
-    setDupr(threadPitch);
-    
-    // Set thread boundaries
-    setLeftStop(&z, max(zStart, zEnd));
-    setRightStop(&z, min(zStart, zEnd));
-
-    setLeftStop(&x, max(xStart, xEnd));
-    setRightStop(&x, min(xStart, xEnd));
-
-    // Wait for stops to be applied
-    while (z.nextLeftStopFlag || z.nextRightStopFlag || 
-           x.nextLeftStopFlag || x.nextRightStopFlag) {
-        delay(10);
-    }
+    long threadPitch = round(pitchMm * 10000);
 
     // Get and validate number of passes
     int passes = command.indexOf('H') >= 0 ? getInt(command, 'H') : 3;
@@ -3745,7 +3725,89 @@ bool handleG33(const String& command) {
         Serial.println("error: Invalid number of passes (1-" + String(PASSES_MAX) + ")");
         return false;
     }
+
+    // Determine threading characteristics from G-code parameters
+    bool isExternal = (xStart < xEnd);      // External if moving from more negative to less negative
+    bool isRightHanded = (zStart < zEnd);   // Right-handed if moving in positive Z direction
+    
+    long zTolerance = duToSteps(&z, 100); // 0.01mm tolerance  
+    long xTolerance = duToSteps(&x, 100);
+
+    if (abs(z.pos - zStart) > zTolerance) {
+        Serial.println("error: Z position mismatch for threading start");
+        return false;
+    }
+
+    if (abs(x.pos - xStart) > xTolerance) {
+        Serial.println("error: X position mismatch for threading start");
+        return false;
+    }
+
+    // Store current mode and settings
+    int previousMode = mode;
+    long previousDupr = dupr;
+    bool previousIsOn = isOn;
+    bool previousAuxForward = auxForward;
+
+    // Set up threading mode and parameters
+    setModeFromLoop(MODE_THREAD);
+    setDupr(threadPitch);
+    // Set auxForward based on our external/internal determination for compatibility
+    auxForward = isExternal;
     setTurnPasses(passes);
+
+    // Set stops as offsets from current position (now at start position)
+    long zOffset = abs(zEnd - zStart);
+    long xOffset = abs(xEnd - xStart);
+
+    // Set Z stops based on threading direction
+    if (isRightHanded) {
+        // Right-handed: start at right stop, end at left stop
+        setRightStop(&z, 0);        // Start position
+        setLeftStop(&z, zOffset);   // End position
+    } else {
+        // Left-handed: start at left stop, end at right stop  
+        // Moving Left to right requires more negative
+        zOffset = zEnd - zStart;
+        setLeftStop(&z, 0);         // Start position
+        setRightStop(&z, zOffset);  // End position
+    }
+
+    // Set X stops based on threading type
+    if (isExternal) {
+        // External: algorithm expects safe at right stop, cutting at left stop
+        setRightStop(&x, 0);        // Start position (safe)
+        setLeftStop(&x, xOffset);   // End position (cutting depth)
+    } else {
+        // Internal: algorithm expects safe at left stop, cutting at right stop
+        // Internal: moving from less negative to more negative (away from centerline)
+        // The offset should represent steps away from centerline
+        xOffset = xEnd - xStart;
+        setLeftStop(&x, 0);         // Start position (safe)
+        setRightStop(&x, xOffset);  // End position (cutting depth)
+    }
+
+    // Wait for stops to be applied
+    while (z.nextLeftStopFlag || z.nextRightStopFlag || 
+           x.nextLeftStopFlag || x.nextRightStopFlag) {
+        delay(10);
+    }
+
+    Serial.print("Z Left Stop: ");
+    Serial.print(stepsToDu(&z, z.leftStop) / 10000.0, 3);
+    Serial.println("mm");
+
+    Serial.print("Z Right Stop: ");
+    Serial.print(stepsToDu(&z, z.rightStop) / 10000.0, 3);
+    Serial.println("mm");
+
+    Serial.print("X Forward Stop: ");
+    Serial.print(stepsToDu(&x, x.leftStop) / 10000.0, 3);
+    Serial.println("mm");
+
+    Serial.print("X Back Stop: ");
+    Serial.print(stepsToDu(&x, x.rightStop) / 10000.0, 3);
+    Serial.println("mm");
 
     // Start threading operation
     setIsOnFromLoop(true);
@@ -3771,6 +3833,7 @@ bool handleG33(const String& command) {
     // Restore previous mode and settings
     setModeFromLoop(previousMode);
     setDupr(previousDupr);
+    auxForward = previousAuxForward;
     setIsOnFromLoop(false);
 
     return true;
@@ -4165,6 +4228,7 @@ void loop() {
   if (emergencyStop != ESTOP_NONE) {
     return;
   }
+
   if (xSemaphoreTake(motionMutex, 1) != pdTRUE) {
     return;
   }
