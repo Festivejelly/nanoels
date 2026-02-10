@@ -114,7 +114,7 @@ const bool Z_HOME_DIRECTION_INVERT = false; //set to true to invert direction
 
 // Version of the pref storage format, should be changed when non-backward-compatible
 // changes are made to the storage logic, resulting in Preferences wipe on first start.
-#define PREFERENCES_VERSION 1
+#define PREFERENCES_VERSION 2
 #define PREF_NAMESPACE "h4"
 #define GCODE_NAMESPACE "gc"
 
@@ -4550,21 +4550,9 @@ void loop() {
 
   if (!isOn || dupr == 0 || spindlePosSync != 0) {
     // None of the modes work.
-  } else if (mode == MODE_NORMAL) {
-    modeGearbox();
-  } else if (mode == MODE_TURN) {
-    modeTurn(&z, &x);
-  } else if (mode == MODE_FACE) {
-    modeTurn(&x, &z);
-  } else if (mode == MODE_CUT) {
-    modeCut();
-  } else if (mode == MODE_CONE) {
-    modeCone();
   } else if (mode == MODE_THREAD) {
     modeTurn(&z, &x);
-  } else if (mode == MODE_ELLIPSE) {
-    modeEllipse(&z, &x);
-  }
+  } 
 
   moveAxis(&z);
   moveAxis(&x);
