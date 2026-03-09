@@ -228,7 +228,7 @@ bool mpgEnabled = true; // Can be toggled by stop/play
 #define MODE_NORMAL 0
 #define MODE_THREAD 1
 
-#define SIMULATE_SPINDLE false
+#define SIMULATE_SPINDLE true
 #define SIMULATED_RPM 300  // 60 RPM = 1 revolution per second
 
 #define MEASURE_METRIC 0
@@ -265,15 +265,17 @@ const float GCODE_FEED_MIN_DU_SEC = 167; // Minimum feed in du/sec in GCode mode
 #include <Preferences.h>
 
 // Controller states (GRBL-style)
-enum ControllerState {
+enum ControllerState { 
   STATE_IDLE,    // Ready, not moving
   STATE_RUN,     // Executing gcode, axes moving
   STATE_HOLD,    // Paused (M0/M1), waiting for resume
+  STATE_WAITING, // Waiting for condition (e.g., RPM in range)
   STATE_ALARM    // Emergency stop
 };
 
 ControllerState controllerState = STATE_IDLE;
 volatile bool stopRequested = false;
+String pendantCommand = "";
 bool nextRunning; // Running state value that should be applied asap
 bool nextRunningFlag; // whether nextRunning requires attention
 unsigned long resetMillis = 0;
@@ -595,6 +597,15 @@ String keycodeCommand = "";
 int spindleRPM = 0;  // Requested spindle speed
 int spindleDirection = 0;  // 0=stopped, 1=CW (M3), -1=CCW (M4)
 
+// M204 RPM assertion/wait condition tracking
+struct WaitCondition {
+  bool active = false;           // Whether we're currently waiting
+  int rpmMin = 0;                // Minimum RPM (inclusive)
+  int rpmMax = 0;                // Maximum RPM (inclusive)
+  unsigned long startTime = 0;   // micros() when wait started
+  unsigned long lastStatusMs = 0; // Last time we printed status
+} waitCondition;
+
 hw_timer_t *async_timer = timerBegin(80);
 bool timerAttached = false;
 
@@ -913,12 +924,9 @@ void processMPGCommand(const String& cmd) {
     handleG92(cmd);
     Serial1.println("OK:ZERO");
   } else if (cmd.startsWith("G28")) {
-    // Handle zero commands from keypad
-    // Process as G-code command
-    Serial.println("OK:HOMING");
-    handleG28(cmd);
-    Serial1.println("OK:HOME");
-    Serial.println("OK:HOME");
+    // Queue for taskGcode so taskMPG stays free to process stop commands
+    pendantCommand = cmd;
+    Serial1.println("OK:HOMING");
   } else if (cmd.startsWith("T")) {
     handleChangeToolCommand(cmd);
     Serial1.println("OK:TOOLCHANGE");
@@ -947,14 +955,27 @@ void taskGcode(void *param) {
       } else if (receivedChar == '!' /* stop */) {
         if (controllerState == STATE_HOLD) {
           Serial.println("stop received, ending program...");
-          controllerState = STATE_IDLE;  // Resume back to IDLE
+        } else if (controllerState == STATE_WAITING) {
+          Serial.println("stop received, canceling wait...");
+          waitCondition.active = false;
+        } else if (controllerState == STATE_RUN) {
+          Serial.println("stop received, ending program...");
         }
+        // Always transition to IDLE on stop, regardless of current state
+        controllerState = STATE_IDLE;
         stopRequested = true;
         setRunningFromTask(false);
       } else if (receivedChar == '~' /* resume */) {
+        Serial.print("DEBUG: resume (~) received, current state: ");
+        Serial.println(controllerState);
         if (controllerState == STATE_HOLD) {
           Serial.println("resume received, continuing program...");
-          controllerState = STATE_RUN;  // Resume back to RUN, not IDLE
+          controllerState = STATE_RUN;
+        } else if (controllerState == STATE_WAITING) {
+          Serial.println("resume received, skipping wait condition...");
+          waitCondition.active = false;
+          controllerState = STATE_RUN;
+          Serial.println("ok");
         }
         stopRequested = false;
         setRunningFromTask(true);
@@ -970,6 +991,9 @@ void taskGcode(void *param) {
         printBacklashValues(); // prints out current backlash values for all axes
       } else if (controllerState == STATE_HOLD) {
         // Skip command processing when in HOLD state
+        // Real-time commands above are still processed
+      } else if (controllerState == STATE_WAITING) {
+        // Skip command processing when in WAITING state
         // Real-time commands above are still processed
       } else {
         if (gcodeInBrace && charCode < 32) {
@@ -998,6 +1022,47 @@ void taskGcode(void *param) {
         }
       } 
     }
+
+    // Process commands queued from pendant (e.g. G28 homing)
+    // Running these here keeps taskMPG free to process stop commands
+    if (pendantCommand.length() > 0) {
+      String cmd = pendantCommand;
+      pendantCommand = "";
+      if (cmd.startsWith("G28")) {
+        handleG28(cmd);
+        Serial1.println("OK:HOME");
+        Serial.println("OK:HOME");
+      }
+    }
+
+    // Check waiting conditions (e.g., M204 RPM assertion)
+    if (controllerState == STATE_WAITING && waitCondition.active) {
+      int currentRpm = getApproxRpm();
+      unsigned long currentMs = millis();
+
+      // Check if condition is met
+      if (currentRpm >= waitCondition.rpmMin && currentRpm <= waitCondition.rpmMax) {
+        // Condition met!
+        Serial.print("RPM condition met (");
+        Serial.print(currentRpm);
+        Serial.println("), continuing...");
+        Serial.println("ok");
+        waitCondition.active = false;
+        controllerState = STATE_RUN;
+      } else {
+        // Print periodic status updates (every 2 seconds)
+        if (currentMs - waitCondition.lastStatusMs >= 2000) {
+          Serial.print("Waiting for RPM ");
+          Serial.print(waitCondition.rpmMin);
+          Serial.print("-");
+          Serial.print(waitCondition.rpmMax);
+          Serial.print(", current: ");
+          Serial.println(currentRpm);
+          waitCondition.lastStatusMs = currentMs;
+        }
+      }
+    }
+
     taskYIELD();
   }
   vTaskDelete(NULL);
@@ -1009,11 +1074,12 @@ void printMPGStatusResponse() {
 
   // Print controller state
   switch (controllerState) {
-    case STATE_IDLE:  Serial1.print("READY"); break;
-    case STATE_RUN:   Serial1.print("RUNNING"); break;
-    case STATE_HOLD:  Serial1.print("HOLD"); break;
-    case STATE_ALARM: Serial1.print("ALARM"); break;
-    default:          Serial1.print("UNKNOWN"); break;
+    case STATE_IDLE:    Serial1.print("READY"); break;
+    case STATE_RUN:     Serial1.print("RUNNING"); break;
+    case STATE_HOLD:    Serial1.print("HOLD"); break;
+    case STATE_WAITING: Serial1.print("WAITING"); break;
+    case STATE_ALARM:   Serial1.print("ALARM"); break;
+    default:            Serial1.print("UNKNOWN"); break;
   } 
   Serial1.print("|WPos:");
   float divisor = measure == MEASURE_METRIC ? 10000.0 : 254000.0;
@@ -1049,11 +1115,12 @@ void printStatusResponse() {
 
   // Print controller state
   switch (controllerState) {
-    case STATE_IDLE:  Serial.print("Idle"); break;
-    case STATE_RUN:   Serial.print("Run"); break;
-    case STATE_HOLD:  Serial.print("Hold"); break;
-    case STATE_ALARM: Serial.print("Alarm"); break;
-    default:          Serial.print("Unknown"); break;
+    case STATE_IDLE:    Serial.print("Idle"); break;
+    case STATE_RUN:     Serial.print("Run"); break;
+    case STATE_HOLD:    Serial.print("Hold"); break;
+    case STATE_WAITING: Serial.print("Waiting"); break;
+    case STATE_ALARM:   Serial.print("Alarm"); break;
+    default:            Serial.print("Unknown"); break;
   }
 
   Serial.print("|WPos:");
@@ -2350,7 +2417,7 @@ void setSpindleSpeed(const String& command) {
   String trimmed = command;
   trimmed.trim();
   if (!trimmed.startsWith("S")) return;
-  
+
   float rpm = getFloat(command, 'S');
   if (rpm >= 0) {
     long newRPM = round(rpm);
@@ -2365,6 +2432,82 @@ void setSpindleSpeed(const String& command) {
   }
 }
 
+// M204 - Wait for spindle RPM to be in specified range
+// Syntax:
+//   M204 S<min> E<max>        - Wait for RPM between min and max (range)
+//   M204 S<target> P<tolerance> - Wait for RPM within target ± tolerance
+//   M204 S0                   - Wait for spindle stopped (RPM < 30)
+bool handleM204(const String& command) {
+  bool hasS = command.indexOf('S') >= 0;
+  bool hasE = command.indexOf('E') >= 0;
+  bool hasP = command.indexOf('P') >= 0;
+
+  if (!hasS) {
+    Serial.println("error: M204 requires S parameter");
+    return false;
+  }
+
+  int target = round(getFloat(command, 'S'));
+  int minRpm, maxRpm;
+
+  if (hasE) {
+    // Range mode: M204 S1000 E1300
+    minRpm = target;
+    maxRpm = round(getFloat(command, 'E'));
+    if (maxRpm < minRpm) {
+      Serial.println("error: M204 E value must be >= S value");
+      return false;
+    }
+  } else if (hasP) {
+    // Tolerance mode: M204 S2000 P100 (means 1900-2100)
+    int tolerance = round(getFloat(command, 'P'));
+    if (tolerance < 0) {
+      Serial.println("error: M204 P value must be >= 0");
+      return false;
+    }
+    minRpm = target - tolerance;
+    maxRpm = target + tolerance;
+  } else {
+    // Single value mode: M204 S2000 (exact, use small tolerance)
+    // Special case: M204 S0 means spindle stopped
+    if (target == 0) {
+      minRpm = 0;
+      maxRpm = 29;  // Below GCODE_MIN_RPM threshold
+    } else {
+      // Use ±5 RPM tolerance for single value
+      minRpm = target - 5;
+      maxRpm = target + 5;
+    }
+  }
+
+  // Ensure minimum RPM is not negative
+  if (minRpm < 0) minRpm = 0;
+
+  // Set up wait condition
+  waitCondition.active = true;
+  waitCondition.rpmMin = minRpm;
+  waitCondition.rpmMax = maxRpm;
+  waitCondition.startTime = micros();
+  waitCondition.lastStatusMs = millis();
+
+  // Enter waiting state
+  controllerState = STATE_WAITING;
+
+  // Print initial status
+  Serial.print("Waiting for RPM ");
+  if (target == 0 && !hasE && !hasP) {
+    Serial.print("less than 30 (stopped)");
+  } else {
+    Serial.print(minRpm);
+    Serial.print("-");
+    Serial.print(maxRpm);
+  }
+
+  Serial.println();
+
+  return true;
+}
+
 /**
  * Check for stop command from MPG pendant (Serial1) or main serial
  * Call this inside any blocking loop that needs to be interruptible
@@ -2373,7 +2516,16 @@ void setSpindleSpeed(const String& command) {
  * @return true if stop was requested and handled, false otherwise
  */
 bool checkForStopCommand(Axis* axis = nullptr) {
-    // Check the global flag first (set by interrupt, other task, etc)
+    // Safety net: check Serial1 directly for pendant stop command
+    // This catches stop even when taskMPG is blocked in a queued operation
+    while (Serial1.available() > 0) {
+        char c = Serial1.read();
+        if (c == '!') {
+            stopRequested = true;
+            Serial1.println("OK:HOLD");
+            break;
+        }
+    }
 
     bool stopDetected = stopRequested;
     
@@ -2559,6 +2711,9 @@ bool handleMcode(const String& command) {
     Serial.println("pause requested, waiting for resume command (~)...");
     return true;  // Caller will print "ok"
   } else if (op == 2 || op == 30) {
+    // M2/M30 - Program end
+    Serial.println("M30: Program end");
+    controllerState = STATE_IDLE;
     setRunningFromTask(false);
   } else if (op == 3) {
     // M3 - Spindle on clockwise
@@ -2599,6 +2754,9 @@ bool handleMcode(const String& command) {
   } else if (op == 119) {
       handleM119(command);
       return true;
+  } else if (op == 204) {
+      // M204 - Wait for RPM in range
+      return handleM204(command);
   } else if (op == 220) {
       handleM220(command);
       return true;
@@ -2659,9 +2817,13 @@ bool handleM119(const String& command) {
   return true;
 }
 
-// M206 - X-axis home calibration routine
+// M206 - axis home calibration routine
 // Run this after zeroing X with your edge finder
 bool handleM206(const String& command) {
+
+  // Clear any previous stop state - starting homing calibration is an intentional action
+  stopRequested = false;
+
   // Count how many axes are specified
   int axisCount = 0;
   bool hasX = command.indexOf('X') >= 0;
@@ -2758,6 +2920,10 @@ bool handleM206(const String& command) {
   
   unsigned long startTime = millis();
   while (digitalRead(sensorPin) != LOW) {
+    if (checkForStopCommand(axis)) {
+        Serial.println("Homing calibration aborted");
+        return false;
+    }
     DELAY(5);
     if (millis() - startTime > 60000) {
       axis->continuous = false;
@@ -2784,6 +2950,10 @@ bool handleM206(const String& command) {
   stepToContinuous(axis, axis->pos + (homeDirectionInvert ? -backoffSteps : backoffSteps));
   
   while (axis->pendingPos != 0) {
+    if (checkForStopCommand(axis)) {
+        Serial.println("Homing calibration aborted");
+        return false;
+    }
     DELAY(5);
   }
   
@@ -2805,6 +2975,10 @@ bool handleM206(const String& command) {
   stepToContinuous(axis, axis->pos + (homeDirectionInvert ? backoffSteps * 2 : -backoffSteps * 2));
   
   while (digitalRead(sensorPin) != LOW) {
+    if (checkForStopCommand(axis)) {
+        Serial.println("Homing calibration aborted");
+        return false;
+    }
     DELAY(1);
   }
   
@@ -2839,6 +3013,10 @@ bool handleM206(const String& command) {
   stepToContinuous(axis, axis->pos + (homeDirectionInvert ? -backoffSteps : backoffSteps));
   
   while (axis->pendingPos != 0) {
+    if (checkForStopCommand(axis)) {
+        Serial.println("Homing calibration aborted");
+        return false;
+    }
     DELAY(5);
   }
   
@@ -2916,9 +3094,6 @@ bool handleM206Save(const String& command) {
   if (valueStr.length() > 0) {
     // M206 S X-99 → Set directly
     valueToSave = valueStr.toFloat();
-    *calibratedPos = valueToSave;
-    *currentHomePos = valueToSave;
-    
     Serial.print("Set ");
   } else {
     // M206 S X → Save calibrated value
@@ -2929,11 +3104,13 @@ bool handleM206Save(const String& command) {
       return false;
     }
     valueToSave = *calibratedPos;
-    
     Serial.print("Saved ");
   }
-  
+
+  // Sync all three values so active, saved, and calibrated are consistent
+  *currentHomePos = valueToSave;
   *savedHomePos = valueToSave;
+  *calibratedPos = valueToSave;
   
   // Save to EEPROM
   Preferences pref;
@@ -3109,9 +3286,13 @@ bool performAxisHome(Axis* axis, char axisName, int sensorPin,
   stepToContinuous(axis, axis->pos + (homeDirectionInvert ? -backoffSteps : backoffSteps));
   
   while (axis->pendingPos != 0) {
+    if (checkForStopCommand(axis)) {
+        Serial.println("Homing aborted during final backoff");
+        return false;
+    }
     DELAY(5);
   }
-  
+
   axis->continuous = false;
   if (xSemaphoreTake(axis->mutex, 100) == pdTRUE) {
     axis->pendingPos = 0;
@@ -3130,8 +3311,11 @@ bool performAxisHome(Axis* axis, char axisName, int sensorPin,
   return true;
 }
 
-// G28 - Home X axis (use sensor)
+// G28 - Home axis (use sensor)
 bool handleG28(const String& command) {
+  // Clear any previous stop state - starting homing is an intentional action
+  stopRequested = false;
+
   // Count how many axes are specified
   int axisCount = 0;
   bool hasX = command.indexOf('X') >= 0;
@@ -3706,7 +3890,7 @@ bool handleG33(const String& command) {
         delay(10);
     }
 
-    Serial.print("Z Left Stop: ");
+    Serial.print("Z Left Stop: "); 
     Serial.print(stepsToDu(&z, z.leftStop) / 10000.0, 3);
     Serial.println("mm");
 
@@ -3790,10 +3974,17 @@ bool handleG33(const String& command) {
  */
 bool handleG10(const String& command) {
     int toolIndex = getInt(command, 'P');
-    
+
     // Check if toolIndex is within the valid range
     if (toolIndex < 1 || toolIndex >= MAX_TOOLS) {
         return false;
+    }
+
+    // Store old offset values if this is the currently active tool
+    bool isCurrentTool = (toolIndex == currentTool);
+    ToolOffset oldOffset;
+    if (isCurrentTool) {
+        oldOffset = toolOffsets[toolIndex];
     }
 
     // Only update offsets that are explicitly specified in the command
@@ -3816,6 +4007,34 @@ bool handleG10(const String& command) {
     if (command.indexOf('W') != -1) {
         float zComp = getFloat(command, 'W');
         toolOffsets[toolIndex].zCompDu = zComp * 10000;
+    }
+
+    // If we modified the currently active tool, re-apply the offsets
+    if (isCurrentTool) {
+        // Calculate old total offset (geometry + compensation)
+        ToolOffset oldTotalOffset;
+        oldTotalOffset.zOffsetDu = oldOffset.zOffsetDu + oldOffset.zCompDu;
+        oldTotalOffset.xOffsetDu = oldOffset.xOffsetDu + oldOffset.xCompDu;
+
+        // Calculate new total offset (geometry + compensation)
+        ToolOffset newOffset = toolOffsets[toolIndex];
+        ToolOffset newTotalOffset;
+        newTotalOffset.zOffsetDu = newOffset.zOffsetDu + newOffset.zCompDu;
+        newTotalOffset.xOffsetDu = newOffset.xOffsetDu + newOffset.xCompDu;
+
+        // Calculate the net change needed
+        ToolOffset netOffset;
+        netOffset.zOffsetDu = newTotalOffset.zOffsetDu - oldTotalOffset.zOffsetDu;
+        netOffset.xOffsetDu = newTotalOffset.xOffsetDu - oldTotalOffset.xOffsetDu;
+
+        // Apply the net change
+        applyToolOffset(netOffset);
+
+        // Update our tracking of what's currently applied
+        currentAppliedOffset = newTotalOffset;
+
+        // Keep the base tool offset info for reference (without compensation)
+        toolOffset = newOffset;
     }
 
     offsetsChanged = true;
@@ -4125,11 +4344,13 @@ void loop() {
   applySettings();
 
   // To simulte RPM and spindle indexing
-  // #if (SIMULATE_SPINDLE == true)
+  // if (SIMULATE_SPINDLE == true) {
   //  simulateSpindle();
-  // #else
+  // }
+  // else {
   //   processSpindleCounter();
-  // #endif
+  // }
+
 
   processSpindleCounter();
   discountFullSpindleTurns();
