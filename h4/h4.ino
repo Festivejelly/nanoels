@@ -12,7 +12,7 @@ const int ENCODER_BACKLASH = 3; // Numer of impulses encoder can issue without m
 
 const bool DEFAULT_ENABLE_Z = true;   // Z axis enabled by default
 const bool DEFAULT_ENABLE_X = true;   // X axis enabled by default
-const bool DEFAULT_ENABLE_A1 = false; // Y axis disabled by default (since it's removable)
+const bool DEFAULT_ENABLE_Y = false; // Y axis disabled by default (since it's removable)
 
 // Main lead screw (Z) parameters.
 const long SCREW_Z_DU = 50000; // 5mm lead screw in deci-microns (10^-7 of a meter)
@@ -46,29 +46,29 @@ const long DELAY_BETWEEN_STEPS_MS = 80; // Time in milliseconds to wait between 
 
 /* Changing anything below shouldn't be needed for basic use. */
 
-// Configuration for axis connected to A1. This is uncommon. Dividing head (C) motor parameters.
+// Configuration for axis connected to y. This is uncommon. Dividing head (C) motor parameters.
 // Throughout the configuration below we assume 1mm = 1degree of rotation, so 1du = 0.0001degree.
-const bool ACTIVE_A1 = true; // Whether the axis is connected
-const long MOTOR_STEPS_A1 = 2000; // Number of motor steps for 1 rotation of the the worm gear screw (full step with 20:30 reduction)
-const long SCREW_A1_DU = 50000; // Degrees multiplied by 10000 that the spindle travels per 1 turn of the worm gear. 2 degrees.
-const long SPEED_START_A1 = MOTOR_STEPS_A1; // Initial speed of a motor, steps / second.
-const long ACCELERATION_A1 = 40 * MOTOR_STEPS_A1; // Acceleration of a motor, steps / second ^ 2.
-const long SPEED_MANUAL_MOVE_A1 = 4 * MOTOR_STEPS_A1; // Maximum speed of a motor during manual move, steps / second.
-const bool INVERT_A1 = false; // change (true/false) if the carriage moves e.g. "left" when you press "right".
-const bool NEEDS_REST_A1 = false; // Set to false for closed-loop drivers. Open-loop: true if you need holding torque, false otherwise.
-const long MAX_TRAVEL_MM_A1 = 100; // Probably doesn't make sense to ask the dividin head to travel multiple turns.
-const long BACKLASH_DU_A1 = 200; // Assuming no backlash on the worm gear
-const char NAME_A1 = 'Y'; // Text shown on screen before axis position value, GCode axis name
-const bool MPG_INVERT_A1 = false; // Set to true to reverse Y/A1 axis MPG direction
+const bool ACTIVE_Y = true; // Whether the axis is connected
+const long MOTOR_STEPS_Y = 2000; // Number of motor steps for 1 rotation of the the worm gear screw (full step with 20:30 reduction)
+const long SCREW_Y_DU = 50000; // Degrees multiplied by 10000 that the spindle travels per 1 turn of the worm gear. 2 degrees.
+const long SPEED_START_Y = MOTOR_STEPS_Y; // Initial speed of a motor, steps / second.
+const long ACCELERATION_Y = 40 * MOTOR_STEPS_Y; // Acceleration of a motor, steps / second ^ 2.
+const long SPEED_MANUAL_MOVE_Y = 4 * MOTOR_STEPS_Y; // Maximum speed of a motor during manual move, steps / second.
+const bool INVERT_Y = false; // change (true/false) if the carriage moves e.g. "left" when you press "right".
+const bool NEEDS_REST_Y = false; // Set to false for closed-loop drivers. Open-loop: true if you need holding torque, false otherwise.
+const long MAX_TRAVEL_MM_Y = 100; // Probably doesn't make sense to ask the dividin head to travel multiple turns.
+const long BACKLASH_DU_Y = 200; // Assuming no backlash on the worm gear
+const char NAME_Y = 'Y'; // Text shown on screen before axis position value, GCode axis name
+const bool MPG_INVERT_Y = false; // Set to true to reverse Y axis MPG direction
 
-// Manual handwheels on A1 and A2. Ignore if you don't have them installed.
-const bool PULSE_1_USE = false; // Whether there's a pulse generator connected on A11-A13 to be used for movement.
-const char PULSE_1_AXIS = NAME_Z; // Set to NAME_X to make A11-A13 pulse generator control X instead.
+// Manual handwheels on y and A2. Ignore if you don't have them installed.
+const bool PULSE_1_USE = false; // Whether there's a pulse generator connected on y1-y3 to be used for movement.
+const char PULSE_1_AXIS = NAME_Z; // Set to NAME_X to make y1-y3 pulse generator control X instead.
 const bool PULSE_1_INVERT = false; // Set to true to change the direction in which encoder moves the axis
 const bool PULSE_2_USE = false; // Whether there's a pulse generator connected on A21-A23 to be used for movement.
 const char PULSE_2_AXIS = NAME_X; // Set to NAME_Z to make A21-A23 pulse generator control Z instead.
 const bool PULSE_2_INVERT = true; // Set to false to change the direction in which encoder moves the axis
-const float PULSE_PER_REVOLUTION = 100; // PPR of handwheels used on A1 and/or A2.
+const float PULSE_PER_REVOLUTION = 100; // PPR of handwheels used on y and/or A2.
 const long PULSE_MIN_WIDTH_US = 1000; // Microseconds width of the pulse that is required for it to be registered. Prevents noise.
 const long PULSE_HALF_BACKLASH = 2; // Prevents spurious reverses when moving using a handwheel. Raise to 3 or 4 if they still happen.
 
@@ -159,33 +159,11 @@ const int GCODE_MIN_RPM = 30; // pause GCode execution if RPM is below this
 
 #define PREF_VERSION "v"
 #define PREF_DUPR "d"
-#define PREF_POS_Z "zp"
-#define PREF_LEFT_STOP_Z "zls"
-#define PREF_RIGHT_STOP_Z "zrs"
-#define PREF_ORIGIN_POS_Z "zpo"
-#define PREF_POS_GLOBAL_Z "zpg"
-#define PREF_MOTOR_POS_Z "zpm"
-#define PREF_DISABLED_Z "zd"
-#define PREF_POS_X "xp"
-#define PREF_LEFT_STOP_X "xls"
-#define PREF_RIGHT_STOP_X "xrs"
-#define PREF_ORIGIN_POS_X "xpo"
-#define PREF_POS_GLOBAL_X "xpg"
-#define PREF_MOTOR_POS_X "xpm"
-#define PREF_DISABLED_X "xd"
-#define PREF_POS_A1 "a1p"
-#define PREF_LEFT_STOP_A1 "a1ls"
-#define PREF_RIGHT_STOP_A1 "a1rs"
-#define PREF_ORIGIN_POS_A1 "a1po"
-#define PREF_POS_GLOBAL_A1 "a1pg"
-#define PREF_MOTOR_POS_A1 "a1pm"
-#define PREF_DISABLED_A1 "a1d"
+#define PREF_DISABLED_Y "yd"
 #define PREF_SPINDLE_POS "sp"
 #define PREF_SPINDLE_POS_AVG "spa"
 #define PREF_OUT_OF_SYNC "oos"
 #define PREF_SPINDLE_POS_GLOBAL "spg"
-#define PREF_SHOW_ANGLE "ang"
-#define PREF_SHOW_TACHO "rpm"
 #define PREF_STARTS "sta"
 #define PREF_MODE "mod"
 #define PREF_MEASURE "mea"
@@ -196,7 +174,7 @@ const int GCODE_MIN_RPM = 30; // pause GCode execution if RPM is below this
 #define PREF_TOOL "t"
 #define PREF_BACKLASH_Z "zbl"
 #define PREF_BACKLASH_X "xbl"
-#define PREF_BACKLASH_A1 "a1bl"
+#define PREF_BACKLASH_Y "ybl"
 #define PREF_CURRENT_APPLIED_OFFSET_Z "cao_z"
 #define PREF_CURRENT_APPLIED_OFFSET_X "cao_x"
 #define PREF_MPG_AXIS "mpg_ax"
@@ -217,10 +195,10 @@ const int GCODE_MIN_RPM = 30; // pause GCode execution if RPM is below this
 // MPG state variables
 volatile int mpgDeltaX = 0;
 volatile int mpgDeltaZ = 0;
-volatile int mpgDeltaA1 = 0;
+volatile int mpgDeltaY = 0;
 volatile long mpgStepSize = MOVE_STEP_2; // Default to 0.1mm
 volatile long savedMpgStepSize = MOVE_STEP_2;
-volatile char mpgActiveAxis = 'N'; // 'X', 'Z', 'Y' (for A1), or 'N' (none)
+volatile char mpgActiveAxis = 'N'; // 'X', 'Z', 'Y', or 'N' (none)
 volatile char savedMpgActiveAxis = 'N';
 SemaphoreHandle_t mpgMutex;
 bool mpgEnabled = true; // Can be toggled by stop/play
@@ -449,7 +427,7 @@ void initAxis(Axis* a, char name, bool active, bool rotational, float motorSteps
 
 Axis z;
 Axis x;
-Axis a1;
+Axis y;
 
 unsigned long saveTime = 0; // micros() of the previous Prefs write
 unsigned long spindleEncTime = 0; // micros() of the previous spindle update
@@ -467,9 +445,6 @@ long spindlePosGlobal = 0; // global spindle position that is unaffected by e.g.
 long savedSpindlePosGlobal = 0; // spindlePosGlobal saved in Preferences
 
 ToolOffset savedToolOffsets[MAX_TOOLS]; // savedToolOffset saved in Preferences
-
-volatile int pulse1Delta = 0; // Outstanding pulses generated by pulse generator on terminal A1.
-volatile int pulse2Delta = 0; // Outstanding pulses generated by pulse generator on terminal A2.
 
 int shownRpm = 0;
 unsigned long shownRpmTime = 0; // micros() when shownRpm was set
@@ -586,7 +561,7 @@ String gcodeCommand = "";
 long gcodeFeedDuPerSec = GCODE_FEED_DEFAULT_DU_SEC;
 long gcodeRapidFeedDuPerSecZ = 166667;   // 1000 mm/min
 long gcodeRapidFeedDuPerSecX = 83333;    // 500 mm/min  
-long gcodeRapidFeedDuPerSecA1 = 83333;   // 500 mm/min
+long gcodeRapidFeedDuPerSecy = 83333;   // 500 mm/min
 int gcodeMotionMode = 0;  // Modal motion mode: 0=G0 (rapid), 1=G1 (feed)
 bool gcodeAbsolutePositioning = true;
 bool gcodeInBrace = false;
@@ -709,36 +684,6 @@ void waitForStep(Axis* a) {
   }
 }
 
-int getAndResetPulses(Axis* a) {
-  int delta = 0;
-  if (PULSE_1_AXIS == a->name) {
-    if (pulse1Delta < -PULSE_HALF_BACKLASH) {
-      noInterrupts();
-      delta = pulse1Delta + PULSE_HALF_BACKLASH;
-      pulse1Delta = -PULSE_HALF_BACKLASH;
-      interrupts();
-    } else if (pulse1Delta > PULSE_HALF_BACKLASH) {
-      noInterrupts();
-      delta = pulse1Delta - PULSE_HALF_BACKLASH;
-      pulse1Delta = PULSE_HALF_BACKLASH;
-      interrupts();
-    }
-  } else if (PULSE_2_AXIS == a->name) {
-    if (pulse2Delta < -PULSE_HALF_BACKLASH) {
-      noInterrupts();
-      delta = pulse2Delta + PULSE_HALF_BACKLASH;
-      pulse2Delta = -PULSE_HALF_BACKLASH;
-      interrupts();
-    } else if (pulse2Delta > PULSE_HALF_BACKLASH) {
-      noInterrupts();
-      delta = pulse2Delta - PULSE_HALF_BACKLASH;
-      pulse2Delta = PULSE_HALF_BACKLASH;
-      interrupts();
-    }
-  }
-  return delta;
-}
-
 void taskMPG(void *param) {
   String mpgCommand = "";
   unsigned long lastTest = 0;
@@ -777,11 +722,11 @@ void taskMPG(void *param) {
         applyMPGMovement(&z, clicks);
         processed = true;
       }
-      else if (mpgDeltaA1 != 0 && mpgActiveAxis == 'Y' && !a1.movingManually && ACTIVE_A1) {
-        int clicks = mpgDeltaA1;  // Already detents from pendant
-        mpgDeltaA1 = 0;
+      else if (mpgDeltaY != 0 && mpgActiveAxis == 'Y' && !y.movingManually && ACTIVE_Y) {
+        int clicks = mpgDeltaY;  // Already detents from pendant
+        mpgDeltaY = 0;
         xSemaphoreGive(mpgMutex);
-        applyMPGMovement(&a1, clicks);
+        applyMPGMovement(&y, clicks);
         processed = true;
       }
       
@@ -840,7 +785,7 @@ void processMPGCommand(const String& cmd) {
   // Command formats:
   // AXIS:X       - Set active axis to X
   // AXIS:Z       - Set active axis to Z
-  // AXIS:Y       - Set active axis to Y (A1)
+  // AXIS:Y       - Set active axis to Y (y)
   // AXIS:N       - Set active axis to None (OFF)
   // STEP:1000    - Set step size (in deci-microns)
   // JOG:5        - Jog active axis by 5 clicks
@@ -854,13 +799,15 @@ void processMPGCommand(const String& cmd) {
   if (cmd == "?") {
     static unsigned long lastMPGStatusTime = 0;
     unsigned long now = millis();
-    
-    // Respond at most every 50ms (20Hz)
-    if (now - lastMPGStatusTime >= 50) {
+
+    // Respond at most every 90ms to match pendant's 100ms poll
+    if (now - lastMPGStatusTime >= 90) {
       printMPGStatusResponse();
       lastMPGStatusTime = now;
+      Serial.print("MPG? t="); Serial.print(now);
+      Serial.print(" X="); Serial.print(x.pos);
+      Serial.print(" Z="); Serial.println(z.pos);
     }
-    // Silently ignore if too soon
   } else if (cmd == "!") {
     if (controllerState == STATE_HOLD) {
       Serial.println("stop received, ending program...");
@@ -913,7 +860,7 @@ void processMPGCommand(const String& cmd) {
         } else if (mpgActiveAxis == 'Z') {
           mpgDeltaZ += MPG_INVERT_Z ? -clicks : clicks;
         } else if (mpgActiveAxis == 'Y') {
-          mpgDeltaA1 += MPG_INVERT_A1 ? -clicks : clicks;
+          mpgDeltaY += MPG_INVERT_Y ? -clicks : clicks;
         }
         xSemaphoreGive(mpgMutex);
       }
@@ -1085,7 +1032,7 @@ void printMPGStatusResponse() {
   float divisor = measure == MEASURE_METRIC ? 10000.0 : 254000.0;
   Serial1.print(getAxisPosDu(&x) / divisor, 4);
   Serial1.print(",");
-  Serial1.print(getAxisPosDu(&a1) / divisor, 4);
+  Serial1.print(getAxisPosDu(&y) / divisor, 4);
   Serial1.print(",");
   Serial1.print(getAxisPosDu(&z) / divisor, 4);
   Serial1.print("|Tool:");
@@ -1093,7 +1040,7 @@ void printMPGStatusResponse() {
   Serial1.print("|Steppers:");
   Serial1.print(x.disabled ? "0" : "1");
   Serial1.print(",");
-  Serial1.print(a1.active && !a1.disabled ? "1" : "0");
+  Serial1.print(y.active && !y.disabled ? "1" : "0");
   Serial1.print(",");
   Serial1.print(z.disabled ? "0" : "1");
   Serial1.print("|FS:");
@@ -1127,7 +1074,7 @@ void printStatusResponse() {
   float divisor = measure == MEASURE_METRIC ? 10000.0 : 254000.0;
   Serial.print(getAxisPosDu(&x) / divisor, 3);
   Serial.print(",");
-  Serial.print(getAxisPosDu(&a1) / divisor, 3);
+  Serial.print(getAxisPosDu(&y) / divisor, 3);
   Serial.print(",");
   Serial.print(getAxisPosDu(&z) / divisor, 3);
   Serial.print("|Tool:");
@@ -1135,7 +1082,7 @@ void printStatusResponse() {
   Serial.print("|Steppers:");
   Serial.print(x.disabled ? "0" : "1");
   Serial.print(",");
-  Serial.print(a1.active && !a1.disabled ? "1" : "0");
+  Serial.print(y.active && !y.disabled ? "1" : "0");
   Serial.print(",");
   Serial.print(z.disabled ? "0" : "1");
   Serial.print("|FS:");
@@ -1170,25 +1117,25 @@ void printDebugResponse() {
   Serial.print(" originPos="); Serial.print(x.originPos);
   Serial.print(" pendingPos="); Serial.println(x.pendingPos);
 
-  Serial.print("Y: pos="); Serial.print(a1.pos);
-  Serial.print(" motorPos="); Serial.print(a1.motorPos);
-  Serial.print(" originPos="); Serial.print(a1.originPos);
-  Serial.print(" pendingPos="); Serial.println(a1.pendingPos);
+  Serial.print("Y: pos="); Serial.print(y.pos);
+  Serial.print(" motorPos="); Serial.print(y.motorPos);
+  Serial.print(" originPos="); Serial.print(y.originPos);
+  Serial.print(" pendingPos="); Serial.println(y.pendingPos);
   
   // Coordinate system state
   Serial.print("G-code: ");
   Serial.print(gcodeAbsolutePositioning ? "G90(abs)" : "G91(rel)");
   Serial.print(" Z.gcodeRelPos="); Serial.print(z.gcodeRelativePos);
   Serial.print(" X.gcodeRelPos="); Serial.print(x.gcodeRelativePos);
-  Serial.print(" Y.gcodeRelPos="); Serial.println(a1.gcodeRelativePos);
+  Serial.print(" Y.gcodeRelPos="); Serial.println(y.gcodeRelativePos);
   
   // Limits (the issue we investigated)
   Serial.print("Z limits: left="); Serial.print(z.leftStop);
   Serial.print(" right="); Serial.println(z.rightStop);
   Serial.print("X limits: left="); Serial.print(x.leftStop);
   Serial.print(" right="); Serial.println(x.rightStop);
-  Serial.print("Y limits: left="); Serial.print(a1.leftStop);
-  Serial.print(" right="); Serial.println(a1.rightStop);
+  Serial.print("Y limits: left="); Serial.print(y.leftStop);
+  Serial.print(" right="); Serial.println(y.rightStop);
   
   // Motion state
   Serial.print("Motion: state=");
@@ -1209,7 +1156,7 @@ void printDebugResponse() {
   // Backlash
   Serial.print("Backlash: Z="); Serial.print(z.backlashSteps);
   Serial.print(" X="); Serial.print(x.backlashSteps);
-  Serial.print(" Y="); Serial.println(a1.backlashSteps);
+  Serial.print(" Y="); Serial.println(y.backlashSteps);
 
   Serial.println("==================");
   Serial.print("\r\n");
@@ -1255,11 +1202,11 @@ bool printBacklashValues() {
   Serial.print("=");
   Serial.print(x.backlashDu / 10000.0, 4);
   
-  if (ACTIVE_A1) {
+  if (ACTIVE_Y) {
     Serial.print(" ");
-    Serial.print(a1.name);
+    Serial.print(y.name);
     Serial.print("=");
-    Serial.print(a1.backlashDu / 10000.0, 4);
+    Serial.print(y.backlashDu / 10000.0, 4);
   }
   
   Serial.println();
@@ -1297,7 +1244,7 @@ void setEmergencyStop(int kind) {
   setAsyncTimerEnable(false);
   xSemaphoreTake(z.mutex, 10);
   xSemaphoreTake(x.mutex, 10);
-  xSemaphoreTake(a1.mutex, 10);
+  xSemaphoreTake(y.mutex, 10);
 }
 
 void setupMPG() {
@@ -1357,7 +1304,7 @@ void setup() {
   pinMode(X_ENA, OUTPUT);
   DHIGH(X_STEP);
 
-  if (ACTIVE_A1) {
+  if (ACTIVE_Y) {
     pinMode(Y_DIR, OUTPUT);
     pinMode(Y_STEP, OUTPUT);
     pinMode(Y_ENA, OUTPUT); 
@@ -1383,7 +1330,7 @@ void setup() {
 
   initAxis(&z, NAME_Z, true, false, MOTOR_STEPS_Z, SCREW_Z_DU, SPEED_START_Z, SPEED_MANUAL_MOVE_Z, ACCELERATION_Z, INVERT_Z, NEEDS_REST_Z, MAX_TRAVEL_MM_Z, BACKLASH_DU_Z, Z_ENA, Z_DIR, Z_STEP);
   initAxis(&x, NAME_X, true, false, MOTOR_STEPS_X, SCREW_X_DU, SPEED_START_X, SPEED_MANUAL_MOVE_X, ACCELERATION_X, INVERT_X, NEEDS_REST_X, MAX_TRAVEL_MM_X, BACKLASH_DU_X, X_ENA, X_DIR, X_STEP);
-  initAxis(&a1, NAME_A1, ACTIVE_A1, false, MOTOR_STEPS_A1, SCREW_A1_DU, SPEED_START_A1, SPEED_MANUAL_MOVE_A1, ACCELERATION_A1, INVERT_A1, NEEDS_REST_A1, MAX_TRAVEL_MM_A1, BACKLASH_DU_A1, Y_ENA, Y_DIR, Y_STEP);
+  initAxis(&y, NAME_Y, ACTIVE_Y, false, MOTOR_STEPS_Y, SCREW_Y_DU, SPEED_START_Y, SPEED_MANUAL_MOVE_Y, ACCELERATION_Y, INVERT_Y, NEEDS_REST_Y, MAX_TRAVEL_MM_Y, BACKLASH_DU_Y, Y_ENA, Y_DIR, Y_STEP);
 
   // Load saved backlash values (after initAxis)
   z.savedBacklashDu = z.backlashDu = pref.getLong(PREF_BACKLASH_Z, BACKLASH_DU_Z);
@@ -1392,9 +1339,9 @@ void setup() {
   x.savedBacklashDu = x.backlashDu = pref.getLong(PREF_BACKLASH_X, BACKLASH_DU_X);
   x.backlashSteps = x.backlashDu * x.motorSteps / x.screwPitch;
   
-  if (ACTIVE_A1) {
-    a1.savedBacklashDu = a1.backlashDu = pref.getLong(PREF_BACKLASH_A1, BACKLASH_DU_A1);
-    a1.backlashSteps = a1.backlashDu * a1.motorSteps / a1.screwPitch;
+  if (ACTIVE_Y) {
+    y.savedBacklashDu = y.backlashDu = pref.getLong(PREF_BACKLASH_Y, BACKLASH_DU_Y);
+    y.backlashSteps = y.backlashDu * y.motorSteps / y.screwPitch;
   }
 
   gcodeMotionMode = 0;  // Initialize once at startup
@@ -1402,7 +1349,7 @@ void setup() {
   motionMutex = xSemaphoreCreateMutex();
   savedStarts = starts = min(STARTS_MAX, max(static_cast<int32_t>(1), pref.getInt(PREF_STARTS)));
 
-  a1.savedDisabled = a1.disabled = pref.getBool(PREF_DISABLED_A1, false);
+  y.savedDisabled = y.disabled = pref.getBool(PREF_DISABLED_Y, false);
   savedSpindlePos = spindlePos = pref.getLong(PREF_SPINDLE_POS);
   savedSpindlePosAvg = spindlePosAvg = pref.getLong(PREF_SPINDLE_POS_AVG);
   savedSpindlePosSync = spindlePosSync = pref.getInt(PREF_OUT_OF_SYNC);
@@ -1441,8 +1388,8 @@ void setup() {
   if (!x.needsRest && !x.disabled) {
     DHIGH(x.ena);
   }
-  if (a1.active && !a1.needsRest && !a1.disabled) {
-    DHIGH(a1.ena);
+  if (y.active && !y.needsRest && !y.disabled) {
+    DHIGH(y.ena);
   }
 
   if (!z.needsRest && !z.disabled && DEFAULT_ENABLE_Z) {
@@ -1459,9 +1406,9 @@ void setup() {
     updateEnable(&x);
   }
   
-  if (a1.active) {
-    a1.disabled = !DEFAULT_ENABLE_A1;
-    updateEnable(&a1);
+  if (y.active) {
+    y.disabled = !DEFAULT_ENABLE_Y;
+    updateEnable(&y);
   }
 
   delay(1000);
@@ -1490,7 +1437,7 @@ bool saveToPrefs() {
   if (areToolOffsetsChanged()) saveToolOffsets(pref);
   if (z.backlashDu != z.savedBacklashDu) pref.putLong(PREF_BACKLASH_Z, z.savedBacklashDu = z.backlashDu);
   if (x.backlashDu != x.savedBacklashDu) pref.putLong(PREF_BACKLASH_X, x.savedBacklashDu = x.backlashDu);
-  if (ACTIVE_A1 && a1.backlashDu != a1.savedBacklashDu) pref.putLong(PREF_BACKLASH_A1, a1.savedBacklashDu = a1.backlashDu);
+  if (ACTIVE_Y && y.backlashDu != y.savedBacklashDu) pref.putLong(PREF_BACKLASH_Y, y.savedBacklashDu = y.backlashDu);
 
     // Save MPG prefs using the constants
   if (mpgActiveAxis != savedMpgActiveAxis) {
@@ -1531,6 +1478,110 @@ bool areToolOffsetsChanged() {
     }
   }
   return false;
+}
+
+// M503 - dump all important calibration/offset prefs to serial.
+// Each line is "PREF <type> <key> <value>" so it can be re-imported via M501.
+void printAllPrefs() {
+  Serial.println("; M503 - TurnCNC preference backup");
+  Serial.println("; Paste these lines (one per line) via M501 on a new device to restore.");
+
+  // Home positions
+  Serial.print("PREF float "); Serial.print(PREF_X_HOME_POSITION); Serial.print(" "); Serial.println(x_home_position, 4);
+  Serial.print("PREF float "); Serial.print(PREF_Y_HOME_POSITION); Serial.print(" "); Serial.println(y_home_position, 4);
+  Serial.print("PREF float "); Serial.print(PREF_Z_HOME_POSITION); Serial.print(" "); Serial.println(z_home_position, 4);
+
+  // Backlash
+  Serial.print("PREF long ");  Serial.print(PREF_BACKLASH_Z); Serial.print(" "); Serial.println(z.backlashDu);
+  Serial.print("PREF long ");  Serial.print(PREF_BACKLASH_X); Serial.print(" "); Serial.println(x.backlashDu);
+  if (ACTIVE_Y) {
+    Serial.print("PREF long "); Serial.print(PREF_BACKLASH_Y); Serial.print(" "); Serial.println(y.backlashDu);
+  }
+
+  // Tool offsets (stored in deci-microns as floats in prefs)
+  for (int i = 0; i < MAX_TOOLS; ++i) {
+    String xKey    = "tool" + String(i) + "X";
+    String zKey    = "tool" + String(i) + "Z";
+    String xCompKey = "tool" + String(i) + "U";
+    String zCompKey = "tool" + String(i) + "W";
+    Serial.print("PREF float "); Serial.print(xKey);    Serial.print(" "); Serial.println(toolOffsets[i].xOffsetDu, 2);
+    Serial.print("PREF float "); Serial.print(zKey);    Serial.print(" "); Serial.println(toolOffsets[i].zOffsetDu, 2);
+    Serial.print("PREF float "); Serial.print(xCompKey); Serial.print(" "); Serial.println(toolOffsets[i].xCompDu, 2);
+    Serial.print("PREF float "); Serial.print(zCompKey); Serial.print(" "); Serial.println(toolOffsets[i].zCompDu, 2);
+  }
+
+  Serial.println("; End of backup");
+}
+
+// M501 <type> <key> <value> - restore a single pref from a backup line.
+// Example: M501 float xhpos -81.0000
+// Example: M501 long zbl 200
+// The in-memory variable is also updated where applicable so M500 will persist it.
+bool restorePref(const String& command) {
+  // command is e.g. "M501 float xhpos -81.0000"
+  // Strip leading "M501" token.
+  int firstSpace = command.indexOf(' ');
+  if (firstSpace < 0) {
+    Serial.println("error: M501 requires type, key, and value");
+    return false;
+  }
+  String rest = command.substring(firstSpace + 1);
+  rest.trim();
+
+  // Parse type
+  int sp1 = rest.indexOf(' ');
+  if (sp1 < 0) { Serial.println("error: M501 missing key and value"); return false; }
+  String typeName = rest.substring(0, sp1);
+  rest = rest.substring(sp1 + 1);
+  rest.trim();
+
+  // Parse key
+  int sp2 = rest.indexOf(' ');
+  if (sp2 < 0) { Serial.println("error: M501 missing value"); return false; }
+  String key = rest.substring(0, sp2);
+  String valueStr = rest.substring(sp2 + 1);
+  valueStr.trim();
+
+  Preferences pref;
+  pref.begin(PREF_NAMESPACE);
+
+  if (typeName == "float") {
+    float val = valueStr.toFloat();
+    pref.putFloat(key.c_str(), val);
+
+    // Sync in-memory variables for known float keys
+    if (key == PREF_X_HOME_POSITION) { x_home_position = x_home_position_saved = val; }
+    else if (key == PREF_Y_HOME_POSITION) { y_home_position = y_home_position_saved = val; }
+    else if (key == PREF_Z_HOME_POSITION) { z_home_position = z_home_position_saved = val; }
+    else {
+      // Tool offset keys: tool0X, tool0Z, tool0U, tool0W, etc.
+      for (int i = 0; i < MAX_TOOLS; ++i) {
+        if (key == ("tool" + String(i) + "X")) { toolOffsets[i].xOffsetDu = savedToolOffsets[i].xOffsetDu = val; break; }
+        if (key == ("tool" + String(i) + "Z")) { toolOffsets[i].zOffsetDu = savedToolOffsets[i].zOffsetDu = val; break; }
+        if (key == ("tool" + String(i) + "U")) { toolOffsets[i].xCompDu   = savedToolOffsets[i].xCompDu   = val; break; }
+        if (key == ("tool" + String(i) + "W")) { toolOffsets[i].zCompDu   = savedToolOffsets[i].zCompDu   = val; break; }
+      }
+    }
+  } else if (typeName == "long") {
+    long val = valueStr.toInt();
+    pref.putLong(key.c_str(), val);
+
+    // Sync in-memory variables for known long keys
+    if (key == PREF_BACKLASH_Z) { z.backlashDu = z.savedBacklashDu = val; }
+    else if (key == PREF_BACKLASH_X) { x.backlashDu = x.savedBacklashDu = val; }
+    else if (key == PREF_BACKLASH_Y && ACTIVE_Y) { y.backlashDu = y.savedBacklashDu = val; }
+  } else if (typeName == "int") {
+    int val = (int)valueStr.toInt();
+    pref.putInt(key.c_str(), val);
+  } else {
+    pref.end();
+    Serial.print("error: unknown type '"); Serial.print(typeName); Serial.println("'");
+    return false;
+  }
+
+  pref.end();
+  Serial.print("ok: restored "); Serial.print(typeName); Serial.print(" "); Serial.print(key); Serial.print(" = "); Serial.println(valueStr);
+  return true;
 }
 
 void saveToolOffsets(Preferences& pref) {
@@ -1599,7 +1650,7 @@ void zeroSpindlePos() {
 void markOrigin() {
   markAxisOrigin(&z);
   markAxisOrigin(&x);
-  markAxisOrigin(&a1);
+  markAxisOrigin(&y);
   zeroSpindlePos();
 }
 
@@ -1666,7 +1717,7 @@ unsigned int getTimerLimit() {
   return min(long(65535), long(1000000 / (z.motorSteps * abs(dupr) / z.screwPitch)) - 1); // 1000000/Hz - 1
 }
 
-// Only used for async movement in ASYNC and A1 modes.
+// Only used for async movement in ASYNC and y modes.
 // Keep code in this method to absolute minimum to achieve high stepper speeds.
 void IRAM_ATTR onAsyncTimer() {
   Axis* a = getAsyncAxis();
@@ -1753,13 +1804,13 @@ void reset() {
   x.motorPos = 0;
   x.pendingPos = 0;
   x.disabled = false;
-  a1.nextLeftStopFlag = false;
-  a1.nextRightStopFlag = false;
-  a1.pos = 0;
-  a1.originPos = 0;
-  a1.posGlobal = 0;
-  a1.motorPos = 0;
-  a1.pendingPos = 0;
+  y.nextLeftStopFlag = false;
+  y.nextRightStopFlag = false;
+  y.pos = 0;
+  y.originPos = 0;
+  y.posGlobal = 0;
+  y.motorPos = 0;
+  y.pendingPos = 0;
   auxForward = true;
 
   // Reset spindle RPM display
@@ -1802,7 +1853,7 @@ void setRunningFromLoop(bool running) {
   }
   stepperEnable(&z, running);
   stepperEnable(&x, running);
-  stepperEnable(&a1, running);
+  stepperEnable(&y, running);
   markOrigin();
   if (running) {
     // Starting: enable steppers and set to RUN
@@ -2339,14 +2390,14 @@ int getInt(const String& command, char letter) {
   return getValueString(command, letter).toInt();
 }
 
-void updateAxisSpeeds(long diffX, long diffZ, long diffA1, bool isRapid = false) {
-  if (diffX == 0 && diffZ == 0 && diffA1 == 0) return;
+void updateAxisSpeeds(long diffX, long diffZ, long diffy, bool isRapid = false) {
+  if (diffX == 0 && diffZ == 0 && diffy == 0) return;
   long absX = abs(diffX);
   long absZ = abs(diffZ);
-  long absC = abs(diffA1);
+  long absC = abs(diffy);
   
   // Calculate speed for each axis independently
-  float stepsPerSecX, stepsPerSecZ, stepsPerSecA1;
+  float stepsPerSecX, stepsPerSecZ, stepsPerSecy;
   
   if (isRapid) {
     // G0 rapid move - use per-axis rapid feedrates
@@ -2360,10 +2411,10 @@ void updateAxisSpeeds(long diffX, long diffZ, long diffA1, bool isRapid = false)
     if (stepsPerSecZ > z.speedManualMove) stepsPerSecZ = z.speedManualMove;
     else if (stepsPerSecZ < minStepsPerSecZ) stepsPerSecZ = minStepsPerSecZ;
     
-    stepsPerSecA1 = gcodeRapidFeedDuPerSecA1 * a1.motorSteps / a1.screwPitch;
-    float minStepsPerSecA1 = GCODE_FEED_MIN_DU_SEC * a1.motorSteps / a1.screwPitch;
-    if (stepsPerSecA1 > a1.speedManualMove) stepsPerSecA1 = a1.speedManualMove;
-    else if (stepsPerSecA1 < minStepsPerSecA1) stepsPerSecA1 = minStepsPerSecA1;
+    stepsPerSecy = gcodeRapidFeedDuPerSecy * y.motorSteps / y.screwPitch;
+    float minStepsPerSecy = GCODE_FEED_MIN_DU_SEC * y.motorSteps / y.screwPitch;
+    if (stepsPerSecy > y.speedManualMove) stepsPerSecy = y.speedManualMove;
+    else if (stepsPerSecy < minStepsPerSecy) stepsPerSecy = minStepsPerSecy;
   } else {
     // G1 feed move - use programmed feedrate (same for all axes in coordinated move)
     stepsPerSecX = gcodeFeedDuPerSec * x.motorSteps / x.screwPitch;
@@ -2376,26 +2427,34 @@ void updateAxisSpeeds(long diffX, long diffZ, long diffA1, bool isRapid = false)
     if (stepsPerSecZ > z.speedManualMove) stepsPerSecZ = z.speedManualMove;
     else if (stepsPerSecZ < minStepsPerSecZ) stepsPerSecZ = minStepsPerSecZ;
     
-    stepsPerSecA1 = gcodeFeedDuPerSec * a1.motorSteps / a1.screwPitch;
-    float minStepsPerSecA1 = GCODE_FEED_MIN_DU_SEC * a1.motorSteps / a1.screwPitch;
-    if (stepsPerSecA1 > a1.speedManualMove) stepsPerSecA1 = a1.speedManualMove;
-    else if (stepsPerSecA1 < minStepsPerSecA1) stepsPerSecA1 = minStepsPerSecA1;
+    stepsPerSecy = gcodeFeedDuPerSec * y.motorSteps / y.screwPitch;
+    float minStepsPerSecy = GCODE_FEED_MIN_DU_SEC * y.motorSteps / y.screwPitch;
+    if (stepsPerSecy > y.speedManualMove) stepsPerSecy = y.speedManualMove;
+    else if (stepsPerSecy < minStepsPerSecy) stepsPerSecy = minStepsPerSecy;
   }
   
   float secX = absX / stepsPerSecX;
   float secZ = absZ / stepsPerSecZ;
-  float secA1 = absC / stepsPerSecA1;
-  float sec = ACTIVE_A1 ? max(max(secX, secZ), secA1) : max(secX, secZ);
+  float secy = absC / stepsPerSecy;
+  float sec = ACTIVE_Y ? max(max(secX, secZ), secy) : max(secX, secZ);
   if (sec > 0) {
     x.speedMax = (absX > 0) ? min(stepsPerSecX, absX / sec) : stepsPerSecX;
     z.speedMax = (absZ > 0) ? min(stepsPerSecZ, absZ / sec) : stepsPerSecZ;
-    a1.speedMax = (absC > 0) ? min(stepsPerSecA1, absC / sec) : stepsPerSecA1;
+    y.speedMax = (absC > 0) ? min(stepsPerSecy, absC / sec) : stepsPerSecy;
   } else {
     // No movement or zero time - use feedrate-limited speed
     x.speedMax = stepsPerSecX;
     z.speedMax = stepsPerSecZ;
-    a1.speedMax = stepsPerSecA1;
+    y.speedMax = stepsPerSecy;
   }
+}
+
+float gcodeUnitScaleDu() {
+  return measure == MEASURE_METRIC ? 10000.0 : 254000.0;
+}
+
+long gcodeUnitToDu(float value) {
+  return round(value * gcodeUnitScaleDu());
 }
 
 void setFeedRate(const String& command) {
@@ -2556,7 +2615,7 @@ void gcodeWaitEpsilon(int epsilon) {
 
   while (abs(x.pendingPos) > epsilon ||
          abs(z.pendingPos) > epsilon ||
-         abs(a1.pendingPos) > epsilon ||
+         abs(y.pendingPos) > epsilon ||
          (SPINDLE_PAUSES_GCODE && getApproxRpm() < GCODE_MIN_RPM)) {
 
           checkForStopCommand();
@@ -2577,28 +2636,28 @@ void gcodeWaitStop() {
 void G00_01(const String& command, bool isRapid = false) {
   long xStart = x.pos;
   long zStart = z.pos;
-  long a1Start = a1.pos;
+  long yStart = y.pos;
   long xEnd = command.indexOf(x.name) >= 0 ? mmOrInchToAbsolutePos(&x, getFloat(command, x.name)) : xStart;
   long zEnd = command.indexOf(z.name) >= 0 ? mmOrInchToAbsolutePos(&z, getFloat(command, z.name)) : zStart;
-  long a1End = command.indexOf(a1.name) >= 0 ? mmOrInchToAbsolutePos(&a1, getFloat(command, a1.name)) : a1Start;
+  long yEnd = command.indexOf(y.name) >= 0 ? mmOrInchToAbsolutePos(&y, getFloat(command, y.name)) : yStart;
   long xDiff = xEnd - xStart;
   long zDiff = zEnd - zStart;
-  long a1Diff = a1End - a1Start;
-  updateAxisSpeeds(xDiff, zDiff, a1Diff, isRapid);
+  long yDiff = yEnd - yStart;
+  updateAxisSpeeds(xDiff, zDiff, yDiff, isRapid);
   float precision = isRapid ? RAPID_LINEAR_INTERPOLATION_PRECISION : LINEAR_INTERPOLATION_PRECISION;
-  long chunks = round(max(max(abs(xDiff), abs(zDiff)), abs(a1Diff)) * precision);
+  long chunks = round(max(max(abs(xDiff), abs(zDiff)), abs(yDiff)) * precision);
   for (long i = 0; i < chunks; i++) {
     if (controllerState != STATE_RUN) return;
     float scale = i / float(chunks);
     stepToContinuous(&x, xStart + xDiff * scale);
     stepToContinuous(&z, zStart + zDiff * scale);
-    if (ACTIVE_A1) stepToContinuous(&a1, a1Start + a1Diff * scale);
+    if (ACTIVE_Y) stepToContinuous(&y, yStart + yDiff * scale);
     gcodeWaitNear();
   }
   // Changed: use stepToContinuous instead of stepToFinal
   stepToContinuous(&x, xEnd);
   stepToContinuous(&z, zEnd);
-  if (ACTIVE_A1) stepToContinuous(&a1, a1End);
+  if (ACTIVE_Y) stepToContinuous(&y, yEnd);
   gcodeWaitStop();
 }
 
@@ -2677,6 +2736,8 @@ bool handleGcode(const String& command) {
   } else if (op == 28) {
       handleG28(command);
       return true;
+  } else if (op == 32) {
+    return handleG32(command);
   } else if (op == 33) {
     return handleG33(command);
   } else if (op == 20 || op == 21) {
@@ -2778,6 +2839,11 @@ bool handleMcode(const String& command) {
       Serial.println("No changes to save");
     }
     return true;
+  } else if (op == 501) {
+    return restorePref(command);
+  } else if (op == 503) {
+    printAllPrefs();
+    return true;
   } else if (op == 700) {
     setModeFromTask(MODE_NORMAL);
     return true;
@@ -2869,11 +2935,11 @@ bool handleM206(const String& command) {
     calibratedPos = &x_home_position_calibrated;
     homeDirectionInvert = X_HOME_DIRECTION_INVERT;
   } else if (hasY) {
-    if (!ACTIVE_A1) {
-      Serial.println("Error: Y-axis (A1) not active");
+    if (!ACTIVE_Y) {
+      Serial.println("Error: Y-axis (y) not active");
       return false;
     }
-    axis = &a1;
+    axis = &y;
     axisName = 'Y';
     sensorPin = X_HOME_SENSOR_PIN;
     maxTravel = Y_HOME_MAX_TRAVEL;
@@ -3070,7 +3136,7 @@ bool handleM206Save(const String& command) {
     currentHomePos = &x_home_position;
     prefKey = PREF_X_HOME_POSITION;
   } else if (hasY) {
-    if (!ACTIVE_A1) {
+    if (!ACTIVE_Y) {
       Serial.println("Error: Y-axis not active");
       return false;
     }
@@ -3155,7 +3221,7 @@ bool handleM206Report(const String& command) {
   Serial.println();
   
   // Y-axis
-  if (ACTIVE_A1) {
+  if (ACTIVE_Y) {
     Serial.println("Y-AXIS:");
     Serial.print("  EEPROM:            Y");
     Serial.println(eepromY, 4);
@@ -3339,8 +3405,8 @@ bool handleG28(const String& command) {
     return false;
   }
   
-  if (hasY && !ACTIVE_A1) {
-    Serial.println("Error: Y-axis (A1) not active");
+  if (hasY && !ACTIVE_Y) {
+    Serial.println("Error: Y-axis (y) not active");
     return false;
   }
   
@@ -3351,7 +3417,7 @@ bool handleG28(const String& command) {
                           X_HOME_SLOW_SPEED, X_HOME_BACKOFF,
                           x_home_position,  X_HOME_DIRECTION_INVERT);
   } else if (hasY) {
-    return performAxisHome(&a1, 'Y', X_HOME_SENSOR_PIN,
+    return performAxisHome(&y, 'Y', X_HOME_SENSOR_PIN,
                           Y_HOME_MAX_TRAVEL, Y_HOME_FAST_SPEED,
                           Y_HOME_SLOW_SPEED, Y_HOME_BACKOFF,
                           y_home_position, Y_HOME_DIRECTION_INVERT);
@@ -3382,11 +3448,11 @@ bool handleM220(const String& command) {
     Serial.println("=== Rapid Feed Rates (mm/min) ===");
     float zRate = gcodeRapidFeedDuPerSecZ * 60.0 / (measure == MEASURE_METRIC ? 10000 : 254000);
     float xRate = gcodeRapidFeedDuPerSecX * 60.0 / (measure == MEASURE_METRIC ? 10000 : 254000);
-    float yRate = gcodeRapidFeedDuPerSecA1 * 60.0 / (measure == MEASURE_METRIC ? 10000 : 254000);
+    float yRate = gcodeRapidFeedDuPerSecy * 60.0 / (measure == MEASURE_METRIC ? 10000 : 254000);
     
     Serial.print("Z: "); Serial.println(zRate, 1);
     Serial.print("X: "); Serial.println(xRate, 1);
-    if (ACTIVE_A1) {
+    if (ACTIVE_Y) {
       Serial.print("Y: "); Serial.println(yRate, 1);
     }
     return true;
@@ -3402,7 +3468,7 @@ bool handleM220(const String& command) {
       long duPerSec = round(feedRate * scaleFactor / 60.0);
       gcodeRapidFeedDuPerSecZ = duPerSec;
       gcodeRapidFeedDuPerSecX = duPerSec;
-      gcodeRapidFeedDuPerSecA1 = duPerSec;
+      gcodeRapidFeedDuPerSecy = duPerSec;
       
       Serial.print("All axes rapid feed set to: ");
       Serial.print(feedRate, 1);
@@ -3435,13 +3501,13 @@ bool handleM220(const String& command) {
   }
   
   if (hasY) {
-    if (!ACTIVE_A1) {
+    if (!ACTIVE_Y) {
       Serial.println("Error: Y-axis not active");
       return false;
     }
     float yRate = getFloat(command, 'Y');
     if (yRate > 0) {
-      gcodeRapidFeedDuPerSecA1 = round(yRate * scaleFactor / 60.0);
+      gcodeRapidFeedDuPerSecy = round(yRate * scaleFactor / 60.0);
       Serial.print("Y rapid feed: ");
       Serial.print(yRate, 1);
       Serial.println(" mm/min");
@@ -3468,9 +3534,9 @@ bool handleM17(const String& command) {
     changed = true;
   }
   
-  if (ACTIVE_A1 && (command.indexOf(a1.name) >= 0 || command.length() <= 3)) {
-    a1.disabled = false;
-    updateEnable(&a1);
+  if (ACTIVE_Y && (command.indexOf(y.name) >= 0 || command.length() <= 3)) {
+    y.disabled = false;
+    updateEnable(&y);
     changed = true;
   }
   
@@ -3493,9 +3559,9 @@ bool handleM18(const String& command) {
     changed = true;
   }
   
-  if (ACTIVE_A1 && (command.indexOf(a1.name) >= 0 || command.length() <= 3)) {
-    a1.disabled = true;
-    updateEnable(&a1);
+  if (ACTIVE_Y && (command.indexOf(y.name) >= 0 || command.length() <= 3)) {
+    y.disabled = true;
+    updateEnable(&y);
     changed = true;
   }
   
@@ -3531,12 +3597,12 @@ bool handleM905(const String& command) {
     }
   }
   
-  if (ACTIVE_A1 && command.indexOf(a1.name) >= 0) {
-    float a1BacklashMm = getFloat(command, a1.name);
-    if (a1BacklashMm >= 0) {
-      long a1BacklashDu = round(a1BacklashMm * 10000); // Convert mm to deci-microns
-      a1.backlashDu = a1BacklashDu;
-      a1.backlashSteps = a1BacklashDu * a1.motorSteps / a1.screwPitch;
+  if (ACTIVE_Y && command.indexOf(y.name) >= 0) {
+    float yBacklashMm = getFloat(command, y.name);
+    if (yBacklashMm >= 0) {
+      long yBacklashDu = round(yBacklashMm * 10000); // Convert mm to deci-microns
+      y.backlashDu = yBacklashDu;
+      y.backlashSteps = yBacklashDu * y.motorSteps / y.screwPitch;
       changed = true;
     } else {
       Serial.println("error: backlash must be non-negative");
@@ -3547,196 +3613,152 @@ bool handleM905(const String& command) {
   return changed;
 }
 
-void synchronizeSpindleForThreading(long zStartPos, long threadPitch) {
-  // Set spindle position to match current Z position for clean thread start
-  // This establishes the phase relationship between spindle and Z axis
-  if (xSemaphoreTake(motionMutex, 100) == pdTRUE) {
-    // Calculate what spindle position should be for current Z position
-    long expectedSpindlePos = zStartPos * z.screwPitch * ENCODER_STEPS_FLOAT / (z.motorSteps * threadPitch);
-    
-    // Adjust spindle tracking to match
-    spindlePos = expectedSpindlePos;
-    spindlePosAvg = expectedSpindlePos;
-    spindlePosSync = 0;
-    
-    xSemaphoreGive(motionMutex);
-  }
+bool gcodeError(const String& message, const String& command) {
+  controllerState = STATE_ALARM;
+  Serial.print("error: ");
+  Serial.print(message);
+  Serial.print(" ");
+  Serial.println(command);
+  return false;
 }
 
-void executeThreadingCutMove(long zStart, long zEnd, long xCutDepth, long threadPitch) {
-  // Set up for synchronized motion - let spindle control speed
-  z.speedMax = LONG_MAX;
-  x.speedMax = LONG_MAX;
-  
-  // Position X at cutting depth and hold it there
-  stepToFinal(&x, xCutDepth);
-  gcodeWaitStop();
-  
-  // Follow spindle for Z motion until we reach the end
+long spindleFromPosWithPitch(Axis* a, long pos, long pitchDu) {
+  return round(pos * a->screwPitch * ENCODER_STEPS_FLOAT / a->motorSteps / pitchDu);
+}
+
+
+bool gcodeWaitForSpindle() {
+  while (controllerState == STATE_RUN && getApproxRpm() < GCODE_MIN_RPM) {
+    taskYIELD();
+  }
+  return controllerState == STATE_RUN;
+}
+
+long gcodeWaitForThreadPhase(Axis* lead, long pitchDu) {
+  if (!gcodeWaitForSpindle()) return -1;
+
+  long lastPhase = spindleModulo(spindlePosGlobal - spindleFromPosWithPitch(lead, lead->posGlobal, pitchDu));
   while (controllerState == STATE_RUN) {
-    // Calculate target Z position based on current spindle position
-    // Reading spindlePosAvg without mutex - it's atomic on 32-bit ESP32
-    long targetZ = spindlePosAvg * z.motorSteps / z.screwPitch / ENCODER_STEPS_FLOAT * threadPitch;
-    
-    // Constrain to our threading range
-    if (zEnd > zStart) {
-      targetZ = constrain(targetZ, zStart, zEnd);
-    } else {
-      targetZ = constrain(targetZ, zEnd, zStart);
+    if (getApproxRpm() < GCODE_MIN_RPM) {
+      if (!gcodeWaitForSpindle()) return -1;
+      lastPhase = spindleModulo(spindlePosGlobal - spindleFromPosWithPitch(lead, lead->posGlobal, pitchDu));
     }
-    
-    // Queue the synchronized move - main loop's moveAxis() will execute it
-    stepToContinuous(&z, targetZ);
-    stepToContinuous(&x, xCutDepth);  // Keep X at cutting depth
-    
-    // Check if we've reached the end
-    if (targetZ == zEnd && abs(z.pendingPos) <= GCODE_WAIT_EPSILON_STEPS) {
-      break;
+
+    long phase = spindleModulo(spindlePosGlobal - spindleFromPosWithPitch(lead, lead->posGlobal, pitchDu));
+    if (phase == 0) {
+      return 0;
     }
-    
-    taskYIELD();  // Let main loop process the queued moves
+    if (phase - lastPhase < -ENCODER_STEPS_INT / 2) {
+      return phase;
+    }
+    lastPhase = phase;
+    taskYIELD();
   }
-  
-  // Ensure we end exactly at target
-  stepToFinal(&z, zEnd);
-  gcodeWaitStop();
+  return -1;
 }
 
-// G33 Threading command handler (New)
-// Format: G33 Z[end] X[end] P[pitch] H[passes] Q[start_z] R[start_x]
-// Parameters:
-//   Z - End Z position
-//   X - End X position
-//   P - Thread pitch in mm
-//   H - Number of passes (optional, default 3)
-//   Q - Start Z position (optional, defaults to current position)
-//   R - Start X position (optional, defaults to current position)
-// Example: G33 Z20 X-4.188 P1.5 H4 Q0 R-5 - External M10x1.5 thread
-// Example: G33 Z20 X-5.1 P1.5 H4 Q0 R-4.5 - Internal M10x1.5 thread
-bool handleG33New(const String &command) {
-  // Extract and validate parameters
-  if (command.indexOf('Z') == -1 || command.indexOf('X') == -1 || command.indexOf('P') == -1) {
-    Serial.println("error: G33 requires Z, X, and P parameters");
+bool gcodeMarkThreadOrigin(long spindleAtOrigin) {
+  if (xSemaphoreTake(motionMutex, 100) != pdTRUE) {
+    Serial.println("error: failed to synchronize G32");
     return false;
   }
-  
-  long zStart = command.indexOf('Q') >= 0 ? mmOrInchToAbsolutePos(&z, getFloat(command, 'Q')) : z.pos;
-  long xStart = command.indexOf('R') >= 0 ? mmOrInchToAbsolutePos(&x, getFloat(command, 'R')) : x.pos;
-  long zEnd = mmOrInchToAbsolutePos(&z, getFloat(command, 'Z'));
-  long xEnd = mmOrInchToAbsolutePos(&x, getFloat(command, 'X'));
-  
-  float pitchMm = getFloat(command, 'P');
-  if (pitchMm <= 0) {
-    Serial.println("error: Invalid pitch value");
-    return false;
-  }
-  long threadPitch = round(pitchMm * 10000);
-  
-  int passes = command.indexOf('H') >= 0 ? getInt(command, 'H') : 3;
-  if (passes <= 0 || passes > PASSES_MAX) {
-    Serial.println("error: Invalid number of passes (1-" + String(PASSES_MAX) + ")");
-    return false;
-  }
-  
-  // Validate we're at start position
-  long zTolerance = duToSteps(&z, 200); // 0.02mm tolerance  
-  long xTolerance = duToSteps(&x, 200);
-  
-  if (abs(z.pos - zStart) > zTolerance) {
-    Serial.println("error: Z position mismatch for threading start");
-    Serial.printf("Expected: %.3f, Actual: %.3f\n", 
-        stepsToDu(&z, zStart)/10000.0, 
-        stepsToDu(&z, z.pos)/10000.0);
-    return false;
-  }
-  
-  if (abs(x.pos - xStart) > xTolerance) {
-    Serial.println("error: X position mismatch for threading start");
-    Serial.printf("Expected: %.3f, Actual: %.3f\n", 
-        stepsToDu(&x, xStart)/10000.0, 
-        stepsToDu(&x, x.pos)/10000.0);
-    return false;
-  }
-  
-  // Calculate threading characteristics
-  bool isExternal = (xStart < xEnd);
-  long xDepth = abs(xEnd - xStart);
-  long xDirection = isExternal ? 1 : -1;
-  
-  // Calculate safe retract position
-  long safeRetractSteps = SAFE_DISTANCE_DU * x.motorSteps / x.screwPitch;
-  long xSafe = xStart + (isExternal ? -safeRetractSteps : safeRetractSteps);
-  
-  // Debug output
-  Serial.println("========================================");
-  Serial.println("G33 THREADING");
-  Serial.println("========================================");
-  Serial.printf("Type: %s\n", isExternal ? "EXTERNAL" : "INTERNAL");
-  Serial.printf("Pitch: %.3fmm\n", pitchMm);
-  Serial.printf("Passes: %d\n", passes);
-  Serial.printf("Z: %.3f -> %.3f (%.3fmm travel)\n", 
-      stepsToDu(&z, zStart)/10000.0, 
-      stepsToDu(&z, zEnd)/10000.0,
-      abs(stepsToDu(&z, zEnd - zStart))/10000.0);
-  Serial.printf("X: %.3f -> %.3f (%.3fmm depth)\n",
-      stepsToDu(&x, xStart)/10000.0,
-      stepsToDu(&x, xEnd)/10000.0,
-      abs(stepsToDu(&x, xEnd - xStart))/10000.0);
-  Serial.println("========================================");
-  
-  // Execute threading passes
-  for (int pass = 1; pass <= passes; pass++) {
-    if (controllerState != STATE_RUN) {
-      Serial.println("Threading aborted");
-      return false;
-    }
-    
-    // Calculate depth for this pass (progressive, squared for lighter first passes)
-    float remainingPasses = passes - pass;
-    float depthRatio = 1.0 - pow(remainingPasses / float(passes), 2);
-    long currentXEnd = xStart + round(xDepth * depthRatio * xDirection);
-    
-    Serial.printf("Pass %d/%d: X depth %.3fmm (%.1f%%)\n", 
-        pass, passes,
-        abs(stepsToDu(&x, currentXEnd - xStart))/10000.0,
-        depthRatio * 100);
-    
-    // 1. Position to start of cut
-    z.speedMax = z.speedManualMove;
-    x.speedMax = x.speedManualMove;
-    stepToFinal(&z, zStart);
-    stepToFinal(&x, currentXEnd);
-    gcodeWaitStop();
-    
-    // 2. Synchronize with spindle for threading
-    synchronizeSpindleForThreading(zStart, threadPitch);
-    
-    // 3. Execute threading cut following spindle
-    executeThreadingCutMove(zStart, zEnd, currentXEnd, threadPitch);
-    
-    // 4. Retract to safe position
-    x.speedMax = x.speedManualMove;
-    stepToFinal(&x, xSafe);
-    gcodeWaitStop();
-    
-    // 5. Return to start Z for next pass (if not last pass)
-    if (pass < passes) {
-      z.speedMax = z.speedManualMove;
-      stepToFinal(&z, zStart);
-      gcodeWaitStop();
-    }
-  }
-  
-  // Final positioning - return to start
-  z.speedMax = z.speedManualMove;
-  stepToFinal(&z, zStart);
-  gcodeWaitStop();
-  
-  Serial.println("Threading complete");
-  Serial.println("========================================");
-  
+  markOrigin();
+  spindlePos = spindleAtOrigin;
+  spindlePosAvg = spindleAtOrigin;
+  xSemaphoreGive(motionMutex);
   return true;
 }
+
+
+// G32 - Single-pass spindle-synchronized threading move
+// Format: G32 F[pitch] [X[end]] [Z[end]] [Y[end]]
+// Parameters:
+//   F - Thread pitch in mm per revolution (required, must be positive)
+//   Z - End Z position in mm (optional, defaults to current Z)
+//   X - End X position in mm (optional, defaults to current X)
+//   Y - End Y position in mm (optional, if Y axis active)
+// Notes:
+//   - At least one axis end position must differ from the current position
+//   - Waits for correct spindle phase before starting the cut
+//   - Single pass only - caller is responsible for depth progression and retract
+//   - For tapered threads, specify both X and Z end positions
+// Example: G32 Z-25 F1.5             - Right-hand thread, Z only
+// Example: G32 Z-25 X-4.2 F1.5      - Right-hand thread with taper
+// Example: G32 Z25 F1.5              - Left-hand thread (positive Z direction)
+bool handleG32(const String& command) {
+    // G32 uses F as thread lead per spindle revolution, not feed per minute.
+    float feed = getFloat(command, 'F');
+    if (feed <= 0) {
+      return gcodeError("G32 requires positive F pitch", command);
+    }
+
+    long pitchDuAbs = abs(gcodeUnitToDu(feed));
+    if (pitchDuAbs == 0 || pitchDuAbs > DUPR_MAX) {
+      return gcodeError("G32 F pitch out of range", command);
+    }
+
+    long xStart = x.pos;
+    long zStart = z.pos;
+    long yStart = y.pos;
+    long xEnd = command.indexOf(x.name) >= 0 ? mmOrInchToAbsolutePos(&x, getFloat(command, x.name)) : xStart;
+    long zEnd = command.indexOf(z.name) >= 0 ? mmOrInchToAbsolutePos(&z, getFloat(command, z.name)) : zStart;
+    long yEnd = command.indexOf(y.name) >= 0 ? mmOrInchToAbsolutePos(&y, getFloat(command, y.name)) : yStart;
+    long xDiff = xEnd - xStart;
+    long zDiff = zEnd - zStart;
+    long yDiff = yEnd - yStart;
+
+    Axis* lead = NULL;
+    long leadDiff = 0;
+    if (zDiff != 0) {
+      lead = &z;
+      leadDiff = zDiff;
+    } else if (xDiff != 0) {
+      lead = &x;
+      leadDiff = xDiff;
+    } else if (ACTIVE_Y && yDiff != 0) {
+      lead = &y;
+      leadDiff = yDiff;
+    } else {
+      return gcodeError("G32 requires an axis move", command);
+    }
+
+    long pitchDu = leadDiff > 0 ? pitchDuAbs : -pitchDuAbs;
+    long spindleTarget = spindleFromPosWithPitch(lead, leadDiff, pitchDu);
+    if (spindleTarget <= 0) {
+      return gcodeError("G32 move too short for pitch", command);
+    }
+
+    long spindleAtOrigin = gcodeWaitForThreadPhase(lead, pitchDu);
+    if (spindleAtOrigin < 0) return true;
+    if (!gcodeMarkThreadOrigin(spindleAtOrigin)) return false;
+
+    x.speedMax = LONG_MAX;
+    z.speedMax = LONG_MAX;
+    y.speedMax = LONG_MAX;
+
+    while (controllerState == STATE_RUN) {
+      long spindle = spindlePosAvg;
+      bool finished = spindle >= spindleTarget;
+      float progress = finished ? 1.0 : spindle / float(spindleTarget);
+      if (progress < 0) progress = 0;
+      else if (progress > 1) progress = 1;
+
+      stepToContinuous(&x, round(xDiff * progress));
+      stepToContinuous(&z, round(zDiff * progress));
+      if (ACTIVE_Y) stepToContinuous(&y, round(yDiff * progress));
+
+      if (finished) break;
+      taskYIELD();
+    }
+
+    if (controllerState != STATE_RUN) return true;
+    stepToFinal(&x, xDiff);
+    stepToFinal(&z, zDiff);
+    if (ACTIVE_Y) stepToFinal(&y, yDiff);
+    gcodeWaitStop();
+    return true;
+}
+
 
 
 // G33 Threading command handler (Legacy)
@@ -4045,7 +4067,7 @@ bool handleG10(const String& command) {
 bool handleG92(const String& command) {
   bool changed = false;
   
-  // Check for X, Y(A1), Z axis parameters
+  // Check for X, Y(y), Z axis parameters
   if (command.indexOf(z.name) >= 0) {
     float value = getFloat(command, z.name);
     long steps = round(value * (measure == MEASURE_METRIC ? 10000 : 254000) / z.screwPitch * z.motorSteps);
@@ -4060,10 +4082,10 @@ bool handleG92(const String& command) {
     changed = true;
   }
   
-  if (command.indexOf(a1.name) >= 0) {
-    float value = getFloat(command, a1.name);
-    long steps = round(value * (measure == MEASURE_METRIC ? 10000 : 254000) / a1.screwPitch * a1.motorSteps);
-    a1.originPos = steps - a1.pos;
+  if (command.indexOf(y.name) >= 0) {
+    float value = getFloat(command, y.name);
+    long steps = round(value * (measure == MEASURE_METRIC ? 10000 : 254000) / y.screwPitch * y.motorSteps);
+    y.originPos = steps - y.pos;
     changed = true;
   }
 
@@ -4077,7 +4099,7 @@ bool handleG92(const String& command) {
   if (!changed && command.length() <= 3) {
     z.originPos = -z.pos;
     x.originPos = -x.pos;
-    if (ACTIVE_A1) a1.originPos = -a1.pos;
+    if (ACTIVE_Y) y.originPos = -y.pos;
     changed = true;
   }
   
@@ -4144,15 +4166,17 @@ bool handleGcodeCommand(String command) {
   // Update position for relative calculations right before performing them.
   z.gcodeRelativePos = gcodeAbsolutePositioning ? -z.originPos : z.pos;
   x.gcodeRelativePos = gcodeAbsolutePositioning ? -x.originPos : x.pos;
-  a1.gcodeRelativePos = gcodeAbsolutePositioning ? -a1.originPos : a1.pos;
+  y.gcodeRelativePos = gcodeAbsolutePositioning ? -y.originPos : y.pos;
 
-  setFeedRate(command);
+  if (!(code == 'G' && getInt(command, 'G') == 32)) {
+    setFeedRate(command);
+  }
   setSpindleSpeed(command);
   switch (code) {
     case 'G':
     case NAME_Z:
     case NAME_X:
-    case NAME_A1:
+    case NAME_Y:
       return handleGcode(command);
     case 'F': return true; /* feed already handled above */
     case 'S': return true; /* spindle speed already handled above */
@@ -4309,13 +4333,13 @@ void applySettings() {
     applyRightStop(&x);
     x.nextRightStopFlag = false;
   }
-  if (a1.nextLeftStopFlag) {
-    applyLeftStop(&a1);
-    a1.nextLeftStopFlag = false;
+  if (y.nextLeftStopFlag) {
+    applyLeftStop(&y);
+    y.nextLeftStopFlag = false;
   }
-  if (a1.nextRightStopFlag) {
-    applyRightStop(&a1);
-    a1.nextRightStopFlag = false;
+  if (y.nextRightStopFlag) {
+    applyRightStop(&y);
+    y.nextRightStopFlag = false;
   }
   if (nextRunningFlag) {
     setRunningFromLoop(nextRunning);
@@ -4364,7 +4388,7 @@ void loop() {
 
   moveAxis(&z);
   moveAxis(&x);
-  if (ACTIVE_A1) moveAxis(&a1);
+  if (ACTIVE_Y) moveAxis(&y);
 
   xSemaphoreGive(motionMutex);
 
