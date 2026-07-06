@@ -61,17 +61,6 @@ const long BACKLASH_DU_Y = 200; // Assuming no backlash on the worm gear
 const char NAME_Y = 'Y'; // Text shown on screen before axis position value, GCode axis name
 const bool MPG_INVERT_Y = false; // Set to true to reverse Y axis MPG direction
 
-// Manual handwheels on y and A2. Ignore if you don't have them installed.
-const bool PULSE_1_USE = false; // Whether there's a pulse generator connected on y1-y3 to be used for movement.
-const char PULSE_1_AXIS = NAME_Z; // Set to NAME_X to make y1-y3 pulse generator control X instead.
-const bool PULSE_1_INVERT = false; // Set to true to change the direction in which encoder moves the axis
-const bool PULSE_2_USE = false; // Whether there's a pulse generator connected on A21-A23 to be used for movement.
-const char PULSE_2_AXIS = NAME_X; // Set to NAME_Z to make A21-A23 pulse generator control Z instead.
-const bool PULSE_2_INVERT = true; // Set to false to change the direction in which encoder moves the axis
-const float PULSE_PER_REVOLUTION = 100; // PPR of handwheels used on y and/or A2.
-const long PULSE_MIN_WIDTH_US = 1000; // Microseconds width of the pulse that is required for it to be registered. Prevents noise.
-const long PULSE_HALF_BACKLASH = 2; // Prevents spurious reverses when moving using a handwheel. Raise to 3 or 4 if they still happen.
-
 const int ENCODER_STEPS_INT = ENCODER_PPR * 2; // Number of encoder impulses PCNT counts per revolution of the spindle
 const int ENCODER_FILTER = 2; // Encoder pulses shorter than this will be ignored. Clock cycles, 1 - 1023.
 const int PCNT_LIM = 31000; // Limit used in hardware pulse counter logic.
@@ -88,7 +77,7 @@ const long STEPPED_ENABLE_DELAY_MS = 100; // Delay after stepper is enabled and 
 float x_home_position = -81.0;  // Position where sensor triggers (will be calibrated)
 float x_home_position_saved = -81.0;
 float x_home_position_calibrated = 0.0; // Set this after running M206 calibration
-const long X_HOME_MAX_TRAVEL = 80; // Maximum travel distance when homing (mm)
+const long X_HOME_MAX_TRAVEL = 100; // Maximum travel distance when homing (mm)
 const long X_HOME_FAST_SPEED = 200; // Fast approach speed (mm/min)
 const long X_HOME_SLOW_SPEED = 50;  // Slow final approach speed (mm/min)
 const long X_HOME_BACKOFF = 2;      // Distance to back off after fast trigger (mm)
@@ -97,7 +86,7 @@ const bool X_HOME_DIRECTION_INVERT = false; //set to true to invert direction
 float y_home_position = -81.0;  // Position where sensor triggers (will be calibrated)
 float y_home_position_saved = -81.0;
 float y_home_position_calibrated = 0.0; // Set this after running M206 calibration
-const long Y_HOME_MAX_TRAVEL = 80; // Maximum travel distance when homing (mm)
+const long Y_HOME_MAX_TRAVEL = 150; // Maximum travel distance when homing (mm)
 const long Y_HOME_FAST_SPEED = 200; // Fast approach speed (mm/min)
 const long Y_HOME_SLOW_SPEED = 50;  // Slow final approach speed (mm/min)
 const long Y_HOME_BACKOFF = 2;      // Distance to back off after fast trigger (mm)
@@ -106,7 +95,7 @@ const bool Y_HOME_DIRECTION_INVERT = true; //set to true to invert direction
 float z_home_position = -81.0;  // Position where sensor triggers (will be calibrated)
 float z_home_position_saved = -81.0;
 float z_home_position_calibrated = 0.0; // Set this after running M206 calibration
-const long Z_HOME_MAX_TRAVEL = 80; // Maximum travel distance when homing (mm)
+const long Z_HOME_MAX_TRAVEL = 100; // Maximum travel distance when homing (mm)
 const long Z_HOME_FAST_SPEED = 200; // Fast approach speed (mm/min)
 const long Z_HOME_SLOW_SPEED = 50;  // Slow final approach speed (mm/min)
 const long Z_HOME_BACKOFF = 2;      // Distance to back off after fast trigger (mm)
@@ -360,6 +349,7 @@ struct Axis {
   long backlashDu;     // Backlash in deci-microns
   long savedBacklashDu; // Value saved in Preferences
   long backlashSteps; // amount of steps in reverse direction to re-engage the carriage
+  bool backlashPositiveOnly; // if true, only compensate backlash on positive-direction moves (e.g. vertical axis loaded by gravity)
   long gcodeRelativePos; // absolute position in steps that relative GCode refers to
 
   int ena; // Enable pin of this motor
@@ -418,6 +408,7 @@ void initAxis(Axis* a, char name, bool active, bool rotational, float motorSteps
   a->estopSteps = maxTravelMm * 10000 / a->screwPitch * a->motorSteps;
   a->backlashDu = backlashDu;
   a->backlashSteps = backlashDu * a->motorSteps / a->screwPitch;
+  a->backlashPositiveOnly = false;
   a->gcodeRelativePos = 0;
 
   a->ena = ena;
@@ -561,7 +552,7 @@ String gcodeCommand = "";
 long gcodeFeedDuPerSec = GCODE_FEED_DEFAULT_DU_SEC;
 long gcodeRapidFeedDuPerSecZ = 166667;   // 1000 mm/min
 long gcodeRapidFeedDuPerSecX = 83333;    // 500 mm/min  
-long gcodeRapidFeedDuPerSecy = 83333;   // 500 mm/min
+long gcodeRapidFeedDuPerSecY = 83333;   // 500 mm/min
 int gcodeMotionMode = 0;  // Modal motion mode: 0=G0 (rapid), 1=G1 (feed)
 bool gcodeAbsolutePositioning = true;
 bool gcodeInBrace = false;
@@ -804,9 +795,9 @@ void processMPGCommand(const String& cmd) {
     if (now - lastMPGStatusTime >= 90) {
       printMPGStatusResponse();
       lastMPGStatusTime = now;
-      Serial.print("MPG? t="); Serial.print(now);
-      Serial.print(" X="); Serial.print(x.pos);
-      Serial.print(" Z="); Serial.println(z.pos);
+      // Serial.print("MPG? t="); Serial.print(now);
+      // Serial.print(" X="); Serial.print(x.pos);
+      // Serial.print(" Z="); Serial.println(z.pos);
     }
   } else if (cmd == "!") {
     if (controllerState == STATE_HOLD) {
@@ -1331,6 +1322,7 @@ void setup() {
   initAxis(&z, NAME_Z, true, false, MOTOR_STEPS_Z, SCREW_Z_DU, SPEED_START_Z, SPEED_MANUAL_MOVE_Z, ACCELERATION_Z, INVERT_Z, NEEDS_REST_Z, MAX_TRAVEL_MM_Z, BACKLASH_DU_Z, Z_ENA, Z_DIR, Z_STEP);
   initAxis(&x, NAME_X, true, false, MOTOR_STEPS_X, SCREW_X_DU, SPEED_START_X, SPEED_MANUAL_MOVE_X, ACCELERATION_X, INVERT_X, NEEDS_REST_X, MAX_TRAVEL_MM_X, BACKLASH_DU_X, X_ENA, X_DIR, X_STEP);
   initAxis(&y, NAME_Y, ACTIVE_Y, false, MOTOR_STEPS_Y, SCREW_Y_DU, SPEED_START_Y, SPEED_MANUAL_MOVE_Y, ACCELERATION_Y, INVERT_Y, NEEDS_REST_Y, MAX_TRAVEL_MM_Y, BACKLASH_DU_Y, Y_ENA, Y_DIR, Y_STEP);
+  y.backlashPositiveOnly = true; // Y is vertical: gravity loads the nut downward, so backlash only occurs when moving up (positive)
 
   // Load saved backlash values (after initAxis)
   z.savedBacklashDu = z.backlashDu = pref.getLong(PREF_BACKLASH_Z, BACKLASH_DU_Z);
@@ -1932,7 +1924,11 @@ bool stepTo(Axis* a, long newPos, bool continuous) {
     if (newPos == a->pos) {
       a->pendingPos = 0;
     } else {
-      a->pendingPos = newPos - a->motorPos - (newPos > a->pos ? 0 : a->backlashSteps);
+      if (a->backlashPositiveOnly) {
+        a->pendingPos = newPos - a->motorPos + (newPos > a->pos ? a->backlashSteps : 0);
+      } else {
+        a->pendingPos = newPos - a->motorPos - (newPos < a->pos ? a->backlashSteps : 0);
+      }
     }
     xSemaphoreGive(a->mutex);
     return true;
@@ -2017,9 +2013,9 @@ void moveAxis(Axis* a) {
       DLOW(a->step);
       int delta = dir ? 1 : -1;
       a->pendingPos -= delta;
-      if (dir && a->motorPos >= a->pos) {
+      if (dir && (a->backlashPositiveOnly ? a->motorPos >= (a->pos + a->backlashSteps) : a->motorPos >= a->pos)) {
         a->pos++;
-      } else if (!dir && a->motorPos <= (a->pos - a->backlashSteps)) {
+      } else if (!dir && (a->backlashPositiveOnly ? a->motorPos <= a->pos : a->motorPos <= (a->pos - a->backlashSteps))) {
         a->pos--;
       }
       a->motorPos += delta;
@@ -2411,7 +2407,7 @@ void updateAxisSpeeds(long diffX, long diffZ, long diffy, bool isRapid = false) 
     if (stepsPerSecZ > z.speedManualMove) stepsPerSecZ = z.speedManualMove;
     else if (stepsPerSecZ < minStepsPerSecZ) stepsPerSecZ = minStepsPerSecZ;
     
-    stepsPerSecy = gcodeRapidFeedDuPerSecy * y.motorSteps / y.screwPitch;
+    stepsPerSecy = gcodeRapidFeedDuPerSecY * y.motorSteps / y.screwPitch;
     float minStepsPerSecy = GCODE_FEED_MIN_DU_SEC * y.motorSteps / y.screwPitch;
     if (stepsPerSecy > y.speedManualMove) stepsPerSecy = y.speedManualMove;
     else if (stepsPerSecy < minStepsPerSecy) stepsPerSecy = minStepsPerSecy;
@@ -3448,7 +3444,7 @@ bool handleM220(const String& command) {
     Serial.println("=== Rapid Feed Rates (mm/min) ===");
     float zRate = gcodeRapidFeedDuPerSecZ * 60.0 / (measure == MEASURE_METRIC ? 10000 : 254000);
     float xRate = gcodeRapidFeedDuPerSecX * 60.0 / (measure == MEASURE_METRIC ? 10000 : 254000);
-    float yRate = gcodeRapidFeedDuPerSecy * 60.0 / (measure == MEASURE_METRIC ? 10000 : 254000);
+    float yRate = gcodeRapidFeedDuPerSecY * 60.0 / (measure == MEASURE_METRIC ? 10000 : 254000);
     
     Serial.print("Z: "); Serial.println(zRate, 1);
     Serial.print("X: "); Serial.println(xRate, 1);
@@ -3468,7 +3464,7 @@ bool handleM220(const String& command) {
       long duPerSec = round(feedRate * scaleFactor / 60.0);
       gcodeRapidFeedDuPerSecZ = duPerSec;
       gcodeRapidFeedDuPerSecX = duPerSec;
-      gcodeRapidFeedDuPerSecy = duPerSec;
+      gcodeRapidFeedDuPerSecY = duPerSec;
       
       Serial.print("All axes rapid feed set to: ");
       Serial.print(feedRate, 1);
@@ -3507,7 +3503,7 @@ bool handleM220(const String& command) {
     }
     float yRate = getFloat(command, 'Y');
     if (yRate > 0) {
-      gcodeRapidFeedDuPerSecy = round(yRate * scaleFactor / 60.0);
+      gcodeRapidFeedDuPerSecY = round(yRate * scaleFactor / 60.0);
       Serial.print("Y rapid feed: ");
       Serial.print(yRate, 1);
       Serial.println(" mm/min");
