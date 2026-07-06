@@ -4371,10 +4371,8 @@ void loop() {
   //   processSpindleCounter();
   // }
 
-
   processSpindleCounter();
   discountFullSpindleTurns();
-  unsigned long t3 = micros();
 
   if (controllerState != STATE_RUN || dupr == 0 || spindlePosSync != 0) {
     // None of the modes work.
